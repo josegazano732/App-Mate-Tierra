@@ -82,18 +82,15 @@ header.scrolled {
 }
 
 .logo-badge {
-  width: 82px;
-  height: 82px;
-  border-radius: 18px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  box-shadow:
-    0 18px 44px rgba(0, 0, 0, 0.22),
-    0 1px 0 rgba(255, 255, 255, 0.12) inset;
-  backdrop-filter: blur(10px);
+  padding: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  width: auto;
+  height: auto;
 }
 
 .brand {
@@ -129,19 +126,17 @@ header.scrolled {
 }
 
 .logo-image {
-  width: 76px;
-  height: 76px;
-  border-radius: 14px;
+  width: 82px;
+  height: 82px;
+  border-radius: 0;
   object-fit: contain;
-  box-shadow:
-    0 14px 34px rgba(0, 0, 0, 0.26),
-    0 1px 0 rgba(255, 255, 255, 0.12) inset;
+  box-shadow: none;
   transition: transform 0.2s;
 }
 
 .logo:hover .logo-image {
-  transform: scale(1.08) rotate(-2deg);
-  box-shadow: 0 4px 24px rgba(0,255,163,0.12);
+  transform: scale(1.03);
+  box-shadow: none;
 }
 
 .menu-toggle {

@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProductService, Product } from '../../services/product.service';
+import { CartService } from '../../services/cart.service';
 
 @Component({
   selector: 'app-product-carousel',
@@ -10,6 +11,7 @@ import { ProductService, Product } from '../../services/product.service';
 export class ProductCarouselComponent implements OnInit {
   products: Product[] = [];
   visibleProducts: Product[] = [];
+  skeletonCards = Array.from({ length: 4 });
   currentGroup = 0;
   productsPerGroup = 4;
   totalGroups: number[] = [];
@@ -19,6 +21,7 @@ export class ProductCarouselComponent implements OnInit {
 
   constructor(
     private productService: ProductService,
+    private cartService: CartService,
     private router: Router
   ) {}
 
@@ -83,6 +86,26 @@ export class ProductCarouselComponent implements OnInit {
     this.router.navigate(['/productos', productId]);
   }
 
+  addToCart(product: Product) {
+    if (!product?.id) {
+      return;
+    }
+
+    if ((product.stock ?? 0) <= 0) {
+      return;
+    }
+
+    const unitPrice = product.discount ? this.getDisplayPrice(product) : product.price;
+
+    this.cartService.addToCart({
+      id: product.id,
+      name: product.name,
+      price: unitPrice,
+      originalPrice: product.price,
+      quantity: 1
+    });
+  }
+
   getDisplayPrice(product: Product): number {
     if (!product?.price && product?.price !== 0) {
       return 0;
@@ -103,5 +126,42 @@ export class ProductCarouselComponent implements OnInit {
 
   getReviews(product: Product): number {
     return product?.reviews ?? 24;
+  }
+
+  getStockBadgeLabel(product: Product): string {
+    const stock = product?.stock ?? 0;
+    if (stock <= 0) {
+      return 'Sin stock';
+    }
+    if (stock <= 5) {
+      return 'Últimas unidades';
+    }
+    return 'Disponible';
+  }
+
+  getStockBadgeClass(product: Product): string {
+    const stock = product?.stock ?? 0;
+    if (stock <= 0) {
+      return 'out';
+    }
+    if (stock <= 5) {
+      return 'low';
+    }
+    return 'ok';
+  }
+
+  getStockBadgeIcon(product: Product): string {
+    const stock = product?.stock ?? 0;
+    if (stock <= 0) {
+      return 'fa-times-circle';
+    }
+    if (stock <= 5) {
+      return 'fa-bolt';
+    }
+    return 'fa-check-circle';
+  }
+
+  trackByProductId(_index: number, product: Product): string {
+    return product.id;
   }
 }

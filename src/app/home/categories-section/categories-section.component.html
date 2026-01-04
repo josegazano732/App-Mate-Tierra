@@ -34,58 +34,29 @@
 
     <div class="categories-mosaic" *ngIf="!isLoading && !errorMessage">
       <article
-        class="mosaic-card"
+        class="mosaic-card featured-only"
         *ngFor="let showcase of showcases; index as i"
         data-aos="fade-up"
         [attr.data-aos-delay]="80 * i">
         <a
-          class="mosaic-surface"
+          class="featured-link"
           [routerLink]="['/productos']"
           [queryParams]="{categoria: showcase.category.slug}"
-          [attr.aria-label]="'Ver colección ' + showcase.category.name">
-          <div class="mosaic-bg">
-            <img
-              [src]="showcase.coverImage"
-              [alt]="'Colección ' + showcase.category.name"
-              loading="lazy"
-              (error)="handleImageError($event, showcase.category.image)">
-          </div>
-
-          <div class="mosaic-overlay"></div>
-
-          <header class="mosaic-header">
-            <span class="mosaic-chip">{{ showcase.category.name }}</span>
-            <span class="mosaic-count">
-              <i class="fas fa-box"></i> {{ showcase.totalProducts || 0 }}
-            </span>
-          </header>
-
-          <div class="mosaic-body">
-            <h3 class="mosaic-title">{{ showcase.category.name }}</h3>
-            <p class="mosaic-description">{{ showcase.description }}</p>
-
-            <div class="mosaic-featured" *ngIf="showcase.featuredProduct as featured">
-              <div class="featured-left">
-                <span class="featured-tag">Producto insignia</span>
-                <span class="featured-name">{{ featured.name }}</span>
-                <span class="featured-price" *ngIf="featured.price">{{ featured.price | currency:'ARS':'symbol-narrow' }}</span>
-              </div>
-              <div class="featured-thumb">
-                <img [src]="featured.image" [alt]="featured.name" loading="lazy">
-              </div>
+          [attr.aria-label]="'Ver productos de ' + showcase.category.name">
+          <div class="mosaic-featured" *ngIf="showcase.featuredProduct as featured">
+            <div class="featured-left">
+              <span class="featured-tag">{{ showcase.category.name }}</span>
+              <span class="featured-name">{{ featured.name }}</span>
+              <span class="featured-price" *ngIf="featured.price">{{ featured.price | currency:'ARS':'symbol-narrow' }}</span>
             </div>
-
-            <div class="mosaic-pills" *ngIf="showcase.additionalProducts.length">
-              <span class="pill" *ngFor="let product of showcase.additionalProducts">{{ product.name }}</span>
+            <div class="featured-thumb">
+              <img
+                [src]="featured.image"
+                [alt]="featured.name"
+                loading="lazy"
+                (error)="handleImageError($event, '')">
             </div>
           </div>
-
-          <footer class="mosaic-footer">
-            <span class="mosaic-link">
-              Ver colección
-              <i class="fas fa-arrow-right"></i>
-            </span>
-          </footer>
         </a>
       </article>
     </div>

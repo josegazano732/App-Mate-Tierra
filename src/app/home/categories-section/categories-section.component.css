@@ -104,17 +104,17 @@
 
 .mosaic-card {
   grid-column: span 4;
-  min-height: 380px;
+  min-height: 320px;
 }
 
 .mosaic-card:nth-child(1) {
   grid-column: span 7;
-  min-height: 430px;
+  min-height: 360px;
 }
 
 .mosaic-card:nth-child(2) {
   grid-column: span 5;
-  min-height: 430px;
+  min-height: 360px;
 }
 
 .mosaic-surface {
@@ -134,6 +134,51 @@
 .mosaic-surface:hover {
   transform: translateY(-8px);
   box-shadow: 0 30px 72px rgba(22, 40, 31, 0.20);
+}
+
+/* Mode: mostrar solo el bloque featured (sin card completa) */
+.mosaic-card.featured-only {
+  min-height: auto;
+}
+
+.featured-link {
+  display: block;
+  text-decoration: none;
+  border-radius: 22px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid rgba(22, 40, 31, 0.10);
+  box-shadow: 0 18px 44px rgba(22, 40, 31, 0.12);
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+.featured-link:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 24px 56px rgba(22, 40, 31, 0.16);
+}
+
+.mosaic-card.featured-only .mosaic-featured {
+  margin-top: 0;
+  border-radius: 0;
+  border: 0;
+  background:
+    radial-gradient(900px circle at 10% 10%, rgba(0, 255, 163, 0.12), transparent 55%),
+    linear-gradient(135deg, rgba(22, 40, 31, 0.92), rgba(31, 69, 45, 0.90));
+  backdrop-filter: none;
+  padding: 1.05rem 1.1rem;
+  grid-template-columns: minmax(0, 1fr) 86px;
+}
+
+.mosaic-card.featured-only .featured-tag {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.mosaic-card.featured-only .featured-name {
+  color: rgba(255, 255, 255, 0.96);
+}
+
+.mosaic-card.featured-only .featured-price {
+  color: rgba(255, 255, 255, 0.92);
 }
 
 .mosaic-bg {
@@ -275,28 +320,6 @@
   object-fit: cover;
 }
 
-.mosaic-pills {
-  margin-top: 0.9rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.pill {
-  display: inline-flex;
-  max-width: 100%;
-  padding: 0.42rem 0.75rem;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.10);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.88);
-  font-weight: 700;
-  font-size: 0.85rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
 .mosaic-footer {
   position: relative;
   z-index: 1;
@@ -335,7 +358,7 @@
   .mosaic-card:nth-child(1),
   .mosaic-card:nth-child(2) {
     grid-column: span 12;
-    min-height: 420px;
+    min-height: 360px;
   }
 }
 
@@ -356,8 +379,4 @@
     width: 100%;
     height: 160px;
   }
-}
-
-.cta-button {
-  background: none;
 }
