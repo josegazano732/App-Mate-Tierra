@@ -1,61 +1,105 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
 import { Sale } from '../../services/sales.service';
+import { PaymentMethod } from '../../services/payment-methods.service';
+
+interface SaleCard {
+  sale: Sale;
+  shortId: string;
+  itemsLabel: string;
+  paymentSummaries: { name: string; amount?: number }[];
+}
+
+interface SalesMetrics {
+  completedCount: number;
+  cancelledCount: number;
+  totalRevenue: number;
+  averageTicket: number;
+  totalItems: number;
+  latestSaleDate: string | null;
+}
 
 @Component({
   selector: 'app-recent-sales',
   templateUrl: './recent-sales.component.html',
   styleUrls: ['./recent-sales.component.css']
 })
-export class RecentSalesComponent {
+export class RecentSalesComponent implements OnChanges {
   @Input() recentSales: Sale[] = [];
   @Input() isLoading: boolean = false;
   @Input() errorMessage: string = '';
-  @Input() paymentMethods: any[] = [];
+  @Input() paymentMethods: PaymentMethod[] = [];
   @Output() cancelSale = new EventEmitter<string>();
+
+  saleCards: SaleCard[] = [];
+  metrics: SalesMetrics = {
+    completedCount: 0,
+    cancelledCount: 0,
+    totalRevenue: 0,
+    averageTicket: 0,
+    totalItems: 0,
+    latestSaleDate: null
+  };
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['recentSales'] || changes['isLoading'] || changes['paymentMethods']) {
+      this.rebuildViewModel();
+    }
+  }
 
   onCancelSale(id: string) {
     this.cancelSale.emit(id);
   }
 
-  get completedSales(): Sale[] {
-    return (this.recentSales || []).filter(sale => sale.status === 'completed');
+  trackBySaleId(_index: number, card: SaleCard): string {
+    return card.sale.id;
   }
 
-  get completedSalesCount(): number {
-    return this.completedSales.length;
-  }
-
-  get cancelledSalesCount(): number {
-    return (this.recentSales || []).filter(sale => sale.status === 'cancelled').length;
-  }
-
-  get totalRecentRevenue(): number {
-    return this.completedSales.reduce((sum, sale) => sum + (sale.total_amount || 0), 0);
-  }
-
-  get averageTicket(): number {
-    return this.completedSalesCount ? this.totalRecentRevenue / this.completedSalesCount : 0;
-  }
-
-  get totalItemsSold(): number {
-    return this.completedSales.reduce((sum, sale) => {
-      const items = sale.items || [];
-      return sum + items.reduce((itemSum, item) => itemSum + (item.quantity || 0), 0);
-    }, 0);
-  }
-
-  get latestSaleDate(): string | null {
-    if (!this.recentSales || this.recentSales.length === 0) {
-      return null;
+  private rebuildViewModel(): void {
+    if (this.isLoading) {
+      this.saleCards = [];
+      return;
     }
-    return this.recentSales[0]?.created_at || null;
+
+    const sales = this.recentSales || [];
+    const paymentCatalog = this.paymentMethods || [];
+
+    const completed = sales.filter(sale => sale.status === 'completed');
+    const cancelledCount = sales.filter(sale => sale.status === 'cancelled').length;
+
+    const totalRevenue = completed.reduce((sum, sale) => sum + (sale.total_amount || 0), 0);
+    const totalItems = completed.reduce((sum, sale) => sum + this.countItems(sale), 0);
+    const averageTicket = completed.length ? totalRevenue / completed.length : 0;
+    const latestSaleDate = sales.length ? (sales[0]?.created_at || null) : null;
+
+    this.metrics = {
+      completedCount: completed.length,
+      cancelledCount,
+      totalRevenue,
+      averageTicket,
+      totalItems,
+      latestSaleDate
+    };
+
+    this.saleCards = sales.map((sale) => ({
+      sale,
+      shortId: this.formatSaleId(sale.id),
+      itemsLabel: this.formatItemsLabel(sale),
+      paymentSummaries: this.buildPaymentSummaries(sale, paymentCatalog)
+    }));
   }
 
-  getPaymentMethodsForSale(sale: Sale): { name: string; amount?: number }[] {
-    if (!sale || !sale.payment_method || !this.paymentMethods) return [];
-    const methods = sale.payment_method.split(',');
+  private buildPaymentSummaries(sale: Sale, catalog: PaymentMethod[]): { name: string; amount?: number }[] {
+    if (!sale?.payment_method) {
+      return [];
+    }
+
+    const methods = sale.payment_method
+      .split(',')
+      .map(method => method.trim())
+      .filter(Boolean);
+
     return methods.map((method, idx) => {
-      const paymentMethod = this.paymentMethods.find(m => m.code === method);
+      const paymentMethod = catalog?.find(m => m.code === method);
       const split = sale.payment_splits?.[idx];
       return {
         name: paymentMethod ? paymentMethod.name : method,
@@ -64,15 +108,19 @@ export class RecentSalesComponent {
     });
   }
 
-  getSaleShortId(id: string): string {
+  private countItems(sale: Sale): number {
+    return (sale.items || []).reduce((total, item) => total + (item.quantity || 0), 0);
+  }
+
+  private formatItemsLabel(sale: Sale): string {
+    const count = this.countItems(sale);
+    return count === 1 ? '1 artículo' : `${count} artículos`;
+  }
+
+  private formatSaleId(id: string): string {
     if (!id) {
       return '';
     }
     return `#${id.slice(0, 4)}…${id.slice(-4)}`;
-  }
-
-  getItemsLabel(sale: Sale): string {
-    const count = sale.items?.reduce((total, item) => total + (item.quantity || 0), 0) || 0;
-    return count === 1 ? '1 artículo' : `${count} artículos`;
   }
 }
