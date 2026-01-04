@@ -132,6 +132,11 @@ h2 {
   margin-bottom: 2rem;
 }
 
+.total-incomes .card-icon {
+  background-color: #f0f9ff;
+  color: #0f62fe;
+}
+
 .summary-card {
   background-color: white;
   padding: 1.5rem;
@@ -176,6 +181,116 @@ h2 {
   font-size: 0.875rem;
   color: #64748b;
   margin-bottom: 0.5rem;
+}
+
+.availability-section {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.75rem;
+  box-shadow: 0 12px 30px rgba(20, 41, 34, 0.08);
+  margin-bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.availability-section header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.availability-section .eyebrow {
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #3C9C36;
+  margin: 0;
+}
+
+.availability-section h3 {
+  margin: 0.25rem 0 0;
+  color: #16281f;
+}
+
+.filter-select {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.9rem;
+  color: #4a5568;
+}
+
+.filter-select select {
+  min-width: 220px;
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 0.95rem;
+}
+
+.availability-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.availability-card {
+  border: 1px solid rgba(22, 40, 31, 0.08);
+  border-radius: 14px;
+  padding: 1rem 1.2rem;
+  background: #fdfefc;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: border-color 0.2s ease, transform 0.2s ease;
+}
+
+.availability-card.active-filter {
+  border-color: #3C9C36;
+  transform: translateY(-2px);
+  box-shadow: 0 16px 30px rgba(23, 58, 34, 0.12);
+}
+
+.availability-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.availability-card__header small {
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.availability-amount {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #102b1c;
+}
+
+.availability-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.availability-filter {
+  margin-top: 0.5rem;
+  align-self: flex-start;
+  border: none;
+  background: rgba(60, 156, 54, 0.12);
+  color: #256d1a;
+  border-radius: 999px;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.85rem;
+  cursor: pointer;
 }
 
 .amount {
@@ -241,6 +356,42 @@ h2 {
 
 .btn-income:hover {
   background-color: #219a52;
+}
+
+.history-toolbar {
+  margin: 2.5rem 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.history-toolbar h3 {
+  margin: 0;
+  color: #1f2937;
+}
+
+.history-filter-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.filter-chip {
+  border: 1px solid rgba(21, 41, 32, 0.2);
+  border-radius: 999px;
+  padding: 0.4rem 1rem;
+  background: #fff;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #1f2937;
+  transition: all 0.2s ease;
+}
+
+.filter-chip.active,
+.filter-chip:hover {
+  background: #16281f;
+  color: #fff;
+  border-color: #16281f;
 }
 
 .modal {
@@ -375,6 +526,31 @@ h2 {
   font-size: 0.95rem;
 }
 
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.section-header h4 {
+  margin: 0;
+  color: #1f2937;
+}
+
+.section-meta {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.empty-row {
+  text-align: center;
+  padding: 1.5rem 0;
+  color: #94a3b8;
+  font-style: italic;
+}
+
 .payment-methods-table tr:hover td,
 .withdrawals-table tr:hover td {
   background-color: #f7fafc;
@@ -495,5 +671,25 @@ h2 {
 
   .description-column {
     max-width: 150px;
+  }
+
+  .availability-section header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .filter-select select {
+    width: 100%;
+    min-width: initial;
+  }
+
+  .history-filter-chips {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-chip {
+    width: 100%;
+    text-align: center;
   }
 }

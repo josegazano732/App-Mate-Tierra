@@ -24,6 +24,14 @@ interface CashIncome {
   created_at: string;
 }
 
+interface PaymentAvailabilityCard {
+  code: string;
+  name: string;
+  available: number;
+  sales: number;
+  percentage: number;
+}
+
 @Component({
   selector: 'app-cash-register',
   templateUrl: './cash-register.component.html',
@@ -54,6 +62,10 @@ export class CashRegisterComponent implements OnInit, OnDestroy {
   };
   paymentMethods: PaymentMethod[] = [];
   userId: string | null = null;
+  availabilityCards: PaymentAvailabilityCard[] = [];
+  historyFilter = 'all';
+  filteredWithdrawals: CashWithdrawal[] = [];
+  filteredIncomes: CashIncome[] = [];
   private destroy$ = new Subject<void>();
   private realtimeChannel: any = null;
 
@@ -110,6 +122,7 @@ export class CashRegisterComponent implements OnInit, OnDestroy {
     this.paymentMethodsService.getActivePaymentMethods().subscribe({
       next: (methods) => {
         this.paymentMethods = methods;
+        this.buildAvailabilityCards();
       },
       error: (error) => {
         console.error('Error loading payment methods:', error);
@@ -146,6 +159,7 @@ export class CashRegisterComponent implements OnInit, OnDestroy {
 
     this.paymentTotals = data;
     this.calculateTotals();
+    this.buildAvailabilityCards();
   }
 
   private async loadWithdrawals() {
@@ -158,6 +172,7 @@ export class CashRegisterComponent implements OnInit, OnDestroy {
       if (error) throw error;
 
       this.withdrawals = data || [];
+      this.applyHistoryFilter();
     } catch (error) {
       console.error('Error loading withdrawals:', error);
       throw error;
@@ -174,6 +189,7 @@ export class CashRegisterComponent implements OnInit, OnDestroy {
       if (error) throw error;
 
       this.incomes = data || [];
+      this.applyHistoryFilter();
     } catch (error) {
       console.error('Error loading incomes:', error);
       throw error;
@@ -185,6 +201,10 @@ export class CashRegisterComponent implements OnInit, OnDestroy {
     this.totalSales = this.paymentTotals.reduce((sum, method) => sum + method.number_of_sales, 0);
     this.totalWithdrawals = this.paymentTotals.reduce((sum, method) => sum + method.total_withdrawals, 0);
     this.totalIncomes = this.paymentTotals.reduce((sum, method) => sum + method.total_incomes, 0);
+  }
+
+  get netAvailable(): number {
+    return this.totalAmount - this.totalWithdrawals + this.totalIncomes;
   }
 
   getPaymentMethodName(code: string): string {
@@ -282,11 +302,49 @@ export class CashRegisterComponent implements OnInit, OnDestroy {
   }
 
   getPercentage(amount: number): number {
+    if (!this.totalAmount) {
+      return 0;
+    }
     return (amount / this.totalAmount) * 100;
   }
 
   formatCurrency(value: number): string {
     return this.decimalPipe.transform(value, '1.2-2') || '0';
+  }
+
+  onHistoryFilterChange(code: string) {
+    this.historyFilter = code;
+    this.applyHistoryFilter();
+  }
+
+  private applyHistoryFilter() {
+    if (this.historyFilter === 'all') {
+      this.filteredWithdrawals = [...this.withdrawals];
+      this.filteredIncomes = [...this.incomes];
+      return;
+    }
+
+    this.filteredWithdrawals = this.withdrawals.filter(w => w.payment_method === this.historyFilter);
+    this.filteredIncomes = this.incomes.filter(i => i.payment_method === this.historyFilter);
+  }
+
+  private buildAvailabilityCards() {
+    if (!this.paymentTotals) {
+      this.availabilityCards = [];
+      return;
+    }
+
+    this.availabilityCards = this.paymentTotals.map((method) => {
+      const name = method.payment_method_name || this.getPaymentMethodName(method.payment_method);
+      const percentage = this.totalAmount ? (method.total_amount / this.totalAmount) * 100 : 0;
+      return {
+        code: method.payment_method,
+        name,
+        available: method.available_amount,
+        sales: method.number_of_sales,
+        percentage
+      };
+    });
   }
 
   exportToExcel() {

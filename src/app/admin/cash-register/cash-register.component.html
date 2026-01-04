@@ -35,6 +35,16 @@
           <p class="detail">{{ totalSales }} transacciones</p>
         </div>
       </div>
+      <div class="summary-card total-incomes">
+        <div class="card-icon">
+          <i class="fas fa-arrow-trend-up"></i>
+        </div>
+        <div class="card-content">
+          <h3>Ingresos de Caja</h3>
+          <p class="amount">{{ totalIncomes | currency:'USD' }}</p>
+          <p class="detail">{{ incomes.length }} registros</p>
+        </div>
+      </div>
       <div class="summary-card total-withdrawals">
         <div class="card-icon">
           <i class="fas fa-money-bill-wave"></i>
@@ -51,11 +61,50 @@
         </div>
         <div class="card-content">
           <h3>Disponible en Caja</h3>
-          <p class="amount">{{ totalAmount - totalWithdrawals | currency:'USD' }}</p>
+          <p class="amount">{{ netAvailable | currency:'USD' }}</p>
           <p class="detail">Total neto</p>
         </div>
       </div>
     </div>
+
+    <!-- Availability by Method -->
+    <section class="availability-section" *ngIf="availabilityCards.length">
+      <header>
+        <div>
+          <p class="eyebrow">Detalle por método</p>
+          <h3>Disponibilidad por medio de pago</h3>
+        </div>
+        <div class="filter-select">
+          <label for="historyFilter">Filtrar historiales</label>
+          <select id="historyFilter" [(ngModel)]="historyFilter" (ngModelChange)="onHistoryFilterChange($event)">
+            <option value="all">Todos los métodos</option>
+            <option *ngFor="let method of paymentMethods" [value]="method.code">
+              {{ method.name }}
+            </option>
+          </select>
+        </div>
+      </header>
+      <div class="availability-grid">
+        <article class="availability-card"
+                 *ngFor="let card of availabilityCards"
+                 [class.active-filter]="historyFilter === card.code">
+          <div class="availability-card__header">
+            <span class="method-name">{{ card.name }}</span>
+            <small>{{ card.code | uppercase }}</small>
+          </div>
+          <p class="availability-amount">{{ card.available | currency:'USD' }}</p>
+          <div class="availability-meta">
+            <span>{{ card.sales }} ventas</span>
+            <span>{{ card.percentage | number:'1.0-1' }}% del total</span>
+          </div>
+          <button type="button"
+                  class="availability-filter"
+                  (click)="onHistoryFilterChange(historyFilter === card.code ? 'all' : card.code)">
+            {{ historyFilter === card.code ? 'Quitar filtro' : 'Ver historial' }}
+          </button>
+        </article>
+      </div>
+    </section>
 
     <!-- Payment Methods Table -->
     <div class="table-container">
@@ -108,8 +157,33 @@
     </div>
 
     <!-- Withdrawals History -->
+    <div class="history-toolbar">
+      <h3>Historial de movimientos</h3>
+      <div class="history-filter-chips">
+        <button type="button"
+                class="filter-chip"
+                [class.active]="historyFilter === 'all'"
+                (click)="onHistoryFilterChange('all')">
+          Todos
+        </button>
+        <button type="button"
+                class="filter-chip"
+                *ngFor="let method of paymentMethods"
+                [class.active]="historyFilter === method.code"
+                (click)="onHistoryFilterChange(method.code)">
+          {{ method.name }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Withdrawals History -->
     <div class="withdrawals-section">
-      <h3>Historial de Retiros</h3>
+      <div class="section-header">
+        <h4>Retiros</h4>
+        <span class="section-meta">
+          {{ filteredWithdrawals.length }} registros · {{ totalWithdrawals | currency:'USD' }}
+        </span>
+      </div>
       <div class="table-container">
         <table class="withdrawals-table">
           <thead>
@@ -121,11 +195,14 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let withdrawal of withdrawals">
+            <tr *ngFor="let withdrawal of filteredWithdrawals">
               <td class="date-column">{{ withdrawal.created_at | date:'MMM d, y, h:mm a' }}</td>
               <td class="method-name">{{ getPaymentMethodName(withdrawal.payment_method) }}</td>
               <td class="amount negative-amount">{{ withdrawal.amount | currency:'USD' }}</td>
               <td class="description-column">{{ withdrawal.description }}</td>
+            </tr>
+            <tr *ngIf="!filteredWithdrawals.length">
+              <td colspan="4" class="empty-row">No hay retiros para este filtro.</td>
             </tr>
           </tbody>
         </table>
@@ -134,7 +211,12 @@
 
     <!-- Incomes History -->
     <div class="withdrawals-section">
-      <h3>Historial de Ingresos</h3>
+      <div class="section-header">
+        <h4>Ingresos</h4>
+        <span class="section-meta">
+          {{ filteredIncomes.length }} registros · {{ totalIncomes | currency:'USD' }}
+        </span>
+      </div>
       <div class="table-container">
         <table class="withdrawals-table">
           <thead>
@@ -146,11 +228,14 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let income of incomes">
+            <tr *ngFor="let income of filteredIncomes">
               <td class="date-column">{{ income.created_at | date:'MMM d, y, h:mm a' }}</td>
               <td class="method-name">{{ getPaymentMethodName(income.payment_method) }}</td>
               <td class="amount positive-amount">{{ income.amount | currency:'USD' }}</td>
               <td class="description-column">{{ income.description }}</td>
+            </tr>
+            <tr *ngIf="!filteredIncomes.length">
+              <td colspan="4" class="empty-row">No hay ingresos para este filtro.</td>
             </tr>
           </tbody>
         </table>
