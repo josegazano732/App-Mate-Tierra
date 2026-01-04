@@ -1,0 +1,416 @@
+<section class="product-crud-page">
+  <header class="crud-hero glass-card">
+    <div class="hero-copy">
+      <p class="eyebrow">Panel de administración</p>
+      <h2>Gestión de productos</h2>
+      <p>Controlá el catálogo, actualizá stocks y mantené cada ficha con información precisa.</p>
+      <div class="hero-actions">
+        <button (click)="showAddForm = true" class="btn-primary">
+          <i class="fas fa-plus"></i> Registrar producto
+        </button>
+        <button class="btn-secondary" (click)="loadProducts()">
+          <i class="fas fa-sync-alt"></i> Actualizar listado
+        </button>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-card">
+        <span class="stat-label">Total de productos</span>
+        <span class="stat-value">{{ products.length }}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Con bajo stock</span>
+        <span class="stat-value">{{ lowStockCount }}</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Temporada</span>
+        <span class="stat-value">{{ seasonalProductCount }}</span>
+      </div>
+    </div>
+  </header>
+
+  <div *ngIf="errorMessage" class="error-message">
+    <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
+  </div>
+
+  <div class="table-card glass-card">
+    <div class="table-head">
+      <div>
+        <p class="eyebrow">Inventario actualizado</p>
+        <h3>Listado de productos</h3>
+      </div>
+    </div>
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Imagen</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Costo</th>
+            <th>Margen %</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Categoría</th>
+            <th>Temporada</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let product of products">
+            <td data-label="Imagen">
+              <img
+                [src]="product.image"
+                [alt]="product.name"
+                class="product-thumbnail"
+              />
+            </td>
+            <td data-label="Nombre">{{ product.name }}</td>
+            <td data-label="Descripción">
+              {{ product.description | slice : 0 : 50
+              }}{{ product.description.length > 50 ? '...' : '' }}
+            </td>
+            <td data-label="Costo">{{ product.cost | currency : 'USD' }}</td>
+            <td data-label="Margen">{{ product.markup_percentage }}%</td>
+            <td data-label="Precio">{{ product.price | currency : 'USD' }}</td>
+            <td
+              data-label="Stock"
+              [class.low-stock]="product.stock < 5"
+              [class.out-of-stock]="product.stock === 0"
+            >
+              {{ product.stock }}
+            </td>
+            <td data-label="Categoría">{{ product.category_name }}</td>
+            <td data-label="Temporada">{{ product.seasonal ? 'Sí' : 'No' }}</td>
+            <td data-label="Acciones">
+              <div class="table-actions">
+                <button
+                  (click)="editProduct(product)"
+                  class="btn-edit"
+                  title="Editar"
+                >
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button
+                  (click)="deleteProduct(product)"
+                  class="btn-delete"
+                  title="Eliminar"
+                >
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Add/Edit Product Modal -->
+  <div *ngIf="showAddForm || editingProduct" class="modal">
+    <div class="modal-content">
+      <h3>{{ editingProduct ? 'Editar producto' : 'Agregar producto' }}</h3>
+
+      <!-- Formulario para Editar -->
+      <form *ngIf="editingProduct" (ngSubmit)="saveProduct()" class="product-form">
+        <div class="form-section">
+          <h4>Detalles generales</h4>
+          <div class="form-grid details-grid">
+            <div class="form-field name-field">
+              <label for="name-edit">Nombre del producto</label>
+              <input
+                type="text"
+                id="name-edit"
+                [(ngModel)]="editingProduct.name"
+                name="name"
+                required
+                placeholder="Ej: Mate imperial de calabaza"
+              />
+              <small>Así se mostrará en el catálogo.</small>
+            </div>
+            <div class="form-field category-field">
+              <label for="category-edit">Categoría</label>
+              <select
+                id="category-edit"
+                [(ngModel)]="editingProduct.category_id"
+                name="category_id"
+                required
+              >
+                <option value="">Seleccioná una categoría</option>
+                <option *ngFor="let category of categories" [value]="category.id">
+                  {{ category.name }}
+                </option>
+              </select>
+              <small>Organiza el producto dentro de la tienda.</small>
+            </div>
+            <div class="form-field description-field">
+              <label for="description-edit">Descripción</label>
+              <textarea
+                id="description-edit"
+                [(ngModel)]="editingProduct.description"
+                name="description"
+                rows="3"
+                required
+                placeholder="Materiales, terminaciones, cuidados, etc."
+              ></textarea>
+              <small>Incluí materiales, cuidados o notas destacadas.</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section two-columns">
+          <div>
+            <h4>Rentabilidad</h4>
+            <div class="form-grid">
+              <div class="form-field cost-field">
+                <label for="cost-edit">Costo</label>
+                <input
+                  type="number"
+                  id="cost-edit"
+                  [(ngModel)]="editingProduct.cost"
+                  (ngModelChange)="updatePrice()"
+                  name="cost"
+                  step="0.01"
+                  min="0.01"
+                  required
+                  inputmode="decimal"
+                />
+                <small>Indicá el costo real del artículo.</small>
+              </div>
+              <div class="form-field markup-field">
+                <label for="markup-edit">Porcentaje de margen</label>
+                <input
+                  type="number"
+                  id="markup-edit"
+                  [(ngModel)]="editingProduct.markup_percentage"
+                  (ngModelChange)="updatePrice()"
+                  name="markup_percentage"
+                  step="0.01"
+                  min="0.01"
+                  required
+                  inputmode="decimal"
+                />
+                <small>Calcularemos automáticamente el precio final.</small>
+              </div>
+              <div class="form-field">
+                <label for="stock-edit">Stock disponible</label>
+                <input
+                  type="number"
+                  id="stock-edit"
+                  [(ngModel)]="editingProduct.stock"
+                  name="stock"
+                  min="0"
+                  required
+                  inputmode="numeric"
+                />
+                <small>Los clientes verán alertas cuando el stock sea bajo.</small>
+              </div>
+              <div class="form-field toggle-field">
+                <label>Temporada</label>
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    [(ngModel)]="editingProduct.seasonal"
+                    name="seasonal"
+                  />
+                  <span class="slider"></span>
+                </label>
+                <small>Activa esta opción si solo se vende por temporada.</small>
+              </div>
+            </div>
+          </div>
+          <div class="price-summary">
+            <span>Precio final sugerido</span>
+            <p>{{ (editingProduct.price || 0) | currency:'USD' }}</p>
+            <small>Se actualiza automáticamente según costo y margen.</small>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h4>Imagen del producto</h4>
+          <div class="image-upload-container">
+            <input
+              type="file"
+              id="image-edit"
+              (change)="onFileSelected($event)"
+              accept="image/*"
+              #fileInput
+              class="file-input"
+            />
+            <div class="upload-placeholder">
+              <i class="fas fa-cloud-upload-alt"></i>
+              <p>Click o arrastra la imagen aquí</p>
+              <small>Formatos permitidos: JPG, PNG, WebP (máx. 5MB)</small>
+            </div>
+            <div
+              class="image-preview"
+              *ngIf="imagePreview || (editingProduct && editingProduct.image)"
+            >
+              <img [src]="imagePreview || editingProduct.image" alt="Vista previa" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-primary" [disabled]="isSubmitting">
+            <i class="fas fa-save"></i> Guardar cambios
+          </button>
+          <button type="button" (click)="cancelEdit()" class="btn-secondary">
+            <i class="fas fa-times"></i> Cancelar
+          </button>
+        </div>
+      </form>
+
+      <!-- Formulario para Agregar -->
+      <form *ngIf="!editingProduct" (ngSubmit)="onSubmit()" class="product-form">
+        <div class="form-section">
+          <h4>Detalles generales</h4>
+          <div class="form-grid details-grid">
+            <div class="form-field name-field">
+              <label for="name-create">Nombre del producto</label>
+              <input
+                type="text"
+                id="name-create"
+                [(ngModel)]="product.name"
+                name="name"
+                required
+                placeholder="Ej: Mate torpedo premium"
+              />
+              <small>Así se mostrará en el catálogo.</small>
+            </div>
+            <div class="form-field category-field">
+              <label for="category-create">Categoría</label>
+              <select
+                id="category-create"
+                [(ngModel)]="product.category_id"
+                name="category_id"
+                required
+              >
+                <option value="">Seleccioná una categoría</option>
+                <option *ngFor="let category of categories" [value]="category.id">
+                  {{ category.name }}
+                </option>
+              </select>
+              <small>Organiza el producto dentro de la tienda.</small>
+            </div>
+            <div class="form-field description-field">
+              <label for="description-create">Descripción</label>
+              <textarea
+                id="description-create"
+                [(ngModel)]="product.description"
+                name="description"
+                rows="3"
+                required
+                placeholder="Materiales, terminaciones, cuidados, etc."
+              ></textarea>
+              <small>Incluí materiales, cuidados o notas destacadas.</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-section two-columns">
+          <div>
+            <h4>Rentabilidad</h4>
+            <div class="form-grid">
+              <div class="form-field cost-field">
+                <label for="cost-create">Costo</label>
+                <input
+                  type="number"
+                  id="cost-create"
+                  [(ngModel)]="product.cost"
+                  (ngModelChange)="updatePrice()"
+                  name="cost"
+                  step="0.01"
+                  min="0.01"
+                  required
+                  inputmode="decimal"
+                />
+                <small>Indicá el costo real del artículo.</small>
+              </div>
+              <div class="form-field markup-field">
+                <label for="markup-create">Porcentaje de margen</label>
+                <input
+                  type="number"
+                  id="markup-create"
+                  [(ngModel)]="product.markup_percentage"
+                  (ngModelChange)="updatePrice()"
+                  name="markup_percentage"
+                  step="0.01"
+                  min="0.01"
+                  required
+                  inputmode="decimal"
+                />
+                <small>Calcularemos automáticamente el precio final.</small>
+              </div>
+              <div class="form-field">
+                <label for="stock-create">Stock disponible</label>
+                <input
+                  type="number"
+                  id="stock-create"
+                  [(ngModel)]="product.stock"
+                  name="stock"
+                  min="0"
+                  required
+                  inputmode="numeric"
+                />
+                <small>Los clientes verán alertas cuando el stock sea bajo.</small>
+              </div>
+              <div class="form-field toggle-field">
+                <label>Temporada</label>
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    [(ngModel)]="product.seasonal"
+                    name="seasonal"
+                  />
+                  <span class="slider"></span>
+                </label>
+                <small>Activa esta opción si solo se vende por temporada.</small>
+              </div>
+            </div>
+          </div>
+          <div class="price-summary">
+            <span>Precio final sugerido</span>
+            <p>{{ (product.price || 0) | currency:'USD' }}</p>
+            <small>Se actualiza automáticamente según costo y margen.</small>
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h4>Imagen del producto</h4>
+          <div class="image-upload-container">
+            <input
+              type="file"
+              id="image-create"
+              (change)="onFileSelected($event)"
+              accept="image/*"
+              #fileInput
+              class="file-input"
+            />
+            <div class="upload-placeholder">
+              <i class="fas fa-cloud-upload-alt"></i>
+              <p>Click o arrastra la imagen aquí</p>
+              <small>Formatos permitidos: JPG, PNG, WebP (máx. 5MB)</small>
+            </div>
+            <div class="image-preview" *ngIf="imagePreview">
+              <img [src]="imagePreview" alt="Vista previa" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-primary" [disabled]="isSubmitting">
+            <i class="fas fa-plus"></i> Agregar producto
+          </button>
+          <button
+            type="button"
+            (click)="showAddForm = false"
+            class="btn-secondary"
+          >
+            <i class="fas fa-times"></i> Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

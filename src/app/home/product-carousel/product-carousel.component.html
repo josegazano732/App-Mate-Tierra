@@ -1,0 +1,112 @@
+<div class="carousel-container">
+  <div *ngIf="isLoading" class="state-card">
+    <i class="fas fa-spinner fa-spin"></i>
+    <span>Preparando la selección...</span>
+  </div>
+
+  <div *ngIf="error" class="state-card error">
+    <i class="fas fa-exclamation-circle"></i>
+    <span>{{ error }}</span>
+  </div>
+
+  <ng-container *ngIf="!isLoading && !error && products.length > 0">
+    <div class="section-header">
+      <div class="section-meta">
+        <span class="eyebrow">Colección Seleccionada</span>
+        <h2>Productos Destacados</h2>
+        <p>Descubre nuestra curaduría semanal con piezas premium listas para lucirse.</p>
+      </div>
+      <div class="header-actions">
+        <button class="pill-button" type="button" (click)="prevGroup(); $event.stopPropagation()" [disabled]="currentGroup === 0">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <button class="pill-button" type="button" (click)="nextGroup(); $event.stopPropagation()" [disabled]="currentGroup === totalGroups.length - 1">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="products-gallery">
+      <div class="gallery-grid" [class.sliding]="isSliding">
+        <article *ngFor="let product of visibleProducts" 
+             class="product-card"
+             role="link"
+             tabindex="0"
+             (click)="goToProduct(product.id)"
+             (keydown.enter)="goToProduct(product.id)"
+             (keydown.space)="$event.preventDefault(); goToProduct(product.id)">
+          <div class="product-image-container">
+            <img [src]="product.image" 
+                 [alt]="product.name" 
+                 class="product-image" 
+                 loading="lazy">
+            <span class="badge seasonal" *ngIf="product.seasonal">
+              <i class="fas fa-star"></i>
+              Destacado
+            </span>
+            <span class="badge discount" *ngIf="product.discount">
+              <i class="fas fa-tag"></i>
+              -{{ product.discount }}%
+            </span>
+          </div>
+          <div class="product-content">
+            <div class="product-chip">
+              <i class="fas fa-leaf"></i>
+              {{ product.category || 'Colección Mate' }}
+            </div>
+            <h3>{{ product.name }}</h3>
+            <p class="description">{{ product.description }}</p>
+
+            <div class="product-metrics">
+              <div class="rating">
+                <i class="fas fa-star"></i>
+                <span>{{ getRating(product) }}</span>
+                <span class="reviews">({{ getReviews(product) }} reseñas)</span>
+              </div>
+              <div class="pricing" *ngIf="product.price">
+                <span class="current">{{ getDisplayPrice(product) | currency:'ARS':'symbol-narrow' }}</span>
+                <span class="original" *ngIf="product.discount">{{ product.price | currency:'ARS':'symbol-narrow' }}</span>
+              </div>
+            </div>
+
+            <div class="card-actions">
+              <div class="card-actions-row">
+                <button class="ghost-link" type="button" (click)="$event.stopPropagation(); goToProduct(product.id)">
+                  Ver detalle <i class="fas fa-arrow-right"></i>
+                </button>
+                <button
+                  class="cta-button"
+                  type="button"
+                  (click)="$event.stopPropagation(); goToProduct(product.id)">
+                  Comprar
+                </button>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+
+    <div class="gallery-controls">
+      <button class="control-button prev" 
+              (click)="prevGroup(); $event.stopPropagation()" 
+              [disabled]="currentGroup === 0"
+              aria-label="Anterior">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <div class="gallery-indicators">
+        <span *ngFor="let group of totalGroups; let i = index" 
+              class="indicator" 
+              [class.active]="i === currentGroup"
+              (click)="showGroup(i); $event.stopPropagation()">
+        </span>
+      </div>
+      <button class="control-button next" 
+              (click)="nextGroup(); $event.stopPropagation()"
+              [disabled]="currentGroup === totalGroups.length - 1"
+              aria-label="Siguiente">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+  </ng-container>
+</div>

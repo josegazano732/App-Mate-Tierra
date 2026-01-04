@@ -1,0 +1,97 @@
+<section class="recent-sales-panel">
+  <header class="panel-header">
+    <div class="panel-copy">
+      <p class="eyebrow">Control de caja</p>
+      <h3>Ventas recientes</h3>
+      <p>Mirá el pulso de las últimas operaciones y actuá rápido ante cualquier incidencia.</p>
+    </div>
+    <div class="panel-meta">
+      <span *ngIf="latestSaleDate">Última venta: {{ latestSaleDate | date:'short' }}</span>
+      <a routerLink="/historial-ventas" class="btn-view-all">
+        <i class="fas fa-history"></i>
+        Historial completo
+      </a>
+    </div>
+  </header>
+
+  <div class="stats-grid" *ngIf="!isLoading">
+    <article class="stat-card">
+      <p>Completadas</p>
+      <h4>{{ completedSalesCount }}</h4>
+      <small>{{ totalItemsSold }} artículos</small>
+    </article>
+    <article class="stat-card">
+      <p>Ingresos 24h</p>
+      <h4>{{ totalRecentRevenue | currency:'USD' }}</h4>
+      <small>Ticket medio {{ averageTicket | currency:'USD' }}</small>
+    </article>
+    <article class="stat-card warning">
+      <p>Canceladas</p>
+      <h4>{{ cancelledSalesCount }}</h4>
+      <small>Revisar motivos</small>
+    </article>
+  </div>
+
+  <div *ngIf="isLoading" class="loading">
+    <i class="fas fa-spinner fa-spin"></i> Cargando ventas recientes...
+  </div>
+
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <div class="empty-state" *ngIf="!isLoading && !errorMessage && (!recentSales || recentSales.length === 0)">
+    <i class="fas fa-clipboard-list"></i>
+    <p>No registraste ventas en las últimas horas.</p>
+    <small>Registrá una venta manual o generala desde el carrito para ver el detalle acá.</small>
+  </div>
+
+  <div class="sales-list" *ngIf="!isLoading && recentSales && recentSales.length > 0">
+    <article class="sale-card" *ngFor="let sale of recentSales" [class.cancelled]="sale.status === 'cancelled'">
+      <div class="sale-header">
+        <div>
+          <span class="sale-id">{{ getSaleShortId(sale.id) }}</span>
+          <p class="sale-date">{{ sale.created_at | date:'medium' }}</p>
+        </div>
+        <div class="sale-meta">
+          <span class="status-chip" [ngClass]="sale.status">
+            {{ sale.status === 'completed' ? 'Completada' : 'Cancelada' }}
+          </span>
+          <span class="sale-total">{{ sale.total_amount | currency:'USD' }}</span>
+        </div>
+      </div>
+      <div class="sale-body">
+        <div class="items-block">
+          <h5>Productos</h5>
+          <ul>
+            <li *ngFor="let item of sale.items || []">
+              <strong>{{ item.product?.name || item.product_name }}</strong>
+              <span>{{ item.quantity }} × {{ item.unit_price | currency:'USD' }}</span>
+            </li>
+          </ul>
+        </div>
+        <div class="payments-block">
+          <h5>Métodos de pago</h5>
+          <div class="method-chips">
+            <span class="method-chip" *ngFor="let method of getPaymentMethodsForSale(sale)">
+              {{ method.name }}
+              <small *ngIf="method.amount">{{ method.amount | currency:'USD' }}</small>
+            </span>
+          </div>
+          <p class="split-note" *ngIf="(sale.payment_splits?.length || 0) > 1">
+            Pagado en {{ sale.payment_splits?.length || 0 }} métodos
+          </p>
+        </div>
+      </div>
+      <div class="sale-footer">
+        <span class="items-count">{{ getItemsLabel(sale) }}</span>
+        <button 
+          class="btn-cancel"
+          (click)="onCancelSale(sale.id)"
+          *ngIf="sale.status !== 'cancelled'">
+          <i class="fas fa-ban"></i> Cancelar venta
+        </button>
+      </div>
+    </article>
+  </div>
+</section>

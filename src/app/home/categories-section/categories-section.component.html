@@ -1,0 +1,93 @@
+<section class="categories-section">
+  <div class="container">
+    <div class="categories-header">
+      <div class="section-meta">
+        <span class="eyebrow">Colecciones por categoría</span>
+        <h2>Explorá por ritual</h2>
+        <p>Elegí una categoría y entrá directo a su colección con producto insignia y una vista rápida del resto.</p>
+      </div>
+
+      <div class="categories-cta" data-aos="fade-left">
+        <div class="cta-card">
+          <div class="cta-copy">
+            <span class="cta-kicker">Acceso rápido</span>
+            <h3>Ver todo el catálogo</h3>
+            <p>Filtrá por categoría, precio y stock. Compra rápida desde el listado.</p>
+          </div>
+          <a class="cta-pill" routerLink="/productos">
+            Ir a productos
+            <i class="fas fa-arrow-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="state-card" *ngIf="isLoading">
+      <i class="fas fa-spinner fa-spin"></i>
+      <span>Estamos preparando las colecciones…</span>
+    </div>
+
+    <div class="state-card error" *ngIf="!isLoading && errorMessage">
+      <i class="fas fa-exclamation-circle"></i>
+      <span>{{ errorMessage }}</span>
+    </div>
+
+    <div class="categories-mosaic" *ngIf="!isLoading && !errorMessage">
+      <article
+        class="mosaic-card"
+        *ngFor="let showcase of showcases; index as i"
+        data-aos="fade-up"
+        [attr.data-aos-delay]="80 * i">
+        <a
+          class="mosaic-surface"
+          [routerLink]="['/productos']"
+          [queryParams]="{categoria: showcase.category.slug}"
+          [attr.aria-label]="'Ver colección ' + showcase.category.name">
+          <div class="mosaic-bg">
+            <img
+              [src]="showcase.coverImage"
+              [alt]="'Colección ' + showcase.category.name"
+              loading="lazy"
+              (error)="handleImageError($event, showcase.category.image)">
+          </div>
+
+          <div class="mosaic-overlay"></div>
+
+          <header class="mosaic-header">
+            <span class="mosaic-chip">{{ showcase.category.name }}</span>
+            <span class="mosaic-count">
+              <i class="fas fa-box"></i> {{ showcase.totalProducts || 0 }}
+            </span>
+          </header>
+
+          <div class="mosaic-body">
+            <h3 class="mosaic-title">{{ showcase.category.name }}</h3>
+            <p class="mosaic-description">{{ showcase.description }}</p>
+
+            <div class="mosaic-featured" *ngIf="showcase.featuredProduct as featured">
+              <div class="featured-left">
+                <span class="featured-tag">Producto insignia</span>
+                <span class="featured-name">{{ featured.name }}</span>
+                <span class="featured-price" *ngIf="featured.price">{{ featured.price | currency:'ARS':'symbol-narrow' }}</span>
+              </div>
+              <div class="featured-thumb">
+                <img [src]="featured.image" [alt]="featured.name" loading="lazy">
+              </div>
+            </div>
+
+            <div class="mosaic-pills" *ngIf="showcase.additionalProducts.length">
+              <span class="pill" *ngFor="let product of showcase.additionalProducts">{{ product.name }}</span>
+            </div>
+          </div>
+
+          <footer class="mosaic-footer">
+            <span class="mosaic-link">
+              Ver colección
+              <i class="fas fa-arrow-right"></i>
+            </span>
+          </footer>
+        </a>
+      </article>
+    </div>
+  </div>
+</section>

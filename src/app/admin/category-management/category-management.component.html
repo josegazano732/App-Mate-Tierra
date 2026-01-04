@@ -1,0 +1,127 @@
+<div class="category-management-container">
+  <h2>Gestión de Categorías</h2>
+
+  <!-- Add New Category Form -->
+  <div class="add-category-form">
+    <h3>Agregar Nueva Categoría</h3>
+    <form (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="name">Nombre:</label>
+        <input 
+          type="text" 
+          id="name" 
+          [(ngModel)]="newCategory.name" 
+          name="name" 
+          required>
+      </div>
+      <div class="form-group">
+        <label for="image">URL de la Imagen:</label>
+        <input 
+          type="text" 
+          id="image" 
+          [(ngModel)]="newCategory.image" 
+          name="image" 
+          required>
+      </div>
+      <div class="form-group">
+        <label for="description">Descripción:</label>
+        <textarea 
+          id="description" 
+          [(ngModel)]="newCategory.description" 
+          name="description">
+        </textarea>
+      </div>
+      <button type="submit" class="btn-primary" [disabled]="isLoading">
+        <i class="fas fa-plus"></i> Agregar Categoría
+      </button>
+    </form>
+  </div>
+
+  <!-- Categories List -->
+  <div class="categories-list">
+    <h3>Categorías Existentes</h3>
+    
+    <div *ngIf="isLoading" class="loading">
+      <i class="fas fa-spinner fa-spin"></i> Cargando categorías...
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message">
+      <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
+    </div>
+
+    <table *ngIf="!isLoading && categories.length > 0">
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Imagen</th>
+          <th>Descripción</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let category of categories">
+          <td>{{ category.name }}</td>
+          <td>
+            <img [src]="category.image" [alt]="category.name" class="category-thumbnail">
+          </td>
+          <td>{{ category.description }}</td>
+          <td class="actions">
+            <button class="btn-edit" (click)="editCategory(category)">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn-delete" (click)="deleteCategory(category.id)">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="!isLoading && categories.length === 0" class="no-categories">
+      No hay categorías disponibles.
+    </div>
+  </div>
+
+  <!-- Edit Category Modal -->
+  <div *ngIf="editingCategory" class="modal">
+    <div class="modal-content">
+      <h3>Editar Categoría</h3>
+      <form (ngSubmit)="updateCategory()">
+        <div class="form-group">
+          <label for="edit-name">Nombre:</label>
+          <input 
+            type="text" 
+            id="edit-name" 
+            [(ngModel)]="editingCategory.name" 
+            name="edit-name" 
+            required>
+        </div>
+        <div class="form-group">
+          <label for="edit-image">URL de la Imagen:</label>
+          <input 
+            type="text" 
+            id="edit-image" 
+            [(ngModel)]="editingCategory.image" 
+            name="edit-image" 
+            required>
+        </div>
+        <div class="form-group">
+          <label for="edit-description">Descripción:</label>
+          <textarea 
+            id="edit-description" 
+            [(ngModel)]="editingCategory.description" 
+            name="edit-description">
+          </textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="btn-primary" [disabled]="isLoading">
+            <i class="fas fa-save"></i> Guardar
+          </button>
+          <button type="button" class="btn-secondary" (click)="editingCategory = null">
+            <i class="fas fa-times"></i> Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

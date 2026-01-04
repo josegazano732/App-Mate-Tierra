@@ -1,0 +1,83 @@
+<div class="discount-settings-container">
+  <h2>Configuración de Descuentos por Mayor</h2>
+
+  <div *ngIf="isLoading" class="loading">
+    <i class="fas fa-spinner fa-spin"></i> Cargando configuración...
+  </div>
+
+  <div *ngIf="errorMessage" class="error-message">
+    <i class="fas fa-exclamation-circle"></i> {{ errorMessage }}
+  </div>
+
+  <div *ngIf="successMessage" class="success-message">
+    <i class="fas fa-check-circle"></i> {{ successMessage }}
+  </div>
+
+  <form *ngIf="!isLoading && settings" (ngSubmit)="onSubmit()">
+    <div class="settings-grid">
+      <!-- Primer nivel de descuento -->
+      <div class="discount-tier">
+        <h3>Primer Nivel de Descuento</h3>
+        <div class="form-group">
+          <label for="tier1_quantity">Cantidad mínima:</label>
+          <input 
+            type="number" 
+            id="tier1_quantity" 
+            name="tier1_quantity"
+            [(ngModel)]="settings.tier1_quantity"
+            min="2"
+            required>
+        </div>
+        <div class="form-group">
+          <label for="tier1_discount">Porcentaje de descuento:</label>
+          <div class="discount-input">
+            <input 
+              type="number" 
+              id="tier1_discount" 
+              name="tier1_discount"
+              [(ngModel)]="settings.tier1_discount"
+              min="1"
+              max="99"
+              required>
+            <span class="percentage">%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Segundo nivel de descuento -->
+      <div class="discount-tier">
+        <h3>Segundo Nivel de Descuento</h3>
+        <div class="form-group">
+          <label for="tier2_quantity">Cantidad mínima:</label>
+          <input 
+            type="number" 
+            id="tier2_quantity" 
+            name="tier2_quantity"
+            [(ngModel)]="settings.tier2_quantity"
+            min="2"
+            required>
+        </div>
+        <div class="form-group">
+          <label for="tier2_discount">Porcentaje de descuento:</label>
+          <div class="discount-input">
+            <input 
+              type="number" 
+              id="tier2_discount" 
+              name="tier2_discount"
+              [(ngModel)]="settings.tier2_discount"
+              min="1"
+              max="99"
+              required>
+            <span class="percentage">%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-save">
+        <i class="fas fa-save"></i> Guardar Configuración
+      </button>
+    </div>
+  </form>
+</div>

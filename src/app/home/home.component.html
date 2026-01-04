@@ -1,0 +1,67 @@
+<div class="home-container">
+  <section class="hero">
+    <div class="hero-bg-slider"></div>
+    <div class="hero-content">
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <span class="hero-badge">Artesanal • Natural • Premium</span>
+          <h1>Mate Tierra</h1>
+          <p>Productos para mate con esencia natural: mates artesanales, yerbas seleccionadas y termos listos para acompañarte todos los días.</p>
+
+          <div class="hero-buttons">
+            <a routerLink="/productos" class="hero-button primary">
+              <i class="fas fa-shopping-bag"></i> Explorar catálogo
+            </a>
+            <a routerLink="/contacto" class="hero-button secondary">
+              <i class="fas fa-leaf"></i> Asesoría y pedidos
+            </a>
+          </div>
+
+          <div class="hero-highlights" aria-label="Beneficios">
+            <div class="highlight">
+              <i class="fas fa-seedling"></i>
+              <span>Selección natural</span>
+            </div>
+            <div class="highlight">
+              <i class="fas fa-hands"></i>
+              <span>Mates artesanales</span>
+            </div>
+            <div class="highlight">
+              <i class="fas fa-truck"></i>
+              <span>Envíos y retiro</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-media" aria-hidden="true">
+          <figure class="hero-frame">
+            <div class="hero-frame-media">
+              <img
+                class="hero-frame-image"
+                src="https://acdn-us.mitiendanube.com/stores/002/905/434/products/modelo-tiendanube-4-6c087d889137f8ca9017303904626139-1024-1024.webp"
+                alt="Mate artesanal"
+                loading="lazy">
+            </div>
+            <figcaption class="hero-frame-caption">
+              <span class="hero-frame-kicker">Artesanal & natural</span>
+              <span class="hero-frame-title">Elegí tu mate ideal</span>
+              <span class="hero-frame-sub">Detalles, stock y compra rápida.</span>
+            </figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+
+  <section class="seasonal-products">
+    <div class="container">
+      <app-product-carousel></app-product-carousel>
+    </div>
+  </section>
+
+  <app-categories-section></app-categories-section>
+
+  <app-features-section></app-features-section>
+</div>

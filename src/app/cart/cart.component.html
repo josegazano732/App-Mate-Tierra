@@ -1,0 +1,45 @@
+<div class="cart-container">
+  <h2>Carrito de Compras</h2>
+  <div *ngIf="cartItems.length === 0" class="empty-cart">
+    El carrito está vacío
+  </div>
+  <div *ngIf="cartItems.length > 0">
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+    <div class="cart-item" *ngFor="let item of cartItems">
+      <div class="item-details">
+        <h3>{{ item.name }}</h3>
+        <p class="price-info">
+          <span class="original-price" *ngIf="getDiscount(item) > 0">${{ getOriginalPrice(item) }}</span>
+          <span class="current-price">${{ item.price }}</span>
+          <span class="discount-badge" *ngIf="getDiscount(item) > 0">
+            -{{ getDiscount(item) | number:'1.0-0' }}%
+          </span>
+        </p>
+      </div>
+      <div class="item-quantity">
+        <button (click)="decrementQuantity(item)">-</button>
+        <span>{{ item.quantity }}</span>
+        <button (click)="incrementQuantity(item)">+</button>
+      </div>
+      <div class="item-total">
+        <p>Total: ${{ item.price * item.quantity | number:'1.2-2' }}</p>
+      </div>
+      <button class="remove-item" (click)="removeItem(item.id)">Eliminar</button>
+    </div>
+    <div class="cart-summary">
+      <div *ngIf="getTotalSavings() > 0" class="savings-info">
+        <p>Ahorro total: <span>${{ getTotalSavings() | number:'1.2-2' }}</span></p>
+      </div>
+      <div class="cart-total">
+        <h3>Total: ${{ getTotal() | number:'1.2-2' }}</h3>
+      </div>
+    </div>
+    <div class="cart-actions">
+      <button class="clear-cart" (click)="clearCart()">Vaciar Carrito</button>
+      <button class="generate-pdf" (click)="generatePDF()">Descargar PDF</button>
+      <button class="checkout">Proceder al Pago</button>
+    </div>
+  </div>
+</div>

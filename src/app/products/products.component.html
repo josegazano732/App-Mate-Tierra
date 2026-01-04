@@ -1,0 +1,158 @@
+<section class="products-page">
+  <header class="products-hero glass-card">
+    <div class="hero-copy">
+      <span class="eyebrow">Catálogo premium</span>
+      <h1>Encuentra tu próximo ritual matero</h1>
+      <p>Explora nuestra selección curada de productos para mate con descripciones claras, disponibilidad al momento y acciones rápidas.</p>
+    </div>
+    <div class="hero-metrics">
+      <div class="metric">
+        <span class="metric-value">{{ filteredProducts.length || 0 }}</span>
+        <span class="metric-label">Productos encontrados</span>
+      </div>
+      <div class="metric">
+        <span class="metric-value">{{ availableProducts || 0 }}</span>
+        <span class="metric-label">Con stock activo</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="products-layout">
+    <aside class="filter-panel glass-card">
+      <div class="filter-intro">
+        <div>
+          <p class="eyebrow">Filtrar catálogo</p>
+          <h2>Refina tu búsqueda</h2>
+          <p>Combina palabras clave y categorías para encontrar el set ideal.</p>
+        </div>
+        <button type="button" class="toolbar-refresh" (click)="retryLoading()" [disabled]="isLoading">
+          <i class="fas fa-sync-alt"></i>
+          Actualizar datos
+        </button>
+      </div>
+      <app-product-filter (filterChange)="onFilterChange($event)"></app-product-filter>
+    </aside>
+
+    <section class="products-panel glass-card">
+      <div class="products-toolbar">
+        <div class="toolbar-meta">
+          <span class="results-count">
+            <i class="fas fa-box-open"></i>
+            Mostrando {{ displayedProducts.length }} de {{ filteredProducts.length }} productos
+          </span>
+          <span class="stock-indicator" *ngIf="availableProducts">
+            <i class="fas fa-check-circle"></i>
+            {{ availableProducts }} disponibles
+          </span>
+        </div>
+        <div class="toolbar-actions">
+          <span class="page-indicator" *ngIf="totalPages > 1">Página {{ currentPage }} / {{ totalPages }}</span>
+          <button type="button" class="toolbar-refresh" (click)="retryLoading()" [disabled]="isLoading">
+            <i class="fas fa-sync-alt"></i>
+            Refrescar
+          </button>
+        </div>
+      </div>
+
+      <div class="state-card" *ngIf="isLoading">
+        <i class="fas fa-spinner fa-spin"></i>
+        <div>
+          <p>Cargando productos...</p>
+          <small>Obteniendo el inventario más reciente.</small>
+        </div>
+      </div>
+
+      <div class="state-card error" *ngIf="errorMessage">
+        <i class="fas fa-exclamation-circle"></i>
+        <div>
+          <p>{{ errorMessage }}</p>
+          <button type="button" class="toolbar-refresh" (click)="retryLoading()">
+            <i class="fas fa-sync-alt"></i>
+            Intentar de nuevo
+          </button>
+        </div>
+      </div>
+
+      <div class="state-card empty" *ngIf="!isLoading && !errorMessage && filteredProducts.length === 0">
+        <i class="fas fa-search"></i>
+        <div>
+          <p>No se encontraron productos con esos filtros.</p>
+          <small>Ajusta la búsqueda o selecciona otra categoría.</small>
+        </div>
+      </div>
+
+      <div *ngIf="!isLoading && !errorMessage && filteredProducts.length" [@productAnimation]="displayedProducts.length" class="products-list">
+        <article class="product-card" *ngFor="let product of displayedProducts">
+          <div class="card-media" (click)="viewProductDetails(product)" role="button" tabindex="0">
+            <img [src]="product.image"
+                 [alt]="product.name"
+                 loading="lazy"
+                 (error)="handleProductImageError($event)">
+            <div class="media-overlay"></div>
+            <div class="badge-stack">
+              <span class="badge category">{{ product.category_name || 'Colección' }}</span>
+              <span class="badge stock"
+                    [class.low-stock]="product.stock < 5 && product.stock > 0"
+                    [class.out-of-stock]="product.stock === 0">
+                {{ product.stock === 0 ? 'Sin stock' : product.stock < 5 ? 'Últimas unidades' : product.stock + ' disponibles' }}
+              </span>
+            </div>
+            <div class="media-cta">
+              <span class="media-title">{{ product.name }}</span>
+              <span class="media-subtitle">Toca para ver detalles</span>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="card-header">
+              <h2 class="product-title" (click)="viewProductDetails(product)">{{ product.name }}</h2>
+              <p class="product-description">
+                {{ product.description | slice:0:110 }}{{ product.description.length > 110 ? '…' : '' }}
+              </p>
+            </div>
+
+            <div class="card-meta">
+              <div class="price-wrapper">
+                <span class="product-price">{{ product.price | currency:'USD' }}</span>
+                <small>Precio final</small>
+              </div>
+              <div class="stock-info" [class.low-stock]="product.stock < 5" [class.out-of-stock]="product.stock === 0">
+                <i class="fas" [ngClass]="{
+                  'fa-check-circle': product.stock > 5,
+                  'fa-exclamation-triangle': product.stock > 0 && product.stock <=5,
+                  'fa-times-circle': product.stock === 0
+                }"></i>
+                <span>
+                  {{ product.stock === 0 ? 'Sin unidades disponibles' : product.stock < 5 ? 'Quedan ' + product.stock + ' unidades' : 'Stock saludable' }}
+                </span>
+              </div>
+            </div>
+
+            <div class="product-actions">
+              <button class="btn cta" (click)="addToCart(product)" [disabled]="product.stock === 0">
+                <i class="fas fa-cart-plus"></i>
+                {{ product.stock === 0 ? 'Sin stock' : 'Agregar al carrito' }}
+              </button>
+              <button class="btn secondary" (click)="viewProductDetails(product)">
+                <i class="fas fa-info-circle"></i>
+                Ver detalles
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <div class="pagination" *ngIf="totalPages > 1">
+        <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">
+          <i class="fas fa-arrow-left"></i>
+          Anterior
+        </button>
+        <span>Página {{ currentPage }} de {{ totalPages }}</span>
+        <button (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages">
+          Siguiente
+          <i class="fas fa-arrow-right"></i>
+        </button>
+      </div>
+    </section>
+  </div>
+</section>

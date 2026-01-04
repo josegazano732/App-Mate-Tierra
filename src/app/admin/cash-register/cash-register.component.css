@@ -1,0 +1,499 @@
+.cash-register-container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 2rem;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+h2 {
+  color: #2c3e50;
+  margin: 0;
+}
+
+.btn-back {
+  background-color: #3498db;
+  color: white;
+  text-decoration: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.3s ease;
+}
+
+.btn-back:hover {
+  background-color: #2980b9;
+}
+
+.btn-export {
+  background-color: #27ae60;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.3s ease;
+  font-size: 1rem;
+}
+
+.btn-export:hover {
+  background-color: #219a52;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  color: #3C9C36;
+  font-size: 1.2rem;
+}
+
+.error-message {
+  background-color: #fee2e2;
+  color: #dc2626;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.table-container {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow-x: auto;
+  margin-bottom: 2rem;
+}
+
+.sales-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+}
+
+.sales-table th,
+.sales-table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.sales-table th {
+  background-color: #f8fafc;
+  color: #2c3e50;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.sales-table tr:hover {
+  background-color: #f8fafc;
+}
+
+.sales-table tr.cancelled {
+  background-color: #f8f9fa;
+  color: #6b7280;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.status-badge.completed {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.status-badge.cancelled {
+  background-color: #fde8e8;
+  color: #c0392b;
+}
+
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.summary-card {
+  background-color: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+}
+
+.total-sales .card-icon {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.total-withdrawals .card-icon {
+  background-color: #fde8e8;
+  color: #c0392b;
+}
+
+.available-cash .card-icon {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.card-content {
+  flex: 1;
+}
+
+.card-content h3 {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+}
+
+.amount {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.detail {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin: 0.25rem 0 0;
+}
+
+.percentage-bar {
+  width: 100%;
+  height: 8px;
+  background-color: #edf2f7;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  margin: 8px 0;
+}
+
+.bar {
+  height: 100%;
+  background: linear-gradient(90deg, #3C9C36 0%, #48bb78 100%);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.percentage-bar .percentage {
+  position: absolute;
+  top: -18px;
+  right: 0;
+  font-size: 0.875rem;
+  color: #4a5568;
+  font-weight: 500;
+}
+
+.btn-withdrawal, .btn-income {
+  background-color: #3C9C36;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: background-color 0.3s ease;
+  font-size: 1rem;
+}
+
+.btn-withdrawal {
+  background-color: #e74c3c;
+}
+
+.btn-withdrawal:hover {
+  background-color: #c0392b;
+}
+
+.btn-income:hover {
+  background-color: #219a52;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content h3 {
+  margin: 0 0 1.5rem;
+  color: #2c3e50;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.form-group select,
+.form-group input,
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.form-group select:focus,
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #3C9C36;
+  box-shadow: 0 0 0 2px rgba(60, 156, 54, 0.1);
+}
+
+.form-group textarea {
+  height: 100px;
+  resize: vertical;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn-save,
+.btn-cancel {
+  flex: 1;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background-color 0.3s ease;
+}
+
+.btn-save {
+  background-color: #3C9C36;
+  color: white;
+}
+
+.btn-save:hover {
+  background-color: #2ecc71;
+}
+
+.btn-cancel {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.btn-cancel:hover {
+  background-color: #c0392b;
+}
+
+.payment-methods-table,
+.withdrawals-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.payment-methods-table th,
+.withdrawals-table th {
+  background-color: #f8fafc;
+  color: #1a365d;
+  font-weight: 600;
+  padding: 1.25rem 1rem;
+  text-transform: uppercase;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.payment-methods-table td,
+.withdrawals-table td {
+  padding: 1.25rem 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  color: #2d3748;
+  font-size: 0.95rem;
+}
+
+.payment-methods-table tr:hover td,
+.withdrawals-table tr:hover td {
+  background-color: #f7fafc;
+}
+
+.payment-methods-table .amount,
+.withdrawals-table .amount {
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.payment-methods-table .positive-amount {
+  color: #2f855a;
+}
+
+.payment-methods-table .negative-amount {
+  color: #c53030;
+}
+
+.payment-methods-table tfoot td {
+  background-color: #f8fafc;
+  font-weight: 700;
+  border-top: 2px solid #e2e8f0;
+}
+
+.withdrawals-section h3 {
+  color: #2d3748;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 2rem 0 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.date-column {
+  white-space: nowrap;
+  color: #718096;
+  font-size: 0.875rem;
+}
+
+.method-name {
+  font-weight: 500;
+  color: #2d3748;
+}
+
+.description-column {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 1024px) {
+  .payment-methods-table,
+  .withdrawals-table {
+    font-size: 0.875rem;
+  }
+
+  .payment-methods-table th,
+  .withdrawals-table th,
+  .payment-methods-table td,
+  .withdrawals-table td {
+    padding: 1rem 0.75rem;
+  }
+
+  .description-column {
+    max-width: 200px;
+  }
+}
+
+@media (max-width: 768px) {
+  .cash-register-container {
+    padding: 1rem;
+  }
+
+  .history-header {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .header-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .btn-export,
+  .btn-withdrawal,
+  .btn-income {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .summary-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .table-container {
+    margin: 0 -1rem;
+    border-radius: 0;
+  }
+
+  .payment-methods-table,
+  .withdrawals-table {
+    font-size: 0.8125rem;
+  }
+
+  .payment-methods-table th,
+  .withdrawals-table th,
+  .payment-methods-table td,
+  .withdrawals-table td {
+    padding: 0.875rem 0.5rem;
+  }
+
+  .description-column {
+    max-width: 150px;
+  }
+}

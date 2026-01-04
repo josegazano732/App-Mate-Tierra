@@ -1,0 +1,50 @@
+<footer>
+  <div class="container">
+    <div class="footer-content">
+      <div class="footer-logo">
+        <img [src]="logoUrl || 'https://via.placeholder.com/150x150?text=Logo'" alt="Mate Tierra Logo">
+        <p>Descubre nuestra selección premium de mates y accesorios, cuidadosamente elegidos para los verdaderos amantes del mate.</p>
+      </div>
+      <div class="footer-links">
+        <h3>Enlaces Rápidos</h3>
+        <ul>
+          <li>
+            <a routerLink="/">
+              <i class="fas fa-home"></i> Inicio
+            </a>
+          </li>
+          <li>
+            <a routerLink="/productos">
+              <i class="fas fa-store"></i> Productos
+            </a>
+          </li>
+          <li>
+            <a routerLink="/contacto">
+              <i class="fas fa-envelope"></i> Contacto
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="footer-social">
+        <h3>Conecta con Nosotros</h3>
+        <div class="social-icons">
+          <a href="#" target="_blank" aria-label="Instagram">
+            <i class="fab fa-instagram"></i>
+          </a>
+          <a href="#" target="_blank" aria-label="Facebook">
+            <i class="fab fa-facebook-f"></i>
+          </a>
+          <a href="tel:+123456789" aria-label="Teléfono">
+            <i class="fas fa-phone"></i>
+          </a>
+          <a href="mailto:info@matetierra.com" aria-label="Email">
+            <i class="fas fa-envelope"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; {{ currentYear }} Mate Tierra. Todos los derechos reservados.</p>
+    </div>
+  </div>
+</footer>
