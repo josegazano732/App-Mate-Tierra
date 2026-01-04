@@ -19,7 +19,13 @@
     {{ errorMessage }}
   </div>
 
-  <div class="table-container" *ngIf="!loading">
+  <div class="empty-state" *ngIf="!loading && historyRows.length === 0 && !errorMessage">
+    <i class="fas fa-clipboard-list"></i>
+    <p>No encontramos ventas registradas todavía.</p>
+    <small>Cuando registres operaciones aparecerán en este historial.</small>
+  </div>
+
+  <div class="table-container" *ngIf="!loading && historyRows.length > 0">
     <table class="sales-table">
       <thead>
         <tr>
@@ -32,16 +38,16 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let sale of sales" [class.cancelled]="sale.status === 'cancelled'">
-          <td>{{ sale.created_at | date:'medium' }}</td>
+        <tr *ngFor="let row of historyRows; trackBy: trackBySaleId" [class.cancelled]="row.sale.status === 'cancelled'">
+          <td>{{ row.sale.created_at | date:'medium' }}</td>
           <td>
-            <span class="status-badge" [class]="sale.status">
-              {{ sale.status === 'completed' ? 'Completada' : 'Cancelada' }}
+            <span class="status-badge" [class]="row.sale.status">
+              {{ row.sale.status === 'completed' ? 'Completada' : 'Cancelada' }}
             </span>
           </td>
           <td>
             <div class="payment-methods-list">
-              <span *ngFor="let method of getPaymentMethodsForSale(sale)">
+              <span *ngFor="let method of row.paymentSummaries">
                 {{ method.name }}
                 <span *ngIf="method.amount" class="payment-amount">({{ method.amount | currency:'USD' }})</span>
               </span>
@@ -49,7 +55,7 @@
           </td>
           <td>
             <ul class="products-list">
-              <li *ngFor="let item of sale.items">
+              <li *ngFor="let item of row.items">
                 {{ item.product_name }} 
                 <span class="product-details">
                   ({{ item.quantity }}x {{ item.unit_price | currency:'USD' }})
@@ -57,11 +63,11 @@
               </li>
             </ul>
           </td>
-          <td class="total-column">{{ sale.total_amount | currency:'USD' }}</td>
+          <td class="total-column">{{ row.sale.total_amount | currency:'USD' }}</td>
           <td>
             <button 
-              *ngIf="sale.status === 'completed'"
-              (click)="cancelSale(sale.id)" 
+              *ngIf="row.sale.status === 'completed'"
+              (click)="cancelSale(row.sale.id)" 
               class="btn-cancel" 
               title="Cancelar venta">
               <i class="fas fa-ban"></i>

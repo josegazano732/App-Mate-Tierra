@@ -62,6 +62,23 @@ h2 {
   font-size: 1.2rem;
 }
 
+.empty-state {
+  border: 1px dashed rgba(44, 62, 80, 0.35);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  color: #4b5563;
+  background-color: #f8fafc;
+  margin-bottom: 1.5rem;
+}
+
+.empty-state i {
+  display: block;
+  font-size: 1.75rem;
+  margin-bottom: 0.5rem;
+  color: #3C9C36;
+}
+
 .error-message {
   background-color: #fee2e2;
   color: #dc2626;

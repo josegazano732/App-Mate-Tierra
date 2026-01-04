@@ -1,7 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { SalesService, Sale, PaymentSplit } from '../../services/sales.service';
+import { SalesService, Sale } from '../../services/sales.service';
 import { PaymentMethodsService, PaymentMethod } from '../../services/payment-methods.service';
 import * as XLSX from 'xlsx';
+
+interface SaleRow {
+  sale: Sale;
+  items: Sale['items'];
+  paymentSummaries: { name: string; amount?: number }[];
+}
 
 @Component({
   selector: 'app-sales-history',
@@ -13,6 +19,7 @@ export class SalesHistoryComponent implements OnInit {
   paymentMethods: PaymentMethod[] = [];
   errorMessage = '';
   loading = true;
+  historyRows: SaleRow[] = [];
   // Paginación
   page = 1;
   pageSize = 20;
@@ -33,6 +40,7 @@ export class SalesHistoryComponent implements OnInit {
     this.paymentMethodsService.getPaymentMethods().subscribe({
       next: (methods) => {
         this.paymentMethods = methods;
+        this.rebuildRows();
       },
       error: (error) => {
         console.error('Error loading payment methods:', error);
@@ -46,6 +54,7 @@ export class SalesHistoryComponent implements OnInit {
       this.sales = [];
       this.page = 1;
       this.totalSales = 0;
+      this.historyRows = [];
     }
     this.loading = this.page === 1;
     this.isLoadingMore = this.page > 1;
@@ -53,6 +62,7 @@ export class SalesHistoryComponent implements OnInit {
       next: (result: { sales: Sale[], total: number }) => {
         this.sales = [...this.sales, ...result.sales];
         this.totalSales = result.total;
+        this.rebuildRows();
         this.loading = false;
         this.isLoadingMore = false;
       },
@@ -77,11 +87,37 @@ export class SalesHistoryComponent implements OnInit {
     });
   }
 
-  getPaymentMethodsForSale(sale: Sale): { name: string; amount?: number }[] {
-    const methods = sale.payment_method.split(',');
-    return methods.map(method => {
-      const paymentMethod = this.paymentMethods.find(m => m.code === method);
-      const split = sale.payment_splits?.[methods.indexOf(method)];
+  trackBySaleId(_index: number, row: SaleRow): string {
+    return row.sale.id;
+  }
+
+  private rebuildRows(): void {
+    if (!this.sales || this.sales.length === 0) {
+      this.historyRows = [];
+      return;
+    }
+
+    const catalog = this.paymentMethods || [];
+    this.historyRows = this.sales.map((sale) => ({
+      sale,
+      items: sale.items || [],
+      paymentSummaries: this.buildPaymentSummaries(sale, catalog)
+    }));
+  }
+
+  private buildPaymentSummaries(sale: Sale, catalog: PaymentMethod[]): { name: string; amount?: number }[] {
+    if (!sale?.payment_method) {
+      return [];
+    }
+
+    const methods = sale.payment_method
+      .split(',')
+      .map(method => method.trim())
+      .filter(Boolean);
+
+    return methods.map((method, idx) => {
+      const paymentMethod = catalog.find(m => m.code === method);
+      const split = sale.payment_splits?.[idx];
       return {
         name: paymentMethod ? paymentMethod.name : method,
         amount: split ? split.amount : undefined
@@ -92,11 +128,11 @@ export class SalesHistoryComponent implements OnInit {
   exportToExcel() {
     // Prepare data for Excel
     const excelData = this.sales.map(sale => {
-      const paymentMethods = this.getPaymentMethodsForSale(sale)
+      const paymentMethods = this.buildPaymentSummaries(sale, this.paymentMethods)
         .map(method => `${method.name}${method.amount ? ` ($${method.amount})` : ''}`)
         .join(', ');
 
-      const items = sale.items?.map(item => 
+      const items = (sale.items || []).map(item => 
         `${item.product_name} (${item.quantity}x $${item.unit_price})`
       ).join(', ') || '';
 
