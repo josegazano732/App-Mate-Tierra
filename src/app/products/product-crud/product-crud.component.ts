@@ -1,11 +1,23 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { Router } from '@angular/router';
 import { ProductService, Product } from '../../services/product.service';
 import { CategoryService } from '../../services/category.service';
 import { Category } from '../../models/category.model';
 import { ImageService } from '../../services/image.service';
 import { SupabaseService } from '../../services/supabase.service';
 import { firstValueFrom } from 'rxjs';
+
+interface ProductFilters {
+  name: string;
+  description: string;
+  categoryId: string;
+  seasonal: 'all' | 'true' | 'false';
+  minCost: number | null;
+  maxCost: number | null;
+  minPrice: number | null;
+  maxPrice: number | null;
+  minStock: number | null;
+  maxStock: number | null;
+}
 
 @Component({
   selector: 'app-product-crud',
@@ -38,6 +50,15 @@ export class ProductCrudComponent implements OnInit {
   errorMessage = '';
   isSubmitting = false;
   showAddForm = false;
+  isLoadingProducts = false;
+
+  filters!: ProductFilters;
+  filteredProducts: Product[] = [];
+  paginatedProducts: Product[] = [];
+  pageSizeOptions = [10, 20, 50];
+  pageSize = 10;
+  currentPage = 1;
+  totalPages = 1;
 
   createImagePreviews: string[] = [];
   createSelectedFiles: File[] = [];
@@ -59,9 +80,10 @@ export class ProductCrudComponent implements OnInit {
     private productService: ProductService,
     private categoryService: CategoryService,
     private imageService: ImageService,
-    private supabaseService: SupabaseService,
-    private router: Router
-  ) {}
+    private supabaseService: SupabaseService
+  ) {
+    this.filters = this.createDefaultFilters();
+  }
 
   ngOnInit() {
     this.loadProducts();
@@ -188,16 +210,206 @@ export class ProductCrudComponent implements OnInit {
   }
 
   loadProducts() {
+    this.isLoadingProducts = true;
     this.productService.getProducts().subscribe({
       next: (products) => {
         this.products = products;
         this.errorMessage = '';
+        this.applyFilters();
+        this.isLoadingProducts = false;
       },
       error: (error) => {
         console.error('Error loading products:', error);
         this.errorMessage = 'Could not load products. Please try again later.';
+        this.filteredProducts = [];
+        this.paginatedProducts = [];
+        this.totalPages = 1;
+        this.isLoadingProducts = false;
       }
     });
+  }
+
+  onFilterChange() {
+    this.applyFilters();
+  }
+
+  resetFilters() {
+    this.filters = this.createDefaultFilters();
+    this.applyFilters();
+  }
+
+  onPageSizeChange(size: number) {
+    const parsedSize = Number(size);
+    if (!parsedSize || parsedSize <= 0) {
+      return;
+    }
+
+    this.pageSize = parsedSize;
+    this.currentPage = 1;
+    this.updatePagination();
+  }
+
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage += 1;
+      this.updatePagination();
+    }
+  }
+
+  prevPage() {
+    if (this.currentPage > 1) {
+      this.currentPage -= 1;
+      this.updatePagination();
+    }
+  }
+
+  get displayRangeStart(): number {
+    if (!this.filteredProducts.length) {
+      return 0;
+    }
+    return (this.currentPage - 1) * this.pageSize + 1;
+  }
+
+  get displayRangeEnd(): number {
+    if (!this.filteredProducts.length) {
+      return 0;
+    }
+    return this.displayRangeStart + this.paginatedProducts.length - 1;
+  }
+
+  get activeFilterCount(): number {
+    const {
+      name,
+      description,
+      categoryId,
+      seasonal,
+      minCost,
+      maxCost,
+      minPrice,
+      maxPrice,
+      minStock,
+      maxStock
+    } = this.filters;
+
+    let count = 0;
+
+    if (name.trim()) count += 1;
+    if (description.trim()) count += 1;
+    if (categoryId) count += 1;
+    if (seasonal !== 'all') count += 1;
+    if (minCost !== null) count += 1;
+    if (maxCost !== null) count += 1;
+    if (minPrice !== null) count += 1;
+    if (maxPrice !== null) count += 1;
+    if (minStock !== null) count += 1;
+    if (maxStock !== null) count += 1;
+
+    return count;
+  }
+
+  get hasActiveFilters(): boolean {
+    return this.activeFilterCount > 0;
+  }
+
+  private createDefaultFilters(): ProductFilters {
+    return {
+      name: '',
+      description: '',
+      categoryId: '',
+      seasonal: 'all',
+      minCost: null,
+      maxCost: null,
+      minPrice: null,
+      maxPrice: null,
+      minStock: null,
+      maxStock: null
+    };
+  }
+
+  private matchesFilters(product: Product): boolean {
+    const {
+      name,
+      description,
+      categoryId,
+      seasonal,
+      minCost,
+      maxCost,
+      minPrice,
+      maxPrice,
+      minStock,
+      maxStock
+    } = this.filters;
+
+    const normalizedName = name.trim().toLowerCase();
+    if (normalizedName && !product.name.toLowerCase().includes(normalizedName)) {
+      return false;
+    }
+
+    const normalizedDescription = description.trim().toLowerCase();
+    if (normalizedDescription && !(product.description || '').toLowerCase().includes(normalizedDescription)) {
+      return false;
+    }
+
+    if (categoryId && product.category_id !== categoryId) {
+      return false;
+    }
+
+    if (seasonal === 'true' && !product.seasonal) {
+      return false;
+    }
+
+    if (seasonal === 'false' && product.seasonal) {
+      return false;
+    }
+
+    if (minCost !== null && product.cost < minCost) {
+      return false;
+    }
+
+    if (maxCost !== null && product.cost > maxCost) {
+      return false;
+    }
+
+    if (minPrice !== null && product.price < minPrice) {
+      return false;
+    }
+
+    if (maxPrice !== null && product.price > maxPrice) {
+      return false;
+    }
+
+    if (minStock !== null && product.stock < minStock) {
+      return false;
+    }
+
+    if (maxStock !== null && product.stock > maxStock) {
+      return false;
+    }
+
+    return true;
+  }
+
+  applyFilters(resetPage: boolean = true) {
+    this.filteredProducts = this.products.filter(product => this.matchesFilters(product));
+
+    if (resetPage) {
+      this.currentPage = 1;
+    }
+
+    this.updatePagination();
+  }
+
+  private updatePagination() {
+    const totalItems = this.filteredProducts.length;
+    this.totalPages = Math.max(Math.ceil(totalItems / this.pageSize), 1);
+
+    if (this.currentPage > this.totalPages) {
+      this.currentPage = this.totalPages;
+    }
+
+    const start = (this.currentPage - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    this.paginatedProducts = this.filteredProducts.slice(start, end);
   }
 
   triggerFileInput(mode: 'create' | 'edit') {
@@ -506,6 +718,10 @@ export class ProductCrudComponent implements OnInit {
     return this.imagePlaceholder;
   }
 
+  trackByProductId(_index: number, product: Product): string {
+    return product.id;
+  }
+
   async deleteProduct(product: Product) {
     const confirmMessage = product.stock > 0
       ? `¿Confirmás la eliminación de "${product.name}"? El producto tiene stock y podría estar vinculado a ventas.`
@@ -516,6 +732,7 @@ export class ProductCrudComponent implements OnInit {
         await firstValueFrom(this.productService.deleteProduct(product.id));
         this.products = this.products.filter(p => p.id !== product.id);
         this.errorMessage = '';
+        this.applyFilters(false);
       } catch (error: any) {
         console.error('Error deleting product:', error);
         if (error.message === 'sale_items_product_id_fkey') {

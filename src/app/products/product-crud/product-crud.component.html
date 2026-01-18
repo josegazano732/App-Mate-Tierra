@@ -39,6 +39,169 @@
         <p class="eyebrow">Inventario actualizado</p>
         <h3>Listado de productos</h3>
       </div>
+      <div class="table-meta">
+        <span class="meta-primary">
+          {{ filteredProducts.length }} {{ filteredProducts.length === 1 ? 'producto' : 'productos' }}
+        </span>
+        <span *ngIf="hasActiveFilters" class="meta-secondary">
+          <i class="fas fa-filter"></i>
+          {{ activeFilterCount }} {{ activeFilterCount === 1 ? 'filtro activo' : 'filtros activos' }}
+        </span>
+      </div>
+    </div>
+
+    <div class="filters-panel">
+      <div class="filters-title">
+        <i class="fas fa-sliders-h"></i>
+        <span>Filtrar por columnas</span>
+      </div>
+      <div class="filter-grid">
+        <div class="filter-field">
+          <label for="filter-name">Nombre</label>
+          <input
+            id="filter-name"
+            type="text"
+            placeholder="Buscar por nombre"
+            [(ngModel)]="filters.name"
+            [ngModelOptions]="{ standalone: true }"
+            (ngModelChange)="onFilterChange()"
+          />
+        </div>
+        <div class="filter-field">
+          <label for="filter-description">Descripción</label>
+          <input
+            id="filter-description"
+            type="text"
+            placeholder="Palabras clave"
+            [(ngModel)]="filters.description"
+            [ngModelOptions]="{ standalone: true }"
+            (ngModelChange)="onFilterChange()"
+          />
+        </div>
+        <div class="filter-field">
+          <label for="filter-category">Categoría</label>
+          <select
+            id="filter-category"
+            [(ngModel)]="filters.categoryId"
+            [ngModelOptions]="{ standalone: true }"
+            (ngModelChange)="onFilterChange()"
+          >
+            <option value="">Todas</option>
+            <option *ngFor="let category of categories" [value]="category.id">
+              {{ category.name }}
+            </option>
+          </select>
+        </div>
+        <div class="filter-field">
+          <label for="filter-seasonal">Temporada</label>
+          <select
+            id="filter-seasonal"
+            [(ngModel)]="filters.seasonal"
+            [ngModelOptions]="{ standalone: true }"
+            (ngModelChange)="onFilterChange()"
+          >
+            <option value="all">Todos</option>
+            <option value="true">Sólo temporada</option>
+            <option value="false">Disponibles siempre</option>
+          </select>
+        </div>
+        <div class="filter-field">
+          <label for="filter-cost-min">Costo (mín - máx)</label>
+          <div class="range-inputs">
+            <input
+              id="filter-cost-min"
+              type="number"
+              placeholder="Min"
+              [(ngModel)]="filters.minCost"
+              [ngModelOptions]="{ standalone: true }"
+              (ngModelChange)="onFilterChange()"
+              inputmode="decimal"
+              step="0.01"
+              min="0"
+            />
+            <input
+              type="number"
+              placeholder="Max"
+              [(ngModel)]="filters.maxCost"
+              [ngModelOptions]="{ standalone: true }"
+              (ngModelChange)="onFilterChange()"
+              inputmode="decimal"
+              step="0.01"
+              min="0"
+              aria-label="Costo máximo"
+            />
+          </div>
+        </div>
+        <div class="filter-field">
+          <label for="filter-price-min">Precio (mín - máx)</label>
+          <div class="range-inputs">
+            <input
+              id="filter-price-min"
+              type="number"
+              placeholder="Min"
+              [(ngModel)]="filters.minPrice"
+              [ngModelOptions]="{ standalone: true }"
+              (ngModelChange)="onFilterChange()"
+              inputmode="decimal"
+              step="0.01"
+              min="0"
+            />
+            <input
+              type="number"
+              placeholder="Max"
+              [(ngModel)]="filters.maxPrice"
+              [ngModelOptions]="{ standalone: true }"
+              (ngModelChange)="onFilterChange()"
+              inputmode="decimal"
+              step="0.01"
+              min="0"
+              aria-label="Precio máximo"
+            />
+          </div>
+        </div>
+        <div class="filter-field">
+          <label for="filter-stock-min">Stock (mín - máx)</label>
+          <div class="range-inputs">
+            <input
+              id="filter-stock-min"
+              type="number"
+              placeholder="Min"
+              [(ngModel)]="filters.minStock"
+              [ngModelOptions]="{ standalone: true }"
+              (ngModelChange)="onFilterChange()"
+              inputmode="numeric"
+              min="0"
+            />
+            <input
+              type="number"
+              placeholder="Max"
+              [(ngModel)]="filters.maxStock"
+              [ngModelOptions]="{ standalone: true }"
+              (ngModelChange)="onFilterChange()"
+              inputmode="numeric"
+              min="0"
+              aria-label="Stock máximo"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="filter-actions">
+        <div class="filter-summary">
+          <span *ngIf="hasActiveFilters" class="active-filter-badge">
+            <i class="fas fa-filter"></i>
+            {{ activeFilterCount }} {{ activeFilterCount === 1 ? 'filtro activo' : 'filtros activos' }}
+          </span>
+          <span class="filter-hint">Combiná criterios para depurar rápidamente el inventario.</span>
+        </div>
+        <button
+          type="button"
+          class="btn-secondary btn-compact filter-reset"
+          (click)="resetFilters()"
+          [disabled]="!hasActiveFilters"
+        >
+          <i class="fas fa-eraser"></i> Limpiar filtros
+        </button>
+      </div>
     </div>
     <div class="table-container">
       <table>
@@ -57,7 +220,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let product of products">
+          <tr *ngFor="let product of paginatedProducts; trackBy: trackByProductId">
             <td data-label="Imagen">
               <img
                 [src]="getPrimaryImage(product)"
@@ -101,8 +264,52 @@
               </div>
             </td>
           </tr>
+          <tr *ngIf="!paginatedProducts.length && !isLoadingProducts">
+            <td colspan="10" class="empty-state">
+              <i class="fas fa-search"></i>
+              <span>
+                {{ hasActiveFilters ? 'No encontramos productos que coincidan con los filtros aplicados.' : 'Todavía no hay productos registrados.' }}
+              </span>
+            </td>
+          </tr>
         </tbody>
       </table>
+    </div>
+    <div class="pagination-bar" *ngIf="filteredProducts.length">
+      <div class="pagination-info">
+        Mostrando {{ displayRangeStart }} - {{ displayRangeEnd }} de {{ filteredProducts.length }}
+      </div>
+      <div class="pagination-controls">
+        <label class="page-size-label" for="page-size">Productos por página</label>
+        <select
+          id="page-size"
+          [ngModel]="pageSize"
+          (ngModelChange)="onPageSizeChange($event)"
+          [ngModelOptions]="{ standalone: true }"
+          aria-label="Seleccionar cantidad de productos por página"
+        >
+          <option *ngFor="let option of pageSizeOptions" [ngValue]="option">{{ option }}</option>
+        </select>
+        <button
+          type="button"
+          class="btn-secondary btn-compact pagination-btn"
+          (click)="prevPage()"
+          [disabled]="currentPage === 1"
+          aria-label="Página anterior"
+        >
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        <span class="page-indicator">Página {{ currentPage }} de {{ totalPages }}</span>
+        <button
+          type="button"
+          class="btn-secondary btn-compact pagination-btn"
+          (click)="nextPage()"
+          [disabled]="currentPage === totalPages || !filteredProducts.length"
+          aria-label="Página siguiente"
+        >
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
     </div>
   </div>
 
