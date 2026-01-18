@@ -16,6 +16,9 @@ export class ProductDetailsComponent implements OnInit {
   errorMessage: string | null = null;
   quantity = 1;
   discountSettings: DiscountSettings | null = null;
+  productImages: string[] = [];
+  selectedImageIndex = 0;
+  private readonly fallbackImage = 'https://images.unsplash.com/photo-1501426026826-31c667bdf23d?auto=format&fit=crop&w=900&q=60';
 
   constructor(
     private route: ActivatedRoute,
@@ -46,6 +49,9 @@ export class ProductDetailsComponent implements OnInit {
         this.isLoading = false;
         if (!product) {
           this.errorMessage = 'Product not found';
+          this.setProductImages(null);
+        } else {
+          this.setProductImages(product);
         }
       },
       error: (error) => {
@@ -154,5 +160,71 @@ export class ProductDetailsComponent implements OnInit {
 
   getQuantityTier2(): number {
     return this.discountSettings?.tier2_quantity || 10;
+  }
+
+  get currentImage(): string {
+    return this.productImages[this.selectedImageIndex] ?? this.fallbackImage;
+  }
+
+  selectImage(index: number) {
+    if (index === this.selectedImageIndex) {
+      return;
+    }
+
+    if (index >= 0 && index < this.productImages.length) {
+      this.selectedImageIndex = index;
+    }
+  }
+
+  handleImageError(event: Event) {
+    const target = event.target as HTMLImageElement | null;
+    if (!target) {
+      return;
+    }
+
+    if (target.src === this.fallbackImage) {
+      return;
+    }
+
+    target.onerror = null;
+    target.src = this.fallbackImage;
+  }
+
+  handleThumbnailError(event: Event, index: number) {
+    const target = event.target as HTMLImageElement | null;
+    if (!target) {
+      return;
+    }
+
+    if (target.src !== this.fallbackImage) {
+      target.onerror = null;
+      target.src = this.fallbackImage;
+    }
+
+    if (index >= 0 && index < this.productImages.length) {
+      this.productImages[index] = this.fallbackImage;
+    }
+  }
+
+  private setProductImages(product: Product | null) {
+    const urls = this.extractImageUrls(product);
+    this.productImages = urls.length ? urls : [this.fallbackImage];
+    this.selectedImageIndex = 0;
+  }
+
+  private extractImageUrls(product: Product | null): string[] {
+    if (!product) {
+      return [];
+    }
+
+    if (Array.isArray(product.image_urls) && product.image_urls.length) {
+      return product.image_urls.filter((url) => typeof url === 'string' && url.trim().length > 0);
+    }
+
+    if (typeof product.image === 'string' && product.image.trim().length > 0) {
+      return [product.image.trim()];
+    }
+
+    return [];
   }
 }

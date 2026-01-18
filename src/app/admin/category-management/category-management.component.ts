@@ -217,20 +217,29 @@ export class CategoryManagementComponent implements OnInit {
 
   private buildProductImageOptions(products: Product[]): { id: string; url: string; label: string }[] {
     const seen = new Set<string>();
-    return products
-      .filter(product => !!product.image)
-      .filter(product => {
-        if (seen.has(product.image)) {
-          return false;
+    const options: { id: string; url: string; label: string }[] = [];
+
+    products.forEach(product => {
+      const urls = Array.isArray(product.image_urls) && product.image_urls.length
+        ? product.image_urls
+        : (product.image ? [product.image] : []);
+
+      urls.forEach((url, index) => {
+        if (!url || seen.has(url)) {
+          return;
         }
-        seen.add(product.image);
-        return true;
-      })
-      .map(product => ({
-        id: product.id,
-        url: product.image,
-        label: `${product.name} · ${product.id}`
-      }));
+
+        seen.add(url);
+        const labelSuffix = urls.length > 1 ? ` · imagen ${index + 1}` : '';
+        options.push({
+          id: `${product.id}#${index}`,
+          url,
+          label: `${product.name}${labelSuffix}`
+        });
+      });
+    });
+
+    return options;
   }
 
   private resolveErrorMessage(error: any, fallback: string): string {

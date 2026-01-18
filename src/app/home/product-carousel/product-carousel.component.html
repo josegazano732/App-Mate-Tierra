@@ -53,9 +53,10 @@
             [attr.aria-label]="'Ver producto ' + product.name">
             <div class="mosaic-bg">
               <img
-                [src]="product.image"
+                [src]="getPrimaryImage(product)"
                 [alt]="product.name"
-                loading="lazy">
+                loading="lazy"
+                (error)="handleImageError($event)">
             </div>
 
             <div class="mosaic-overlay"></div>
@@ -80,7 +81,7 @@
                   <span class="featured-price" *ngIf="product.discount">{{ product.price | currency:'ARS':'symbol-narrow' }}</span>
                 </div>
                 <div class="featured-thumb">
-                  <img [src]="product.image" [alt]="product.name" loading="lazy">
+                  <img [src]="getPrimaryImage(product)" [alt]="product.name" loading="lazy" (error)="handleImageError($event)">
                 </div>
               </div>
 

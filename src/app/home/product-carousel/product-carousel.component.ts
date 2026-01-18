@@ -18,6 +18,7 @@ export class ProductCarouselComponent implements OnInit {
   isLoading = true;
   isSliding = false;
   error: string | null = null;
+  private readonly fallbackImage = 'https://images.unsplash.com/photo-1501426026826-31c667bdf23d?auto=format&fit=crop&w=900&q=60';
 
   constructor(
     private productService: ProductService,
@@ -163,5 +164,31 @@ export class ProductCarouselComponent implements OnInit {
 
   trackByProductId(_index: number, product: Product): string {
     return product.id;
+  }
+
+  getPrimaryImage(product: Product): string {
+    if (product?.image_urls?.length) {
+      return product.image_urls[0];
+    }
+
+    if (product?.image) {
+      return product.image;
+    }
+
+    return this.fallbackImage;
+  }
+
+  handleImageError(event: Event) {
+    const target = event.target as HTMLImageElement | null;
+    if (!target) {
+      return;
+    }
+
+    if (target.src === this.fallbackImage) {
+      return;
+    }
+
+    target.onerror = null;
+    target.src = this.fallbackImage;
   }
 }

@@ -5,11 +5,26 @@
   
   <div class="product-content">
     <div class="product-image">
-      <img [src]="product.image" [alt]="product.name">
-      <span class="product-category">{{ product.category_name }}</span>
-      <span class="stock-badge" [class.low-stock]="product.stock < 5" [class.out-of-stock]="product.stock === 0">
-        {{ product.stock === 0 ? 'Sin stock' : product.stock < 5 ? 'Últimas unidades' : product.stock + ' disponibles' }}
-      </span>
+      <div class="main-image">
+        <img [src]="currentImage" [alt]="product.name" (error)="handleImageError($event)">
+        <span class="product-category">{{ product.category_name }}</span>
+        <span class="stock-badge" [class.low-stock]="product.stock < 5" [class.out-of-stock]="product.stock === 0">
+          {{ product.stock === 0 ? 'Sin stock' : product.stock < 5 ? 'Últimas unidades' : product.stock + ' disponibles' }}
+        </span>
+      </div>
+
+      <div class="thumbnail-strip" *ngIf="productImages.length > 1">
+        <button
+          type="button"
+          class="thumbnail"
+          *ngFor="let image of productImages; let i = index"
+          [class.active]="i === selectedImageIndex"
+          (click)="selectImage(i)"
+          [attr.aria-label]="'Ver imagen ' + (i + 1)"
+        >
+          <img [src]="image" [alt]="product.name + ' vista ' + (i + 1)" (error)="handleThumbnailError($event, i)">
+        </button>
+      </div>
     </div>
     
     <div class="product-info">

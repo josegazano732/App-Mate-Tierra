@@ -13,7 +13,11 @@ import { firstValueFrom } from 'rxjs';
   styleUrls: ['./product-crud.component.css']
 })
 export class ProductCrudComponent implements OnInit {
-  @ViewChild('fileInput') fileInput!: ElementRef;
+  @ViewChild('createFileInput') createFileInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('editFileInput') editFileInput!: ElementRef<HTMLInputElement>;
+
+  readonly maxImages = 3;
+  readonly imagePlaceholder = 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=400&q=60';
 
   products: Product[] = [];
   editingProduct: Product | null = null;
@@ -24,6 +28,7 @@ export class ProductCrudComponent implements OnInit {
     cost: 0,
     markup_percentage: 30,
     image: '',
+    image_urls: [] as string[],
     category_id: '',
     stock: 0,
     seasonal: false
@@ -31,10 +36,16 @@ export class ProductCrudComponent implements OnInit {
 
   categories: Category[] = [];
   errorMessage = '';
-  imagePreview: string | null = null;
-  selectedFile: File | null = null;
   isSubmitting = false;
   showAddForm = false;
+
+  createImagePreviews: string[] = [];
+  createSelectedFiles: File[] = [];
+
+  editExistingImages: string[] = [];
+  editSelectedFiles: File[] = [];
+  editNewImagePreviews: string[] = [];
+  originalEditImages: string[] = [];
 
   get lowStockCount(): number {
     return this.products.filter(product => product.stock < 5).length;
@@ -189,31 +200,134 @@ export class ProductCrudComponent implements OnInit {
     });
   }
 
-  onFileSelected(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files[0]) {
-      this.selectedFile = input.files[0];
-      
-      const validationError = this.imageService.validateImage(this.selectedFile);
+  triggerFileInput(mode: 'create' | 'edit') {
+    if (this.getRemainingSlots(mode) <= 0) {
+      this.errorMessage = `Solo podés subir hasta ${this.maxImages} imágenes por producto.`;
+      return;
+    }
+
+    const ref = mode === 'create' ? this.createFileInput : this.editFileInput;
+    ref?.nativeElement?.click();
+  }
+
+  onCreateFilesSelected(event: Event) {
+    this.handleFilesSelected(event, 'create');
+  }
+
+  onEditFilesSelected(event: Event) {
+    this.handleFilesSelected(event, 'edit');
+  }
+
+  removeCreateImage(index: number) {
+    this.createSelectedFiles.splice(index, 1);
+    this.createImagePreviews.splice(index, 1);
+  }
+
+  removeEditExistingImage(index: number) {
+    this.editExistingImages.splice(index, 1);
+    if (this.editingProduct) {
+      this.editingProduct.image_urls = [...this.editExistingImages];
+      this.editingProduct.image = this.editExistingImages[0] ?? this.editingProduct.image;
+    }
+  }
+
+  removeEditNewImage(index: number) {
+    this.editSelectedFiles.splice(index, 1);
+    this.editNewImagePreviews.splice(index, 1);
+  }
+
+  getRemainingSlots(mode: 'create' | 'edit'): number {
+    return Math.max(this.maxImages - this.getCurrentImageCount(mode), 0);
+  }
+
+  private handleFilesSelected(event: Event, mode: 'create' | 'edit') {
+    const input = event.target as HTMLInputElement | null;
+    if (!input?.files?.length) {
+      this.resetNativeFileInput(mode);
+      return;
+    }
+
+    const files = Array.from(input.files);
+    const availableSlots = this.getRemainingSlots(mode);
+
+    if (availableSlots <= 0) {
+      this.errorMessage = `Solo podés subir hasta ${this.maxImages} imágenes por producto.`;
+      this.resetNativeFileInput(mode);
+      return;
+    }
+
+    const filesToProcess = files.slice(0, availableSlots);
+
+    for (const file of filesToProcess) {
+      const validationError = this.imageService.validateImage(file);
       if (validationError) {
         this.errorMessage = validationError;
-        this.resetFileInput();
-        return;
+        continue;
       }
 
       const reader = new FileReader();
       reader.onload = (e) => {
-        this.imagePreview = e.target?.result as string;
+        const result = e.target?.result as string;
+        if (!result) {
+          return;
+        }
+
+        if (mode === 'create') {
+          this.createImagePreviews.push(result);
+        } else {
+          this.editNewImagePreviews.push(result);
+        }
       };
-      reader.readAsDataURL(this.selectedFile);
+      reader.readAsDataURL(file);
+
+      if (mode === 'create') {
+        this.createSelectedFiles.push(file);
+      } else {
+        this.editSelectedFiles.push(file);
+      }
+    }
+
+    if (files.length > filesToProcess.length) {
+      this.errorMessage = `Solo podés subir hasta ${this.maxImages} imágenes por producto.`;
+    }
+
+    this.resetNativeFileInput(mode);
+  }
+
+  private getCurrentImageCount(mode: 'create' | 'edit'): number {
+    if (mode === 'create') {
+      return this.createSelectedFiles.length;
+    }
+
+    return this.editExistingImages.length + this.editSelectedFiles.length;
+  }
+
+  private resetNativeFileInput(mode: 'create' | 'edit') {
+    const ref = mode === 'create' ? this.createFileInput : this.editFileInput;
+    if (ref?.nativeElement) {
+      ref.nativeElement.value = '';
     }
   }
 
-  private resetFileInput() {
-    this.selectedFile = null;
-    this.imagePreview = null;
-    if (this.fileInput) {
-      this.fileInput.nativeElement.value = '';
+  private resetCreateImageState() {
+    this.createSelectedFiles = [];
+    this.createImagePreviews = [];
+    this.resetNativeFileInput('create');
+  }
+
+  private resetEditImageState() {
+    this.editExistingImages = [];
+    this.editSelectedFiles = [];
+    this.editNewImagePreviews = [];
+    this.originalEditImages = [];
+    this.resetNativeFileInput('edit');
+  }
+
+  private async safeDeleteImage(url: string) {
+    try {
+      await this.imageService.deleteImage(url);
+    } catch (error) {
+      console.error('Error deleting image from storage:', error);
     }
   }
 
@@ -230,8 +344,8 @@ export class ProductCrudComponent implements OnInit {
   }
 
   async onSubmit() {
-    if (!this.selectedFile) {
-      this.errorMessage = 'Please select an image for the product';
+    if (this.createSelectedFiles.length === 0) {
+      this.errorMessage = 'Carga al menos una imagen para crear el producto.';
       return;
     }
 
@@ -254,9 +368,10 @@ export class ProductCrudComponent implements OnInit {
     this.errorMessage = '';
 
     try {
-      const imageUrl = await firstValueFrom(this.imageService.uploadImage(this.selectedFile));
-      
-      // Calculate final price
+      const uploadedUrls = await Promise.all(
+        this.createSelectedFiles.map(file => firstValueFrom(this.imageService.uploadImage(file)))
+      );
+
       this.product.price = this.calculatePrice(this.product.cost, this.product.markup_percentage);
 
       const productData = {
@@ -265,7 +380,8 @@ export class ProductCrudComponent implements OnInit {
         price: this.product.price,
         cost: this.product.cost,
         markup_percentage: this.product.markup_percentage,
-        image: imageUrl,
+        image: uploadedUrls[0] ?? '',
+        image_urls: uploadedUrls,
         category_id: this.product.category_id,
         stock: this.product.stock,
         seasonal: this.product.seasonal
@@ -291,23 +407,34 @@ export class ProductCrudComponent implements OnInit {
       cost: 0,
       markup_percentage: 30,
       image: '',
+      image_urls: [],
       category_id: '',
       stock: 0,
       seasonal: false
     };
-    this.resetFileInput();
+    this.resetCreateImageState();
     this.errorMessage = '';
   }
 
   editProduct(product: Product) {
-    this.editingProduct = { ...product };
-    this.resetFileInput();
+    const images = product.image_urls?.length ? [...product.image_urls] : (product.image ? [product.image] : []);
+    this.editingProduct = {
+      ...product,
+      image_urls: images
+    };
+    this.originalEditImages = [...images];
+    this.editExistingImages = [...images];
+    this.editSelectedFiles = [];
+    this.editNewImagePreviews = [];
+    this.errorMessage = '';
+    this.showAddForm = false;
+    this.resetNativeFileInput('edit');
   }
 
   cancelEdit() {
     this.editingProduct = null;
     this.errorMessage = '';
-    this.resetFileInput();
+    this.resetEditImageState();
   }
 
   async saveProduct() {
@@ -328,27 +455,37 @@ export class ProductCrudComponent implements OnInit {
       return;
     }
 
+    if (this.editExistingImages.length + this.editSelectedFiles.length === 0) {
+      this.errorMessage = 'El producto debe tener al menos una imagen.';
+      return;
+    }
+
     this.isSubmitting = true;
     this.errorMessage = '';
 
     try {
-      let imageUrl = this.editingProduct.image;
+      const uploadedUrls = await Promise.all(
+        this.editSelectedFiles.map(file => firstValueFrom(this.imageService.uploadImage(file)))
+      );
 
-      if (this.selectedFile) {
-        imageUrl = await firstValueFrom(this.imageService.uploadImage(this.selectedFile));
-      }
-
-      // Calculate final price
+      const finalImageUrls = [...this.editExistingImages, ...uploadedUrls].slice(0, this.maxImages);
       this.editingProduct.price = this.calculatePrice(this.editingProduct.cost, this.editingProduct.markup_percentage);
 
       const updatedProduct = {
         ...this.editingProduct,
-        image: imageUrl
+        image: finalImageUrls[0] ?? this.editingProduct.image,
+        image_urls: finalImageUrls
       };
 
       await firstValueFrom(this.productService.updateProduct(updatedProduct.id, updatedProduct));
+
+      const removedImages = this.originalEditImages.filter(url => !this.editExistingImages.includes(url));
+      if (removedImages.length) {
+        await Promise.all(removedImages.map(url => this.safeDeleteImage(url)));
+      }
+
       this.editingProduct = null;
-      this.resetFileInput();
+      this.resetEditImageState();
       this.errorMessage = '';
       this.loadProducts();
     } catch (error: any) {
@@ -357,6 +494,16 @@ export class ProductCrudComponent implements OnInit {
     } finally {
       this.isSubmitting = false;
     }
+  }
+
+  getPrimaryImage(product: Product): string {
+    if (product?.image_urls?.length) {
+      return product.image_urls[0];
+    }
+    if (product?.image) {
+      return product.image;
+    }
+    return this.imagePlaceholder;
   }
 
   async deleteProduct(product: Product) {

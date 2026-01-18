@@ -84,7 +84,7 @@
       <div *ngIf="!isLoading && !errorMessage && filteredProducts.length" [@productAnimation]="displayedProducts.length" class="products-list">
         <article class="product-card" *ngFor="let product of displayedProducts">
           <div class="card-media" (click)="viewProductDetails(product)" role="button" tabindex="0">
-            <img [src]="product.image"
+              <img [src]="getPrimaryImage(product)"
                  [alt]="product.name"
                  loading="lazy"
                  (error)="handleProductImageError($event)">

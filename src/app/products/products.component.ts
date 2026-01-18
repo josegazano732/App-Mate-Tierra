@@ -111,6 +111,18 @@ export class ProductsComponent implements OnInit {
     this.loadProducts();
   }
 
+  getPrimaryImage(product: Product): string {
+    if (product?.image_urls?.length) {
+      return product.image_urls[0];
+    }
+
+    if (product?.image) {
+      return product.image;
+    }
+
+    return this.productImageFallback;
+  }
+
   handleProductImageError(event: Event) {
     const target = event.target as HTMLImageElement | null;
     if (!target) {

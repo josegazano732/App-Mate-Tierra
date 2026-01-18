@@ -24,6 +24,7 @@ export class CategoriesSectionComponent implements OnInit {
   isLoading = true;
   errorMessage: string | null = null;
   private readonly fallbackImage = 'assets/images/placeholders/category-placeholder.jpg';
+  private readonly productFallbackImage = 'https://images.unsplash.com/photo-1501426026826-31c667bdf23d?auto=format&fit=crop&w=900&q=60';
 
   constructor(
     private categoryService: CategoryService,
@@ -70,7 +71,7 @@ export class CategoriesSectionComponent implements OnInit {
 
     const featuredProduct = categoryProducts[0];
     const additionalProducts = categoryProducts.slice(1, 4);
-    const coverImage = featuredProduct?.image || category.image;
+    const coverImage = this.resolveProductImage(featuredProduct) || category.image;
     const description = category.description || featuredProduct?.description || this.buildFallbackDescription(category.name);
     const totalProducts = categoryProducts.length || category.productCount;
 
@@ -101,6 +102,22 @@ export class CategoriesSectionComponent implements OnInit {
 
   private buildFallbackDescription(categoryName: string): string {
     return `Descubre lo mejor de ${categoryName} en una selección curada para los amantes del mate.`;
+  }
+
+  private resolveProductImage(product?: Product): string | undefined {
+    if (!product) {
+      return undefined;
+    }
+
+    if (product.image_urls?.length) {
+      return product.image_urls[0];
+    }
+
+    if (product.image) {
+      return product.image;
+    }
+
+    return this.productFallbackImage;
   }
 
   handleImageError(event: Event, fallback: string) {

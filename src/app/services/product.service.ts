@@ -9,6 +9,7 @@ export interface Product {
   description: string;
   price: number;
   image: string;
+  image_urls: string[];
   category_id: string;
   category_name?: string;
   stock: number;
@@ -39,7 +40,8 @@ export class ProductService {
       retry(3),
       map(({ data, error }) => {
         if (error) throw error;
-        return data || [];
+        const rows = data || [];
+        return rows.map(row => this.normalizeProductRow(row));
       }),
       catchError(error => {
         console.error('Error loading products:', error);
@@ -59,7 +61,8 @@ export class ProductService {
       retry(3),
       map(({ data, error }) => {
         if (error) throw error;
-        return data || [];
+        const rows = data || [];
+        return rows.map(row => this.normalizeProductRow(row));
       }),
       catchError(error => {
         console.error('Error loading seasonal products:', error);
@@ -79,7 +82,7 @@ export class ProductService {
       retry(3),
       map(({ data, error }) => {
         if (error) throw error;
-        return data;
+        return data ? this.normalizeProductRow(data) : null;
       }),
       catchError(error => {
         console.error('Error loading product:', error);
@@ -89,6 +92,8 @@ export class ProductService {
   }
 
   addProduct(product: Omit<Product, 'id' | 'category_name'>): Observable<Product> {
+    const sanitizedImageUrls = this.sanitizeImageUrls(product.image, product.image_urls);
+
     return from(
       this.supabase.client
         .from('products')
@@ -96,7 +101,8 @@ export class ProductService {
           name: product.name,
           description: product.description,
           price: product.price,
-          image: product.image,
+          image: sanitizedImageUrls[0] ?? (typeof product.image === 'string' ? product.image.trim() : ''),
+          image_urls: sanitizedImageUrls,
           category_id: product.category_id,
           stock: product.stock,
           seasonal: product.seasonal,
@@ -109,7 +115,7 @@ export class ProductService {
       map(({ data, error }) => {
         if (error) throw error;
         if (!data) throw new Error('No data returned');
-        return data;
+        return this.normalizeProductRow(data);
       }),
       catchError(error => {
         console.error('Error adding product:', error);
@@ -119,11 +125,14 @@ export class ProductService {
   }
 
   updateProduct(id: string, product: Partial<Product>): Observable<Product> {
+    const sanitizedImageUrls = this.sanitizeImageUrls(product.image, product.image_urls);
+
     const updateData = {
       name: product.name,
       description: product.description,
       price: product.price,
-      image: product.image,
+      image: sanitizedImageUrls[0] ?? (typeof product.image === 'string' ? product.image.trim() : ''),
+      image_urls: sanitizedImageUrls,
       category_id: product.category_id,
       stock: product.stock,
       seasonal: product.seasonal,
@@ -142,7 +151,7 @@ export class ProductService {
       map(({ data, error }) => {
         if (error) throw error;
         if (!data) throw new Error('Product not found');
-        return data;
+        return this.normalizeProductRow(data);
       }),
       catchError(error => {
         console.error('Error updating product:', error);
@@ -179,12 +188,39 @@ export class ProductService {
       retry(3),
       map(({ data, error }) => {
         if (error) throw error;
-        return data || [];
+        const rows = data || [];
+        return rows.map(row => this.normalizeProductRow(row));
       }),
       catchError(error => {
         console.error('Error searching products:', error);
         return throwError(() => new Error('Error searching products'));
       })
     );
+  }
+
+  private sanitizeImageUrls(image?: string | null, imageUrls?: string[] | null): string[] {
+    const arrayFromPayload = Array.isArray(imageUrls) ? imageUrls : [];
+    const cleaned = arrayFromPayload
+      .map(url => (typeof url === 'string' ? url.trim() : ''))
+      .filter(url => url.length > 0);
+
+    const unique = cleaned.filter((url, index, arr) => arr.indexOf(url) === index);
+
+    if (unique.length === 0 && typeof image === 'string' && image.trim().length > 0) {
+      unique.push(image.trim());
+    }
+
+    return unique.slice(0, 3);
+  }
+
+  private normalizeProductRow(row: any): Product {
+    const imageUrls = this.sanitizeImageUrls(row?.image, row?.image_urls);
+    const primaryImage = imageUrls[0] ?? (typeof row?.image === 'string' ? row.image : '');
+
+    return {
+      ...row,
+      image: primaryImage,
+      image_urls: imageUrls
+    } as Product;
   }
 }

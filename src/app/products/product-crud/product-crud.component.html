@@ -60,7 +60,7 @@
           <tr *ngFor="let product of products">
             <td data-label="Imagen">
               <img
-                [src]="product.image"
+                [src]="getPrimaryImage(product)"
                 [alt]="product.name"
                 class="product-thumbnail"
               />
@@ -227,26 +227,46 @@
         </div>
 
         <div class="form-section">
-          <h4>Imagen del producto</h4>
+          <h4>Imágenes del producto</h4>
           <div class="image-upload-container">
             <input
               type="file"
-              id="image-edit"
-              (change)="onFileSelected($event)"
+              id="images-edit"
+              multiple
               accept="image/*"
-              #fileInput
-              class="file-input"
+              #editFileInput
+              class="file-input-hidden"
+              (change)="onEditFilesSelected($event)"
             />
-            <div class="upload-placeholder">
+            <div class="upload-placeholder" (click)="triggerFileInput('edit')">
               <i class="fas fa-cloud-upload-alt"></i>
-              <p>Click o arrastra la imagen aquí</p>
-              <small>Formatos permitidos: JPG, PNG, WebP (máx. 5MB)</small>
+              <p>Click o arrastra las imágenes aquí</p>
+              <small>Podés cargar hasta {{ maxImages }} imágenes (restan {{ getRemainingSlots('edit') }})</small>
+              <button
+                type="button"
+                class="upload-trigger"
+                (click)="triggerFileInput('edit'); $event.stopPropagation()"
+                [disabled]="getRemainingSlots('edit') === 0"
+              >
+                Seleccionar archivos
+              </button>
             </div>
-            <div
-              class="image-preview"
-              *ngIf="imagePreview || (editingProduct && editingProduct.image)"
-            >
-              <img [src]="imagePreview || editingProduct.image" alt="Vista previa" />
+
+            <div class="image-preview-grid" *ngIf="editExistingImages.length || editNewImagePreviews.length">
+              <div class="image-preview-card existing" *ngFor="let image of editExistingImages; let i = index">
+                <img [src]="image" alt="Imagen actual {{ i + 1 }}" />
+                <button type="button" class="remove-image" (click)="removeEditExistingImage(i)" aria-label="Eliminar imagen actual">
+                  <i class="fas fa-times"></i>
+                </button>
+                <span class="image-chip">Actual</span>
+              </div>
+              <div class="image-preview-card new" *ngFor="let preview of editNewImagePreviews; let i = index">
+                <img [src]="preview" alt="Nueva imagen {{ i + 1 }}" />
+                <button type="button" class="remove-image" (click)="removeEditNewImage(i)" aria-label="Eliminar imagen nueva">
+                  <i class="fas fa-times"></i>
+                </button>
+                <span class="image-chip">Nueva</span>
+              </div>
             </div>
           </div>
         </div>
@@ -377,23 +397,39 @@
         </div>
 
         <div class="form-section">
-          <h4>Imagen del producto</h4>
+          <h4>Imágenes del producto</h4>
           <div class="image-upload-container">
             <input
               type="file"
-              id="image-create"
-              (change)="onFileSelected($event)"
+              id="images-create"
+              multiple
               accept="image/*"
-              #fileInput
-              class="file-input"
+              #createFileInput
+              class="file-input-hidden"
+              (change)="onCreateFilesSelected($event)"
             />
-            <div class="upload-placeholder">
+            <div class="upload-placeholder" (click)="triggerFileInput('create')">
               <i class="fas fa-cloud-upload-alt"></i>
-              <p>Click o arrastra la imagen aquí</p>
-              <small>Formatos permitidos: JPG, PNG, WebP (máx. 5MB)</small>
+              <p>Click o arrastra las imágenes aquí</p>
+              <small>Podés cargar hasta {{ maxImages }} imágenes (restan {{ getRemainingSlots('create') }})</small>
+              <button
+                type="button"
+                class="upload-trigger"
+                (click)="triggerFileInput('create'); $event.stopPropagation()"
+                [disabled]="getRemainingSlots('create') === 0"
+              >
+                Seleccionar archivos
+              </button>
             </div>
-            <div class="image-preview" *ngIf="imagePreview">
-              <img [src]="imagePreview" alt="Vista previa" />
+
+            <div class="image-preview-grid" *ngIf="createImagePreviews.length">
+              <div class="image-preview-card new" *ngFor="let preview of createImagePreviews; let i = index">
+                <img [src]="preview" alt="Imagen seleccionada {{ i + 1 }}" />
+                <button type="button" class="remove-image" (click)="removeCreateImage(i)" aria-label="Eliminar imagen seleccionada">
+                  <i class="fas fa-times"></i>
+                </button>
+                <span class="image-chip">Nueva</span>
+              </div>
             </div>
           </div>
         </div>
