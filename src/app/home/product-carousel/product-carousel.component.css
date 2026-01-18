@@ -1,8 +1,8 @@
 .carousel-container {
   width: 100%;
-  max-width: 1320px;
+  max-width: 95%;
   margin: 0 auto;
-  padding: 5.25rem 1.75rem 3.5rem;
+  padding: 5.25rem 3rem 3.5rem;
   background:
     radial-gradient(900px circle at 12% 12%, rgba(60, 156, 54, 0.12), transparent 55%),
     radial-gradient(700px circle at 88% 24%, rgba(0, 255, 163, 0.10), transparent 60%),
@@ -245,7 +245,62 @@
 .gallery-grid {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 1.25rem;
+  gap: 1.75rem;
+}
+
+.section-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.section-meta {
+  max-width: 720px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(60, 156, 54, 0.12), rgba(0, 255, 163, 0.10));
+  border: 1px solid rgba(60, 156, 54, 0.20);
+  color: #1f452d;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  width: fit-content;
+  margin: 0 auto;
+  box-shadow: 0 4px 12px rgba(60, 156, 54, 0.15);
+}
+
+.section-meta h2 {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  background: linear-gradient(135deg, #102b1c 0%, #1f452d 50%, #3c9c36 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  position: relative;
+}
+
+.section-meta p {
+  margin: 0 auto;
+  font-size: 1.05rem;
+  color: #5b6b62;
+  line-height: 1.6;
+  font-weight: 500;
+  text-align: center;
+  max-width: 620px;
 }
 
 .mosaic-card {
@@ -881,16 +936,33 @@
 
 @media (min-width: 1400px) {
   .carousel-container {
-    max-width: 1420px;
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
+    max-width: 98%;
+    padding-left: 4rem;
+    padding-right: 4rem;
+  }
+}
+
+@media (min-width: 1920px) {
+  .carousel-container {
+    max-width: 98.5%;
+    padding-left: 5rem;
+    padding-right: 5rem;
   }
 }
 
 @media (max-width: 640px) {
   .section-header {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
+    margin-bottom: 1.25rem;
+  }
+
+  .section-meta h2 {
+    font-size: 1.85rem;
+  }
+
+  .section-meta p {
+    font-size: 0.95rem;
   }
 
   .header-actions {
