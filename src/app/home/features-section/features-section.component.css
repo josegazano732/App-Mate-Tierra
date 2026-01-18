@@ -2,11 +2,12 @@
 .features-section {
   padding: 5.25rem 0;
   background:
-    radial-gradient(900px circle at 18% 12%, rgba(60, 156, 54, 0.10), transparent 55%),
-    radial-gradient(700px circle at 86% 18%, rgba(0, 255, 163, 0.08), transparent 60%),
-    linear-gradient(180deg, #ffffff 0%, #f7faf8 100%);
+    radial-gradient(900px circle at 18% 12%, rgba(60, 156, 54, 0.04), transparent 55%),
+    radial-gradient(700px circle at 86% 18%, rgba(0, 255, 163, 0.03), transparent 60%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, rgba(247, 250, 248, 0.40) 100%);
   position: relative;
   overflow: hidden;
+  z-index: 1;
 }
 
 .section-header {

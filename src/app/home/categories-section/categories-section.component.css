@@ -1,9 +1,11 @@
 .categories-section {
   padding: 5.25rem 0;
   background:
-    radial-gradient(900px circle at 12% 12%, rgba(60, 156, 54, 0.12), transparent 55%),
-    radial-gradient(700px circle at 88% 24%, rgba(0, 255, 163, 0.10), transparent 60%),
-    linear-gradient(180deg, #ffffff 0%, #f6fbf7 100%);
+    radial-gradient(900px circle at 12% 12%, rgba(60, 156, 54, 0.04), transparent 55%),
+    radial-gradient(700px circle at 88% 24%, rgba(0, 255, 163, 0.03), transparent 60%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, rgba(246, 251, 247, 0.40) 100%);
+  position: relative;
+  z-index: 1;
 }
 
 .categories-header {

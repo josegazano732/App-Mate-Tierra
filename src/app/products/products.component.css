@@ -5,6 +5,64 @@
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  position: relative;
+}
+
+.products-page::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    url('/assets/images/yerba-mate-leaves.png'),
+    url('/assets/images/yerba-mate-leaves.png'),
+    url('/assets/images/yerba-mate-leaves.png'),
+    url('/assets/images/yerba-mate-leaves.png'),
+    url('/assets/images/yerba-mate-leaves.png'),
+    url('/assets/images/yerba-mate-leaves.png'),
+    url('/assets/images/yerba-mate-leaves.png'),
+    url('/assets/images/yerba-mate-leaves.png');
+  background-position: 
+    8% 12%,
+    92% 18%,
+    12% 42%,
+    88% 48%,
+    15% 70%,
+    85% 78%,
+    25% 88%,
+    75% 95%;
+  background-size: 
+    240px auto,
+    250px auto,
+    235px auto,
+    245px auto,
+    240px auto,
+    250px auto,
+    235px auto,
+    245px auto;
+  background-repeat: no-repeat;
+  opacity: 0.45;
+  z-index: -1;
+  pointer-events: none;
+  filter: grayscale(0.15) brightness(1.1);
+}
+
+.products-page::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 12% 20%, rgba(255, 255, 255, 0.25), transparent 35%),
+    radial-gradient(circle at 88% 25%, rgba(255, 255, 255, 0.25), transparent 35%),
+    radial-gradient(circle at 10% 60%, rgba(255, 255, 255, 0.25), transparent 35%),
+    radial-gradient(circle at 90% 65%, rgba(255, 255, 255, 0.25), transparent 35%);
+  z-index: -1;
+  pointer-events: none;
 }
 
 .glass-card {

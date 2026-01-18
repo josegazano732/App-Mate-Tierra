@@ -2,9 +2,60 @@
 .contact-page {
   padding: 3.25rem 0 4rem;
   background:
-    radial-gradient(900px circle at 18% 12%, rgba(60, 156, 54, 0.10), transparent 55%),
-    radial-gradient(700px circle at 86% 18%, rgba(0, 255, 163, 0.08), transparent 60%),
-    linear-gradient(180deg, #ffffff 0%, #f7faf8 100%);
+    radial-gradient(900px circle at 18% 12%, rgba(60, 156, 54, 0.04), transparent 55%),
+    radial-gradient(700px circle at 86% 18%, rgba(0, 255, 163, 0.03), transparent 60%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, rgba(247, 250, 248, 0.40) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.contact-page::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    url('/assets/images/yerba-mate-leaves.png'),
+    url('/assets/images/yerba-mate-leaves.png'),
+    url('/assets/images/yerba-mate-leaves.png'),
+    url('/assets/images/yerba-mate-leaves.png'),
+    url('/assets/images/yerba-mate-leaves.png'),
+    url('/assets/images/yerba-mate-leaves.png'),
+    url('/assets/images/yerba-mate-leaves.png'),
+    url('/assets/images/yerba-mate-leaves.png');
+  background-repeat: no-repeat;
+  background-position:
+    8% 12%,
+    92% 18%,
+    12% 42%,
+    88% 48%,
+    15% 70%,
+    85% 78%,
+    25% 88%,
+    75% 95%;
+  background-size: 240px, 250px, 235px, 245px, 240px, 250px, 235px, 245px;
+  opacity: 0.45;
+  filter: grayscale(0.15) brightness(1.1);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.contact-page::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background:
+    radial-gradient(1100px circle at 12% 20%, rgba(247, 250, 248, 0.25) 0%, transparent 45%),
+    radial-gradient(1000px circle at 88% 25%, rgba(247, 250, 248, 0.25) 0%, transparent 48%),
+    radial-gradient(950px circle at 10% 60%, rgba(247, 250, 248, 0.25) 0%, transparent 46%),
+    radial-gradient(1050px circle at 90% 65%, rgba(247, 250, 248, 0.25) 0%, transparent 47%);
+  z-index: -1;
+  pointer-events: none;
 }
 
 .contact-header {
