@@ -55,6 +55,10 @@
               "extractLicenses": false,
               "sourceMap": true,
               "namedChunks": true
+            },
+            "github-pages": {
+              "baseHref": "/App-Mate-Tierra/",
+              "outputPath": "dist/github-pages"
             }
           },
           "defaultConfiguration": "production"
