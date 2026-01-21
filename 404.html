@@ -3,7 +3,6 @@
 <head>
   <meta charset="utf-8">
   <title>Redirigiendo…</title>
-  <meta http-equiv="refresh" content="0; url=/App-Mate-Tierra/">
   <script>
     (function() {
       // Redirige rutas profundas a la SPA principal en GitHub Pages
@@ -18,7 +17,8 @@
       if (path === base + '/' || path === base) {
         return;
       }
-      var redirectUrl = base + '/#' + path.replace(base, '').replace(/^\//, '') + l.search + l.hash;
+      var redirectPath = path.replace(base, '').replace(/^\//, '');
+      var redirectUrl = base + '/#/' + redirectPath + l.search + l.hash;
       window.location.replace(redirectUrl);
     })();
   </script>
