@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Redirigiendo…</title>
+  <script>
+    (function() {
+      // Redirige rutas profundas a la SPA principal en GitHub Pages
+      var base = '/App-Mate-Tierra';
+      var l = window.location;
+      var path = l.pathname;
+      // Garantizar que base termine sin slash extra
+      if (base.endsWith('/')) {
+        base = base.slice(0, -1);
+      }
+      // Si la ruta ya es la raíz base, salir
+      if (path === base + '/' || path === base) {
+        return;
+      }
+      var redirectPath = path.replace(base, '').replace(/^\//, '');
+      var redirectUrl = base + '/#/' + redirectPath + l.search + l.hash;
+      window.location.replace(redirectUrl);
+    })();
+  </script>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 2rem; }
+  </style>
+</head>
+<body>
+  <p>Redirigiendo…</p>
+</body>
+</html>

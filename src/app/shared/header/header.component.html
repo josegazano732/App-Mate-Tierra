@@ -2,7 +2,7 @@
   <div class="container header-flex">
     <div class="header-row header-top">
       <!-- Logo principal + branding -->
-      <a routerLink="/" class="logo" aria-label="Ir a inicio">
+      <a routerLink="/" class="logo" aria-label="Ir a inicio" (click)="closeMenu()">
         <span class="logo-badge" aria-hidden="true">
           <img [src]="logoUrl || 'assets/logo.png'" alt="Logo" class="logo-image">
         </span>
@@ -17,12 +17,20 @@
         [class.active]="isMenuOpen"
         (click)="toggleMenu()"
         aria-label="Abrir o cerrar menú de navegación"
-        [attr.aria-expanded]="isMenuOpen">
-        <i class="fas" [class.fa-bars]="!isMenuOpen" [class.fa-times]="isMenuOpen"></i>
+        [attr.aria-expanded]="isMenuOpen"
+        type="button">
+        <i class="fas" [class.fa-bars]="!isMenuOpen" [class.fa-times]="isMenuOpen" aria-hidden="true"></i>
       </button>
     </div>
 
     <div class="header-row header-bottom">
+      <!-- Backdrop for mobile menu (clickable overlay) -->
+      <div class="nav-backdrop" 
+           [class.show]="isMenuOpen" 
+           (click)="closeMenu()" 
+           aria-hidden="true"
+           [attr.inert]="!isMenuOpen ? '' : null"></div>
+
       <!-- Navegación principal -->
       <nav [class.open]="isMenuOpen" class="main-nav" role="navigation" aria-label="Menú principal">
       <ul class="nav-links" role="menubar">
@@ -32,8 +40,9 @@
              [routerLinkActiveOptions]="{exact: true}"
              class="nav-link"
              (click)="closeMenu()"
-             role="menuitem">
-            <i class="fas fa-home"></i> <span>Inicio</span>
+             role="menuitem"
+             tabindex="0">
+            <i class="fas fa-home" aria-hidden="true"></i> <span>Inicio</span>
           </a>
         </li>
         <li role="none">
@@ -41,8 +50,9 @@
              routerLinkActive="active" 
              class="nav-link"
              (click)="closeMenu()"
-             role="menuitem">
-            <i class="fas fa-store"></i> <span>Productos</span>
+             role="menuitem"
+             tabindex="0">
+            <i class="fas fa-store" aria-hidden="true"></i> <span>Productos</span>
           </a>
         </li>
         <li role="none">
@@ -50,16 +60,21 @@
              routerLinkActive="active" 
              class="nav-link"
              (click)="closeMenu()"
-             role="menuitem">
-            <i class="fas fa-envelope"></i> <span>Contacto</span>
+             role="menuitem"
+             tabindex="0">
+            <i class="fas fa-envelope" aria-hidden="true"></i> <span>Contacto</span>
           </a>
         </li>
 
         <!-- Menú de administración solo visible para administradores -->
         <li role="none" *ngIf="isAdmin$ | async" class="admin-menu" [class.open]="isAdminMenuOpen">
-          <button class="nav-link admin-toggle" (click)="toggleAdminMenu($event)" aria-haspopup="true" [attr.aria-expanded]="isAdminMenuOpen">
-            <i class="fas fa-cog"></i> <span>Administración</span>
-            <i class="fas fa-chevron-down chevron"></i>
+          <button class="nav-link admin-toggle" 
+                  (click)="toggleAdminMenu($event)" 
+                  aria-haspopup="true" 
+                  [attr.aria-expanded]="isAdminMenuOpen"
+                  type="button">
+            <i class="fas fa-cog" aria-hidden="true"></i> <span>Administración</span>
+            <i class="fas fa-chevron-down chevron" aria-hidden="true"></i>
           </button>
           <ul class="admin-submenu" role="menu" [class.open]="isAdminMenuOpen">
             <li role="none">
@@ -67,8 +82,9 @@
                  routerLinkActive="active" 
                  class="nav-link"
                  (click)="closeMenu()"
-                 role="menuitem">
-                <i class="fas fa-box"></i> <span>Gestionar Productos</span>
+                 role="menuitem"
+                 tabindex="0">
+                <i class="fas fa-box" aria-hidden="true"></i> <span>Gestionar Productos</span>
               </a>
             </li>
             <li role="none">
@@ -76,8 +92,9 @@
                  routerLinkActive="active" 
                  class="nav-link"
                  (click)="closeMenu()"
-                 role="menuitem">
-                <i class="fas fa-tags"></i> <span>Gestionar Categorías</span>
+                 role="menuitem"
+                 tabindex="0">
+                <i class="fas fa-tags" aria-hidden="true"></i> <span>Gestionar Categorías</span>
               </a>
             </li>
             <li role="none">
@@ -85,8 +102,9 @@
                  routerLinkActive="active" 
                  class="nav-link"
                  (click)="closeMenu()"
-                 role="menuitem">
-                <i class="fas fa-cash-register"></i> <span>Ventas</span>
+                 role="menuitem"
+                 tabindex="0">
+                <i class="fas fa-cash-register" aria-hidden="true"></i> <span>Ventas</span>
               </a>
             </li>
             <li role="none">
@@ -94,8 +112,9 @@
                  routerLinkActive="active" 
                  class="nav-link"
                  (click)="closeMenu()"
-                 role="menuitem">
-                <i class="fas fa-money-bill-wave"></i> <span>Caja</span>
+                 role="menuitem"
+                 tabindex="0">
+                <i class="fas fa-money-bill-wave" aria-hidden="true"></i> <span>Caja</span>
               </a>
             </li>
             <li role="none">
@@ -103,8 +122,9 @@
                  routerLinkActive="active" 
                  class="nav-link"
                  (click)="closeMenu()"
-                 role="menuitem">
-                <i class="fas fa-credit-card"></i> <span>Métodos de Pago</span>
+                 role="menuitem"
+                 tabindex="0">
+                <i class="fas fa-credit-card" aria-hidden="true"></i> <span>Métodos de Pago</span>
               </a>
             </li>
             <li role="none">
@@ -112,8 +132,9 @@
                  routerLinkActive="active" 
                  class="nav-link"
                  (click)="closeMenu()"
-                 role="menuitem">
-                <i class="fas fa-file-invoice-dollar"></i> <span>Lista de Precios Mayorista</span>
+                 role="menuitem"
+                 tabindex="0">
+                <i class="fas fa-file-invoice-dollar" aria-hidden="true"></i> <span>Lista de Precios Mayorista</span>
               </a>
             </li>
           </ul>
@@ -125,16 +146,17 @@
         <a routerLink="/carrito" 
            class="cart-button" 
            (click)="closeMenu()"
-           aria-label="Carrito de compras">
-          <i class="fas fa-shopping-cart"></i>
+           [attr.aria-label]="cartItemCount > 0 ? 'Ver carrito de compras - ' + cartItemCount + ' artículos' : 'Ver carrito de compras'">
+          <i class="fas fa-shopping-cart" aria-hidden="true"></i>
           <span class="cart-label">Carrito</span>
-          <span class="cart-count" *ngIf="cartItemCount > 0">{{ cartItemCount }}</span>
+          <span class="cart-count" *ngIf="cartItemCount > 0" aria-hidden="true">{{ cartItemCount }}</span>
         </a>
         <button *ngIf="isLoggedIn$ | async" 
                 (click)="logout()" 
                 class="auth-button auth-logout"
-                aria-label="Cerrar sesión">
-          <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
+                aria-label="Cerrar sesión"
+                type="button">
+          <i class="fas fa-sign-out-alt" aria-hidden="true"></i> <span>Cerrar Sesión</span>
         </button>
       </div>
     </nav>
