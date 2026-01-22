@@ -3,12 +3,12 @@ main {
   padding: 0rem 0; /* Ajustar el padding a 0 para que ocupe todo el ancho */
   margin: 0 auto; /* Centrar el contenido */
   width: 100%; /* Asegurar que el main ocupe todo el ancho */
-  max-width: 1200px; /* Ancho máximo para el contenido */
+  max-width: none; /* Permitir ancho completo; lo controlan los contenedores internos */
   box-sizing: border-box; /* Incluir padding y border en el ancho total */
   flex: 1; /* Permite que el main ocupe el espacio restante */
   display: flex;  
   flex-direction: column;
-  min-height: calc(100vh - 1080px);
+  min-height: auto;
   margin-bottom: 60px; /* Añadir margen inferior para el footer */
 }
 

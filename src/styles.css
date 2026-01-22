@@ -27,9 +27,11 @@ html {
 }
 
 .container {
-  max-width: 1200px;
+  width: 100%;
+  max-width: 1320px;
   margin: 0 auto;
   padding: 0 var(--gutter);
+  box-sizing: border-box;
 }
 
 .state-card {

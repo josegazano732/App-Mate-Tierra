@@ -1,6 +1,5 @@
 .carousel-container {
-  width: 100%;
-  max-width: 95%;
+  width: min(1280px, 100%);
   margin: 0 auto;
   padding: 5.25rem 3rem 3.5rem;
   background:
@@ -142,6 +141,35 @@
 @media (max-width: 1024px) {
   .carousel-container {
     padding: 3rem 1.35rem 3.25rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .carousel-container {
+    padding: 2.35rem 1.1rem 2.5rem;
+    border-radius: 22px;
+  }
+
+  .gallery-grid {
+    gap: 1.1rem;
+  }
+
+  .mosaic-card {
+    min-height: 300px;
+  }
+
+  .gallery-controls {
+    margin-top: 1.75rem;
+    gap: 1rem;
+  }
+
+  .control-button {
+    width: 46px;
+    height: 46px;
+  }
+
+  .indicator {
+    width: 26px;
   }
 }
 
@@ -583,6 +611,34 @@
 @media (max-width: 640px) {
   .mosaic-card {
     grid-column: span 12;
+    min-height: 320px;
+  }
+
+  .gallery-grid {
+    gap: 1rem;
+  }
+
+  .mosaic-body {
+    padding: 0.85rem 0.95rem 0.85rem;
+  }
+
+  .mosaic-featured {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .mosaic-footer-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .mosaic-cart {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .gallery-controls {
+    flex-direction: column;
   }
 }
 

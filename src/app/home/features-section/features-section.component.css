@@ -255,7 +255,7 @@
 
 @media (max-width: 768px) {
   .features-section {
-    padding: 4.25rem 0;
+    padding: 3.75rem 0;
   }
   
   .section-header .section-meta h2 {
@@ -268,16 +268,17 @@
 
   .features {
     grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: 1.1rem;
-    padding: 0 1.25rem;
+    gap: 1rem;
+    padding: 0 1rem;
   }
 
   .feature {
     grid-column: span 12;
+    border-radius: 22px;
   }
 
   .feature-img-container {
-    height: 200px;
+    height: 180px;
   }
 }
 
@@ -291,10 +292,14 @@
   }
 
   .feature-content {
-    padding: 1.5rem;
+    padding: 1.25rem 1.2rem 1.35rem;
   }
 
   .feature h3 {
     font-size: 1.25rem;
+  }
+
+  .feature-img-container {
+    height: 160px;
   }
 }
