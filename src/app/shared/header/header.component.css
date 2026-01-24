@@ -3,6 +3,8 @@
    ============================================ */
 header,
 .main-header {
+  max-width: 100vw;
+  overflow-x: clip;
   --header-bg-1: rgba(16, 43, 28, 0.98);
   --header-bg-2: rgba(22, 40, 31, 0.96);
   --header-surface: rgba(16, 43, 28, 0.95);
@@ -634,22 +636,26 @@ nav {
   .main-nav {
     position: fixed;
     top: 0.75rem;
-    right: 1rem;
-    left: auto;
+    left: 0.75rem;
+    right: 0.75rem;
     bottom: auto;
-    width: min(360px, calc(100vw - 1.5rem));
-    max-width: 360px;
+    width: auto;
+    max-width: 420px;
+    margin: 0 auto;
     background: linear-gradient(135deg, rgba(16, 43, 28, 0.98) 0%, rgba(22, 40, 31, 0.98) 100%);
     backdrop-filter: blur(20px);
     flex-direction: column;
     justify-content: flex-start;
     align-items: stretch;
     padding: 4rem 1.15rem 1.1rem;
-    transform: translateX(100%);
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateY(-120%);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                opacity 0.3s ease,
+                visibility 0.3s ease;
     z-index: var(--z-nav-mobile);
-    opacity: 1;
-    visibility: visible;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
     gap: 0.85rem;
     max-height: calc(100vh - 1.5rem);
     overflow-y: auto;
@@ -659,7 +665,10 @@ nav {
   }
 
   .main-nav.open {
-    transform: translateX(0);
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
   }
 
   /* Navigation links - mobile style */
@@ -857,9 +866,12 @@ nav {
   }
 
   .main-nav {
-    width: 100vw;
-    max-width: 100vw;
+    left: 0.5rem;
+    right: 0.5rem;
+    width: auto;
+    max-width: calc(100vw - 1rem);
     padding: 5rem 1.25rem 1.5rem;
+    border-radius: 16px;
   }
 
   .nav-link {

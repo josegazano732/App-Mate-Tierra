@@ -15,9 +15,21 @@
   text-decoration: none;
   box-shadow: 2px 2px 3px #999;
   transition: all 0.3s ease;
-  z-index: 1000;
+  z-index: 1200;
 }
 .whatsapp-button:hover {
   background-color: #128C7E;
   transform: scale(1.1);
+}
+
+@media (max-width: 768px) {
+  .whatsapp-button {
+    bottom: 18px;
+    right: 18px;
+    width: 64px;
+    height: 64px;
+    font-size: 30px;
+    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+  }
 }

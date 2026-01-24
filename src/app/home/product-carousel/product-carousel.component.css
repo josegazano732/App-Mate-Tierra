@@ -1,7 +1,8 @@
 .carousel-container {
-  width: min(1280px, 100%);
+  width: 100%;
+  max-width: min(1180px, calc(100% - 2rem));
   margin: 0 auto;
-  padding: 5.25rem 3rem 3.5rem;
+  padding: 5.25rem clamp(1.5rem, 4vw, 3rem) 3.5rem;
   background:
     radial-gradient(900px circle at 12% 12%, rgba(60, 156, 54, 0.03), transparent 55%),
     radial-gradient(700px circle at 88% 24%, rgba(0, 255, 163, 0.02), transparent 60%),
@@ -140,12 +141,14 @@
 
 @media (max-width: 1024px) {
   .carousel-container {
-    padding: 3rem 1.35rem 3.25rem;
+    max-width: min(1100px, calc(100% - 2rem));
+    padding: 3rem clamp(1.1rem, 4vw, 2rem) 3.25rem;
   }
 }
 
 @media (max-width: 768px) {
   .carousel-container {
+    max-width: calc(100% - 1.5rem);
     padding: 2.35rem 1.1rem 2.5rem;
     border-radius: 22px;
   }
