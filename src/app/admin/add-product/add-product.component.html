@@ -38,6 +38,14 @@
       </select>
     </div>
     <div class="form-group">
+      <label for="unit">Unidad de medida:</label>
+      <select id="unit" name="unit_of_measure" [(ngModel)]="product.unit_of_measure" required>
+        <option value="unidad">Unidad</option>
+        <option value="kg">KG</option>
+        <option value="gs">GS</option>
+      </select>
+    </div>
+    <div class="form-group">
       <label for="stock">Stock:</label>
       <input type="number" id="stock" name="stock" [(ngModel)]="product.stock" required min="0">
     </div>

@@ -137,6 +137,16 @@ describe('SalesService', () => {
         }
       });
     });
+    it('debe requerir datos de cliente para cuenta_corriente', (done) => {
+      const items = [{ id: 'p1', price: 100, quantity: 1 }];
+      const paymentSplits: PaymentSplit[] = [{ method: 'cuenta_corriente', amount: 100 }];
+      service.createSale('u1', items as any, 'cuenta_corriente', paymentSplits).subscribe({
+        error: (err) => {
+          expect(err.message).toContain('Customer name');
+          done();
+        }
+      });
+    });
     it('debe manejar error al crear venta', (done) => {
       const items = [{ id: 'p1', price: 100, quantity: 1 }];
       const paymentSplits: PaymentSplit[] = [{ method: 'cash', amount: 100 }];

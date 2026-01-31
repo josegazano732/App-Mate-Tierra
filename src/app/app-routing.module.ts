@@ -8,12 +8,14 @@ import { ProductDetailsComponent } from './products/product-details/product-deta
 import { ProductCrudComponent } from './products/product-crud/product-crud.component';
 import { AddProductComponent } from './admin/add-product/add-product.component';
 import { LoginComponent } from './auth/login/login.component';
+import { RegisterComponent } from './auth/register/register.component';
 import { CategoryManagementComponent } from './admin/category-management/category-management.component';
 import { SalesComponent } from './admin/sales/sales.component';
 import { SalesHistoryComponent } from './admin/sales-history/sales-history.component';
 import { PaymentMethodsComponent } from './admin/payment-methods/payment-methods.component';
 import { CashRegisterComponent } from './admin/cash-register/cash-register.component';
 import { CurrentSaleComponent } from './admin/current-sale/current-sale.component';
+import { SupplierExpensesComponent } from './admin/supplier-expenses/supplier-expenses.component';
 import { AdminGuard } from './guards/admin.guard';
 
 const routes: Routes = [
@@ -23,6 +25,7 @@ const routes: Routes = [
   { path: 'contacto', component: ContactComponent },
   { path: 'carrito', component: CartComponent },
   { path: 'login', component: LoginComponent },
+  { path: 'registro', component: RegisterComponent },
   { path: 'gestionar-productos', component: ProductCrudComponent, canActivate: [AdminGuard] },
   { path: 'agregar-producto', component: AddProductComponent, canActivate: [AdminGuard] },
   { path: 'gestionar-categorias', component: CategoryManagementComponent, canActivate: [AdminGuard] },
@@ -31,6 +34,7 @@ const routes: Routes = [
   { path: 'historial-ventas', component: SalesHistoryComponent, canActivate: [AdminGuard] },
   { path: 'metodos-pago', component: PaymentMethodsComponent, canActivate: [AdminGuard] },
   { path: 'caja', component: CashRegisterComponent, canActivate: [AdminGuard] },
+  { path: 'gastos-proveedores', component: SupplierExpensesComponent, canActivate: [AdminGuard] },
   { 
     path: 'lista-precios-mayorista', 
     loadChildren: () => import('./wholesale-price-list/wholesale-price-list.module').then(m => m.WholesalePriceListModule),

@@ -42,6 +42,7 @@ export class ProductCrudComponent implements OnInit {
     image: '',
     image_urls: [] as string[],
     category_id: '',
+    unit_of_measure: 'unidad',
     stock: 0,
     seasonal: false
   };
@@ -555,6 +556,21 @@ export class ProductCrudComponent implements OnInit {
     }
   }
 
+  getUnitStep(unit?: string | null): number {
+    return this.isWeightUnit(unit) ? 0.01 : 1;
+  }
+
+  getUnitLabel(unit?: string | null): string {
+    const normalized = (unit || 'unidad').toLowerCase();
+    if (normalized === 'kg') return 'kg';
+    if (normalized === 'gs') return 'gs';
+    return 'unidad';
+  }
+
+  private isWeightUnit(unit?: string | null): boolean {
+    return (unit || '').toLowerCase() === 'kg';
+  }
+
   async onSubmit() {
     if (this.createSelectedFiles.length === 0) {
       this.errorMessage = 'Carga al menos una imagen para crear el producto.';
@@ -595,6 +611,7 @@ export class ProductCrudComponent implements OnInit {
         image: uploadedUrls[0] ?? '',
         image_urls: uploadedUrls,
         category_id: this.product.category_id,
+        unit_of_measure: this.product.unit_of_measure || 'unidad',
         stock: this.product.stock,
         seasonal: this.product.seasonal
       };
@@ -621,6 +638,7 @@ export class ProductCrudComponent implements OnInit {
       image: '',
       image_urls: [],
       category_id: '',
+      unit_of_measure: 'unidad',
       stock: 0,
       seasonal: false
     };
@@ -632,7 +650,8 @@ export class ProductCrudComponent implements OnInit {
     const images = product.image_urls?.length ? [...product.image_urls] : (product.image ? [product.image] : []);
     this.editingProduct = {
       ...product,
-      image_urls: images
+      image_urls: images,
+      unit_of_measure: product.unit_of_measure || 'unidad'
     };
     this.originalEditImages = [...images];
     this.editExistingImages = [...images];

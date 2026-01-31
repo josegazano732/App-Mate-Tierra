@@ -30,6 +30,7 @@ export class ProductsComponent implements OnInit {
   errorMessage: string | null = null;
   availableProducts = 0;
   private readonly productImageFallback = 'https://images.unsplash.com/photo-1501426026826-31c667bdf23d?auto=format&fit=crop&w=900&q=60';
+  private readonly prioritizedKeywords = ['mates', 'termera', 'termos'];
 
   constructor(
     private cartService: CartService,
@@ -72,8 +73,39 @@ export class ProductsComponent implements OnInit {
     } else {
       this.filteredProducts = [...this.products];
     }
+
+    this.filteredProducts = this.sortProductsByPriority(this.filteredProducts);
     this.updateAvailableProducts();
     this.updateDisplayedProducts();
+  }
+
+  private sortProductsByPriority(products: Product[]): Product[] {
+    return [...products].sort((a, b) => {
+      const priorityA = this.getProductPriority(a);
+      const priorityB = this.getProductPriority(b);
+
+      if (priorityA !== priorityB) {
+        return priorityA - priorityB;
+      }
+
+      return (a.name || '').localeCompare(b.name || '', 'es', { sensitivity: 'base' });
+    });
+  }
+
+  private getProductPriority(product: Product): number {
+    const name = this.normalizeText(product.name);
+    const category = this.normalizeText(product.category_name || '');
+    const combined = `${name} ${category}`.trim();
+
+    const index = this.prioritizedKeywords.findIndex(keyword => combined.includes(keyword));
+    return index === -1 ? 999 : index;
+  }
+
+  private normalizeText(value: string): string {
+    return value
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
   }
 
   updateDisplayedProducts() {
@@ -99,7 +131,8 @@ export class ProductsComponent implements OnInit {
       id: product.id,
       name: product.name,
       price: product.price,
-      quantity: 1
+      quantity: 1,
+      unit_of_measure: product.unit_of_measure || 'unidad'
     });
   }
 

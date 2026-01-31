@@ -1,0 +1,112 @@
+<section class="expenses-container">
+  <header class="expenses-header">
+    <div>
+      <p class="eyebrow">Administración</p>
+      <h2>Registrar gastos y pagos a proveedores</h2>
+      <p>Ingresá el proveedor, el concepto y distribuí el pago por uno o más medios.</p>
+    </div>
+  </header>
+
+  <div *ngIf="isLoading" class="loading">
+    <i class="fas fa-spinner fa-spin"></i> Cargando datos...
+  </div>
+
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="!isLoading" class="expense-card">
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="supplierName">Nombre del proveedor</label>
+        <input
+          id="supplierName"
+          type="text"
+          [(ngModel)]="supplierName"
+          placeholder="Ej: Distribuidora Norte" />
+      </div>
+      <div class="form-group">
+        <label for="expenseDescription">Concepto / Descripción</label>
+        <textarea
+          id="expenseDescription"
+          rows="3"
+          [(ngModel)]="description"
+          placeholder="Ej: Pago de mercadería, flete, servicios"></textarea>
+      </div>
+    </div>
+
+    <div class="section-title">
+      <h3>Medios de pago</h3>
+      <p>Podés dividir el importe entre varios medios y ver el disponible actual.</p>
+    </div>
+
+    <div class="payment-splits">
+      <div class="payment-split" *ngFor="let split of paymentSplits; let i = index">
+        <div class="form-group">
+          <label [for]="'paymentMethod' + i">Medio</label>
+          <select
+            [id]="'paymentMethod' + i"
+            [(ngModel)]="split.method"
+            class="payment-select">
+            <option value="">Seleccioná un medio</option>
+            <option *ngFor="let method of paymentMethods" [value]="method.code">
+              {{ method.name }} (Disponible: {{ getAvailableAmount(method.code) | currency:'USD' }})
+            </option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label [for]="'amount' + i">Importe</label>
+          <input
+            [id]="'amount' + i"
+            type="number"
+            min="0"
+            step="0.01"
+            [(ngModel)]="split.amount"
+            class="amount-input" />
+          <small class="availability" *ngIf="split.method">
+            Disponible actual: {{ getAvailableAmount(split.method) | currency:'USD' }}
+          </small>
+        </div>
+        <button
+          type="button"
+          *ngIf="i > 0"
+          (click)="removePaymentSplit(i)"
+          class="btn-remove-split"
+          aria-label="Eliminar medio">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="split-actions">
+      <button
+        type="button"
+        class="btn-add-split"
+        (click)="addPaymentSplit()"
+        [disabled]="!canAddMoreSplits()">
+        <i class="fas fa-plus"></i> Añadir medio
+      </button>
+    </div>
+
+    <div class="summary-row" [class.error]="hasOverdraw">
+      <div>
+        <span>Total a registrar</span>
+        <strong>{{ totalAmount | currency:'USD' }}</strong>
+      </div>
+      <div class="summary-hint">
+        <span *ngIf="hasOverdraw">El importe supera el disponible en algún medio.</span>
+        <span *ngIf="!hasOverdraw">Disponible validado por cada medio.</span>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button
+        type="button"
+        class="btn-submit"
+        (click)="registerExpense()"
+        [disabled]="!canRegisterExpense() || isSubmitting">
+        <i class="fas fa-file-invoice-dollar"></i> Registrar gasto
+      </button>
+    </div>
+  </div>
+</section>

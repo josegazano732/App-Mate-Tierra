@@ -48,10 +48,14 @@
 
           <div class="cart-card-body">
             <div class="quantity-control" aria-label="Controlar cantidad">
-              <button type="button" (click)="decrementQuantity(item)" aria-label="Disminuir cantidad">
+              <button
+                type="button"
+                (click)="decrementQuantity(item)"
+                [disabled]="item.quantity <= getQuantityStep(item)"
+                aria-label="Disminuir cantidad">
                 <i class="fas fa-minus"></i>
               </button>
-              <span>{{ item.quantity }}</span>
+              <span>{{ formatQuantity(item) }}</span>
               <button type="button" (click)="incrementQuantity(item)" aria-label="Incrementar cantidad">
                 <i class="fas fa-plus"></i>
               </button>
@@ -93,7 +97,7 @@
           <button type="button" class="btn-outline" (click)="clearCart()">
             <i class="fas fa-trash"></i> Vaciar carrito
           </button>
-          <button type="button" class="btn-primary">
+          <button type="button" class="btn-primary" (click)="proceedToPayment()">
             <i class="fas fa-credit-card"></i> Proceder al pago
           </button>
         </div>

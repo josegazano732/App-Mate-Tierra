@@ -11,6 +11,7 @@ export interface FirebaseProduct {
   price: number;
   image: string;
   category: string;
+  unit_of_measure?: string;
   stock: number;
   createdAt?: string;
   updatedAt?: string;

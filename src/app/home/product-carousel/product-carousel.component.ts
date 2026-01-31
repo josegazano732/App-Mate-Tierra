@@ -103,7 +103,8 @@ export class ProductCarouselComponent implements OnInit {
       name: product.name,
       price: unitPrice,
       originalPrice: product.price,
-      quantity: 1
+      quantity: 1,
+      unit_of_measure: product.unit_of_measure || 'unidad'
     });
   }
 

@@ -12,11 +12,40 @@
   </header>
 
   <div class="current-sale">
-    <div *ngIf="cartItems.length === 0" class="empty-cart">
-      No hay productos en el carrito. Agregá artículos desde el catálogo.
+    <div class="product-selector">
+      <div class="section-title">
+        <h3>Seleccioná productos</h3>
+        <p>Buscá y agregá artículos sin depender del carrito.</p>
+      </div>
+      <div class="selector-controls">
+        <input
+          type="text"
+          placeholder="Buscar por nombre"
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearchChange($event)"
+          class="search-input" />
+        <span class="hint" *ngIf="isLoadingProducts">Cargando productos...</span>
+        <span class="error-message" *ngIf="productError">{{ productError }}</span>
+      </div>
+      <div class="product-grid" *ngIf="!isLoadingProducts && filteredProducts.length">
+        <article class="product-chip" *ngFor="let product of filteredProducts | slice:0:8">
+          <div>
+            <strong>{{ product.name }}</strong>
+            <p class="price">{{ product.price | currency:'USD' }}</p>
+            <small *ngIf="product.stock !== undefined">Stock: {{ product.stock }} {{ product.unit_of_measure || 'unidad' }}</small>
+          </div>
+          <button type="button" class="btn-add-product" (click)="addProductToSale(product)">
+            <i class="fas fa-plus"></i> Agregar
+          </button>
+        </article>
+      </div>
     </div>
 
-    <div *ngIf="cartItems.length > 0" class="current-sale-body">
+    <div *ngIf="saleItems.length === 0" class="empty-cart">
+      No hay productos seleccionados. Agregá artículos para registrar la venta.
+    </div>
+
+    <div *ngIf="saleItems.length > 0" class="current-sale-body">
       <table class="items-table">
         <thead>
           <tr>
@@ -24,14 +53,30 @@
             <th>Cantidad</th>
             <th>Precio Unitario</th>
             <th>Total</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let item of cartItems">
+          <tr *ngFor="let item of saleItems">
             <td>{{ item.name }}</td>
-            <td>{{ item.quantity }}</td>
+            <td>
+              <input
+                type="number"
+                [min]="getQuantityMin(item)"
+                [step]="getQuantityStep(item)"
+                [value]="item.quantity"
+                (input)="updateItemQuantity(item.id, $any($event.target).value)"
+                [attr.inputmode]="getUnitLabel(item) === 'kg' ? 'decimal' : 'numeric'"
+                class="qty-input" />
+              <small class="qty-unit">{{ getUnitLabel(item) }}</small>
+            </td>
             <td>{{ item.price | currency:'USD' }}</td>
             <td>{{ item.price * item.quantity | currency:'USD' }}</td>
+            <td>
+              <button type="button" class="btn-remove" (click)="removeItem(item.id)">
+                <i class="fas fa-times"></i>
+              </button>
+            </td>
           </tr>
         </tbody>
         <tfoot>
@@ -82,8 +127,22 @@
                 aria-label="Eliminar método">
                 <i class="fas fa-times"></i>
               </button>
+              <div class="current-account-inline" *ngIf="isCurrentAccount(split.method)">
+                <div class="form-group">
+                  <label for="customerName">Nombre del cliente</label>
+                  <input id="customerName" type="text" [(ngModel)]="customerName" placeholder="Ej: Juan Pérez" />
+                </div>
+                <div class="form-group">
+                  <label for="paymentDueDate">Fecha de pago</label>
+                  <input id="paymentDueDate" type="date" [(ngModel)]="paymentDueDate" />
+                </div>
+              </div>
             </div>
           </div>
+
+          <p class="helper-text" *ngIf="!usesCurrentAccount()">
+            Seleccioná "Cuenta corriente" en algún método para cargar cliente y fecha de pago.
+          </p>
 
           <div class="payment-summary" [class.error]="getRemainingAmount() < 0">
             <span>Restante</span>

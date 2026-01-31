@@ -7,6 +7,7 @@ export interface CartItem {
   price: number;
   originalPrice?: number;
   quantity: number;
+  unit_of_measure?: string;
 }
 
 @Injectable({

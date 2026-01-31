@@ -12,6 +12,7 @@ export interface Product {
   image_urls: string[];
   category_id: string;
   category_name?: string;
+  unit_of_measure?: string;
   stock: number;
   seasonal: boolean;
   cost: number;
@@ -104,6 +105,7 @@ export class ProductService {
           image: sanitizedImageUrls[0] ?? (typeof product.image === 'string' ? product.image.trim() : ''),
           image_urls: sanitizedImageUrls,
           category_id: product.category_id,
+          unit_of_measure: product.unit_of_measure || 'unidad',
           stock: product.stock,
           seasonal: product.seasonal,
           cost: product.cost,
@@ -134,6 +136,7 @@ export class ProductService {
       image: sanitizedImageUrls[0] ?? (typeof product.image === 'string' ? product.image.trim() : ''),
       image_urls: sanitizedImageUrls,
       category_id: product.category_id,
+      unit_of_measure: product.unit_of_measure || 'unidad',
       stock: product.stock,
       seasonal: product.seasonal,
       cost: product.cost,
@@ -220,7 +223,8 @@ export class ProductService {
     return {
       ...row,
       image: primaryImage,
-      image_urls: imageUrls
+      image_urls: imageUrls,
+      unit_of_measure: row?.unit_of_measure || 'unidad'
     } as Product;
   }
 }

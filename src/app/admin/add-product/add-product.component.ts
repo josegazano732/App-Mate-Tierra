@@ -18,6 +18,7 @@ export class AddProductComponent {
     price: 0,
     image: '',
     category: '',
+    unit_of_measure: 'unidad',
     stock: 0
   };
 
@@ -64,7 +65,8 @@ export class AddProductComponent {
         price: this.product.price,
         image: imageUrl,
         category: this.product.category,
-        stock: this.product.stock
+        stock: this.product.stock,
+        unit_of_measure: this.product.unit_of_measure || 'unidad'
       };
 
       await firstValueFrom(this.firebaseProductService.addProduct(productData));

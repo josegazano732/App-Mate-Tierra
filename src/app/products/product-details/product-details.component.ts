@@ -51,6 +51,7 @@ export class ProductDetailsComponent implements OnInit {
           this.errorMessage = 'Product not found';
           this.setProductImages(null);
         } else {
+          this.quantity = this.getMinQuantity();
           this.setProductImages(product);
         }
       },
@@ -127,7 +128,8 @@ export class ProductDetailsComponent implements OnInit {
         name: this.product.name,
         price: unitPrice,
         originalPrice: this.product.price,
-        quantity: this.quantity
+        quantity: this.quantity,
+        unit_of_measure: this.product.unit_of_measure || 'unidad'
       });
 
       this.router.navigate(['/carrito']);
@@ -135,11 +137,43 @@ export class ProductDetailsComponent implements OnInit {
   }
 
   updateQuantity(change: number) {
-    const newQuantity = this.quantity + change;
-    if (this.product && newQuantity >= 1 && newQuantity <= this.product.stock) {
+    if (!this.product) return;
+    const step = this.getQuantityStep();
+    const newQuantity = this.normalizeQuantity(this.quantity + (change * step));
+    if (newQuantity >= this.getMinQuantity() && newQuantity <= this.product.stock) {
       this.quantity = newQuantity;
       this.errorMessage = '';
     }
+  }
+
+  getQuantityStep(): number {
+    return this.isWeightUnit() ? 0.01 : 1;
+  }
+
+  getMinQuantity(): number {
+    return this.isWeightUnit() ? 0.01 : 1;
+  }
+
+  getUnitLabel(): string {
+    const unit = (this.product?.unit_of_measure || 'unidad').toLowerCase();
+    if (unit === 'kg') return 'kg';
+    if (unit === 'gs') return 'gs';
+    return 'unidad';
+  }
+
+  private normalizeQuantity(value: number): number {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) return 0;
+    const min = this.getMinQuantity();
+    const clamped = Math.max(0, parsed);
+    if (this.isWeightUnit()) {
+      return Number(Math.max(min, clamped).toFixed(2));
+    }
+    return Math.max(min, Math.round(clamped));
+  }
+
+  private isWeightUnit(): boolean {
+    return (this.product?.unit_of_measure || '').toLowerCase() === 'kg';
   }
 
   goBack() {

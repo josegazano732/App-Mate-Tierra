@@ -406,11 +406,26 @@
                   id="stock-edit"
                   [(ngModel)]="editingProduct.stock"
                   name="stock"
+                  [step]="getUnitStep(editingProduct.unit_of_measure)"
                   min="0"
                   required
-                  inputmode="numeric"
+                  [attr.inputmode]="getUnitLabel(editingProduct.unit_of_measure) === 'kg' ? 'decimal' : 'numeric'"
                 />
                 <small>Los clientes verán alertas cuando el stock sea bajo.</small>
+              </div>
+              <div class="form-field">
+                <label for="unit-edit">Unidad de medida</label>
+                <select
+                  id="unit-edit"
+                  [(ngModel)]="editingProduct.unit_of_measure"
+                  name="unit_of_measure"
+                  required
+                >
+                  <option value="unidad">Unidad</option>
+                  <option value="kg">KG</option>
+                  <option value="gs">GS</option>
+                </select>
+                <small>Define cómo se vende y controla la cantidad.</small>
               </div>
               <div class="form-field toggle-field">
                 <label>Temporada</label>
@@ -576,11 +591,26 @@
                   id="stock-create"
                   [(ngModel)]="product.stock"
                   name="stock"
+                  [step]="getUnitStep(product.unit_of_measure)"
                   min="0"
                   required
-                  inputmode="numeric"
+                  [attr.inputmode]="getUnitLabel(product.unit_of_measure) === 'kg' ? 'decimal' : 'numeric'"
                 />
                 <small>Los clientes verán alertas cuando el stock sea bajo.</small>
+              </div>
+              <div class="form-field">
+                <label for="unit-create">Unidad de medida</label>
+                <select
+                  id="unit-create"
+                  [(ngModel)]="product.unit_of_measure"
+                  name="unit_of_measure"
+                  required
+                >
+                  <option value="unidad">Unidad</option>
+                  <option value="kg">KG</option>
+                  <option value="gs">GS</option>
+                </select>
+                <small>Define cómo se vende y controla la cantidad.</small>
               </div>
               <div class="form-field toggle-field">
                 <label>Temporada</label>

@@ -19,6 +19,8 @@ export interface Sale {
   status: 'completed' | 'cancelled';
   created_at: string;
   updated_at: string;
+  customer_name?: string | null;
+  payment_due_date?: string | null;
   items?: SaleItem[];
 }
 
@@ -56,7 +58,17 @@ export class SalesService {
       return throwError(() => new Error('You do not have permission to perform this action.'));
     }
     
+    const details = error?.details || error?.hint || error?.message;
+    if (details) {
+      return throwError(() => new Error(`Error creating sale: ${details}`));
+    }
+
     return throwError(() => new Error('Error creating sale. Please try again.'));
+  }
+
+  private roundAmount(value: number): number {
+    if (!Number.isFinite(value)) return 0;
+    return Number(value.toFixed(2));
   }
 
   private retryStrategy<T>() {
@@ -132,18 +144,30 @@ export class SalesService {
     userId: string, 
     items: CartItem[], 
     paymentMethod: string,
-    paymentSplits: PaymentSplit[]
+    paymentSplits: PaymentSplit[],
+    metadata?: { customerName?: string | null; paymentDueDate?: string | null }
   ): Observable<Sale> {
     // Validate payment method format
     const methods = paymentMethod.split(',');
-    const validMethodFormat = methods.every(method => /^[a-z]+$/.test(method));
+    const validMethodFormat = methods.every(method => /^[a-z_]+$/.test(method));
     if (!validMethodFormat) {
       return throwError(() => new Error('Invalid payment method format'));
     }
 
+    const usesCurrentAccount = methods.includes('cuenta_corriente');
+    if (usesCurrentAccount) {
+      if (!metadata?.customerName || !metadata.paymentDueDate) {
+        return throwError(() => new Error('Customer name and payment due date are required for cuenta_corriente'));
+      }
+    }
+
     // Calculate totals
-    const itemsTotal = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const splitsTotal = paymentSplits.reduce((sum, split) => sum + split.amount, 0);
+    const itemsTotal = this.roundAmount(items.reduce((sum, item) => sum + (item.price * item.quantity), 0));
+    const normalizedSplits = paymentSplits.map(split => ({
+      ...split,
+      amount: this.roundAmount(split.amount)
+    }));
+    const splitsTotal = this.roundAmount(normalizedSplits.reduce((sum, split) => sum + split.amount, 0));
 
     // Validate payment splits total matches items total
     if (Math.abs(itemsTotal - splitsTotal) > 0.01) {
@@ -157,9 +181,11 @@ export class SalesService {
         .insert([{
           user_id: userId,
           payment_method: paymentMethod,
-          payment_splits: paymentSplits,
+          payment_splits: normalizedSplits,
           total_amount: itemsTotal,
-          status: 'completed'
+          status: 'completed',
+          customer_name: metadata?.customerName || null,
+          payment_due_date: metadata?.paymentDueDate || null
         }])
         .select()
         .single()
@@ -172,9 +198,9 @@ export class SalesService {
         const saleItems = items.map(item => ({
           sale_id: data.id,
           product_id: item.id,
-          quantity: item.quantity,
-          unit_price: item.price,
-          original_price: item.originalPrice || item.price
+          quantity: this.roundAmount(item.quantity),
+          unit_price: this.roundAmount(item.price),
+          original_price: this.roundAmount(item.originalPrice || item.price)
         }));
 
         return from(

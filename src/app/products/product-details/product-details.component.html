@@ -55,10 +55,10 @@
       </div>
       
       <div class="quantity-selector" *ngIf="product.stock > 0">
-        <label>Cantidad:</label>
+        <label>Cantidad ({{ getUnitLabel() }}):</label>
         <div class="quantity-controls">
-          <button (click)="updateQuantity(-1)" [disabled]="quantity <= 1">-</button>
-          <span>{{ quantity }}</span>
+          <button (click)="updateQuantity(-1)" [disabled]="quantity <= getMinQuantity()">-</button>
+          <span>{{ quantity | number:'1.0-2' }}</span>
           <button (click)="updateQuantity(1)" [disabled]="quantity >= product.stock">+</button>
         </div>
         <div class="current-price" *ngIf="quantity >= getQuantityTier1()">

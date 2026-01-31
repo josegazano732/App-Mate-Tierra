@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { CartService, CartItem } from '../services/cart.service';
 import { ProductService } from '../services/product.service';
 import { DiscountSettingsService } from '../services/discount-settings.service';
@@ -27,7 +28,8 @@ export class CartComponent implements OnInit {
     private cartService: CartService,
     private productService: ProductService,
     private discountSettingsService: DiscountSettingsService,
-    private siteSettingsService: SiteSettingsService
+    private siteSettingsService: SiteSettingsService,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -68,14 +70,17 @@ export class CartComponent implements OnInit {
   incrementQuantity(item: CartItem) {
     this.productService.getProductById(item.id).subscribe({
       next: (product) => {
-        if (product && item.quantity < product.stock) {
-          const newQuantity = item.quantity + 1;
+        if (product) {
+          const step = this.getQuantityStep(item);
+          const newQuantity = this.normalizeQuantity(item.quantity + step, item.unit_of_measure);
+          if (newQuantity <= product.stock) {
           const originalPrice = this.getOriginalPrice(item);
           const newPrice = this.calculateUnitPrice(originalPrice, newQuantity);
           this.cartService.updateQuantity(item.id, newQuantity, newPrice);
           this.errorMessage = '';
-        } else {
-          this.errorMessage = 'Not enough stock available';
+          } else {
+            this.errorMessage = 'Not enough stock available';
+          }
         }
       },
       error: (error) => {
@@ -86,8 +91,9 @@ export class CartComponent implements OnInit {
   }
 
   decrementQuantity(item: CartItem) {
-    if (item.quantity > 1) {
-      const newQuantity = item.quantity - 1;
+    const step = this.getQuantityStep(item);
+    if (item.quantity > step) {
+      const newQuantity = this.normalizeQuantity(item.quantity - step, item.unit_of_measure);
       const originalPrice = this.getOriginalPrice(item);
       const newPrice = this.calculateUnitPrice(originalPrice, newQuantity);
       this.cartService.updateQuantity(item.id, newQuantity, newPrice);
@@ -98,6 +104,10 @@ export class CartComponent implements OnInit {
 
   clearCart() {
     this.cartService.clearCart();
+  }
+
+  proceedToPayment() {
+    this.router.navigate(['/registro']);
   }
 
   getTotal() {
@@ -128,6 +138,40 @@ export class CartComponent implements OnInit {
     return this.cartItems.reduce((total, item) => {
       return total + (this.getOriginalPrice(item) * item.quantity);
     }, 0);
+  }
+
+  getQuantityStep(item: CartItem): number {
+    return this.isWeightUnit(item.unit_of_measure) ? 0.01 : 1;
+  }
+
+  getUnitLabel(item: CartItem): string {
+    const unit = (item.unit_of_measure || 'unidad').toLowerCase();
+    if (unit === 'kg') return 'kg';
+    if (unit === 'gs') return 'gs';
+    return 'unidad';
+  }
+
+  formatQuantity(item: CartItem): string {
+    const quantity = this.normalizeQuantity(item.quantity, item.unit_of_measure);
+    const formatted = this.isWeightUnit(item.unit_of_measure)
+      ? quantity.toFixed(2)
+      : Math.round(quantity).toString();
+    return `${formatted} ${this.getUnitLabel(item)}`;
+  }
+
+  private normalizeQuantity(value: number, unit?: string | null): number {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) return 0;
+    const min = this.isWeightUnit(unit) ? 0.01 : 1;
+    const clamped = Math.max(0, parsed);
+    if (this.isWeightUnit(unit)) {
+      return Number(Math.max(min, clamped).toFixed(2));
+    }
+    return Math.max(min, Math.round(clamped));
+  }
+
+  private isWeightUnit(unit?: string | null): boolean {
+    return (unit || '').toLowerCase() === 'kg';
   }
 
   private calculateUnitPrice(originalPrice: number, quantity: number): number {

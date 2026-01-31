@@ -18,6 +18,7 @@ import { ProductDetailsComponent } from './products/product-details/product-deta
 import { ProductCrudComponent } from './products/product-crud/product-crud.component';
 import { AddProductComponent } from './admin/add-product/add-product.component';
 import { LoginComponent } from './auth/login/login.component';
+import { RegisterComponent } from './auth/register/register.component';
 import { CategoryManagementComponent } from './admin/category-management/category-management.component';
 import { ProductCarouselComponent } from './home/product-carousel/product-carousel.component';
 import { SalesComponent } from './admin/sales/sales.component';
@@ -28,6 +29,7 @@ import { FeaturesSectionComponent } from './home/features-section/features-secti
 import { CategoriesSectionComponent } from './home/categories-section/categories-section.component';
 import { RecentSalesComponent } from './admin/recent-sales/recent-sales.component';
 import { CurrentSaleComponent } from './admin/current-sale/current-sale.component';
+import { SupplierExpensesComponent } from './admin/supplier-expenses/supplier-expenses.component';
 
 import { AppRoutingModule } from './app-routing.module';
 import { SupabaseService } from './services/supabase.service';
@@ -55,6 +57,7 @@ import { PaymentMethodsService } from './services/payment-methods.service';
     ProductCrudComponent,
     AddProductComponent,
     LoginComponent,
+    RegisterComponent,
     CategoryManagementComponent,
     ProductCarouselComponent,
     SalesComponent,
@@ -64,7 +67,8 @@ import { PaymentMethodsService } from './services/payment-methods.service';
     FeaturesSectionComponent,
     CategoriesSectionComponent,
     RecentSalesComponent,
-    CurrentSaleComponent
+    CurrentSaleComponent,
+    SupplierExpensesComponent
   ],
   imports: [
     BrowserModule,
