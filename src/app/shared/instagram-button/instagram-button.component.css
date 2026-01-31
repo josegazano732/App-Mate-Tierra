@@ -1,12 +1,12 @@
-.whatsapp-button {
+.instagram-button {
   position: fixed;
-  bottom: 20px;
+  bottom: 90px;
   right: 20px;
-  background-color: #25D366;
+  background: radial-gradient(circle at 30% 30%, #feda75 0%, #fa7e1e 30%, #d62976 55%, #962fbf 75%, #4f5bd5 100%);
   color: white;
   border-radius: 50%;
   text-align: center;
-  font-size: 30px;
+  font-size: 28px;
   width: 60px;
   height: 60px;
   display: flex;
@@ -17,14 +17,15 @@
   transition: all 0.3s ease;
   z-index: 1200;
 }
-.whatsapp-button:hover {
-  background-color: #128C7E;
+
+.instagram-button:hover {
   transform: scale(1.1);
+  filter: brightness(0.95);
 }
 
 @media (max-width: 768px) {
-  .whatsapp-button {
-    bottom: 18px;
+  .instagram-button {
+    bottom: 92px;
     right: 18px;
     width: 64px;
     height: 64px;
@@ -35,8 +36,8 @@
 }
 
 @media (min-width: 1200px) {
-  .whatsapp-button {
-    bottom: 28px;
+  .instagram-button {
+    bottom: 102px;
     right: 28px;
     width: 68px;
     height: 68px;

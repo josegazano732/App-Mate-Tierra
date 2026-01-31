@@ -12,6 +12,7 @@ import { ContactComponent } from './contact/contact.component';
 import { HeaderComponent } from './shared/header/header.component';
 import { FooterComponent } from './shared/footer/footer.component';
 import { WhatsAppButtonComponent } from './shared/whatsapp-button/whatsapp-button.component';
+import { InstagramButtonComponent } from './shared/instagram-button/instagram-button.component';
 import { ProductFilterComponent } from './products/product-filter/product-filter.component';
 import { CartComponent } from './cart/cart.component';
 import { ProductDetailsComponent } from './products/product-details/product-details.component';
@@ -51,6 +52,7 @@ import { PaymentMethodsService } from './services/payment-methods.service';
     HeaderComponent,
     FooterComponent,
     WhatsAppButtonComponent,
+    InstagramButtonComponent,
     ProductFilterComponent,
     CartComponent,
     ProductDetailsComponent,

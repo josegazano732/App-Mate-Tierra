@@ -18,14 +18,14 @@
   right: 0;
   bottom: 0;
   background-image: 
-    url('/assets/images/yerba-mate-leaves.png'),
-    url('/assets/images/yerba-mate-leaves.png'),
-    url('/assets/images/yerba-mate-leaves.png'),
-    url('/assets/images/yerba-mate-leaves.png'),
-    url('/assets/images/yerba-mate-leaves.png'),
-    url('/assets/images/yerba-mate-leaves.png'),
-    url('/assets/images/yerba-mate-leaves.png'),
-    url('/assets/images/yerba-mate-leaves.png');
+    url('../../assets/images/yerba-mate-leaves.png'),
+    url('../../assets/images/yerba-mate-leaves.png'),
+    url('../../assets/images/yerba-mate-leaves.png'),
+    url('../../assets/images/yerba-mate-leaves.png'),
+    url('../../assets/images/yerba-mate-leaves.png'),
+    url('../../assets/images/yerba-mate-leaves.png'),
+    url('../../assets/images/yerba-mate-leaves.png'),
+    url('../../assets/images/yerba-mate-leaves.png');
   background-position: 
     8% 12%,
     92% 18%,
@@ -115,6 +115,40 @@
     background-position: 10% 18%, 90% 14%, center;
     transform: scale(1.01);
     opacity: 0.36;
+  }
+}
+
+@media (min-width: 1400px) {
+  .home-container {
+    width: min(1800px, 100vw);
+  }
+
+  .hero {
+    padding: 7.5rem 2rem 6rem;
+    max-height: 760px;
+  }
+
+  .home-container::before {
+    background-size:
+      280px auto,
+      290px auto,
+      270px auto,
+      285px auto,
+      280px auto,
+      290px auto,
+      270px auto,
+      285px auto;
+  }
+}
+
+@media (min-width: 1700px) {
+  .home-container {
+    width: min(2000px, 100vw);
+  }
+
+  .hero {
+    padding: 8rem 2.5rem 6.5rem;
+    max-height: 820px;
   }
 }
 
