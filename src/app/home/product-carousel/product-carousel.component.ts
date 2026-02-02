@@ -11,10 +11,12 @@ import { CartService } from '../../services/cart.service';
 export class ProductCarouselComponent implements OnInit {
   products: Product[] = [];
   visibleProducts: Product[] = [];
-  skeletonCards = Array.from({ length: 4 });
+  skeletonCards = Array.from({ length: 5 });
   currentGroup = 0;
-  productsPerGroup = 4;
+  productsPerGroup = 5;
   totalGroups: number[] = [];
+  categoryChips: string[] = [];
+  categoryCount = 0;
   isLoading = true;
   isSliding = false;
   error: string | null = null;
@@ -27,24 +29,54 @@ export class ProductCarouselComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.loadSeasonalProducts();
+    this.loadRitualProducts();
   }
 
-  private loadSeasonalProducts() {
+  private loadRitualProducts() {
     this.isLoading = true;
-    this.productService.getSeasonalProducts(10).subscribe({
+    this.productService.getProducts().subscribe({
       next: (products) => {
-        this.products = products;
+        const showcases = this.buildCategoryShowcases(products);
+        this.products = showcases;
+        this.categoryCount = showcases.length;
+        this.categoryChips = showcases
+          .map(product => this.getCategoryLabel(product))
+          .filter((label, index, arr) => arr.indexOf(label) === index)
+          .slice(0, 6);
         this.calculateGroups();
         this.showGroup(0);
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Error loading seasonal products:', error);
-        this.error = 'Error loading seasonal products';
+        console.error('Error loading ritual products:', error);
+        this.error = 'Error loading ritual products';
         this.isLoading = false;
       }
     });
+  }
+
+  private buildCategoryShowcases(products: Product[]): Product[] {
+    const scored = [...products].sort((a, b) => this.getProductScore(b) - this.getProductScore(a));
+    const categoryMap = new Map<string, Product>();
+
+    for (const product of scored) {
+      const categoryLabel = this.getCategoryLabel(product);
+      if (!categoryMap.has(categoryLabel)) {
+        categoryMap.set(categoryLabel, product);
+      }
+    }
+
+    return Array.from(categoryMap.values());
+  }
+
+  private getProductScore(product: Product): number {
+    const seasonalScore = product.seasonal ? 3 : 0;
+    const discountScore = product.discount ? 2 : 0;
+    const ratingScore = product.rating ? Math.min(product.rating, 5) / 5 : 0;
+    const stockScore = (product.stock ?? 0) > 0 ? 1 : 0;
+    const createdAt = product.created_at ? Date.parse(product.created_at) : 0;
+
+    return seasonalScore + discountScore + ratingScore + stockScore + createdAt / 1e13;
   }
 
   private calculateGroups() {
@@ -161,6 +193,10 @@ export class ProductCarouselComponent implements OnInit {
       return 'fa-bolt';
     }
     return 'fa-check-circle';
+  }
+
+  getCategoryLabel(product: Product): string {
+    return product?.category_name || product?.category || 'Colección Mate';
   }
 
   trackByProductId(_index: number, product: Product): string {

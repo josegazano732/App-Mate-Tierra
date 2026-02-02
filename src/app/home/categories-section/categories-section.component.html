@@ -30,31 +30,68 @@
       <span>{{ errorMessage }}</span>
     </div>
 
-    <div class="categories-mosaic" *ngIf="!isLoading && !errorMessage">
+    <div class="ritual-grid" *ngIf="!isLoading && !errorMessage">
       <article
-        class="mosaic-card featured-only"
+        class="ritual-card"
         *ngFor="let showcase of showcases; index as i"
         data-aos="fade-up"
         [attr.data-aos-delay]="80 * i">
         <a
-          class="featured-link"
+          class="ritual-surface"
           [routerLink]="['/productos']"
           [queryParams]="{categoria: showcase.category.slug}"
           [attr.aria-label]="'Ver productos de ' + showcase.category.name">
-          <div class="mosaic-featured" *ngIf="showcase.featuredProduct as featured">
-            <div class="featured-left">
-              <span class="featured-tag">{{ showcase.category.name }}</span>
-              <span class="featured-name">{{ featured.name }}</span>
-              <span class="featured-price" *ngIf="featured.price">{{ featured.price | currency:'ARS':'symbol-narrow' }}</span>
+          <div class="ritual-bg">
+            <img
+              [src]="showcase.coverImage"
+              [alt]="showcase.category.name"
+              loading="lazy"
+              (error)="handleImageError($event, '')">
+          </div>
+          <div class="ritual-overlay"></div>
+
+          <header class="ritual-header">
+            <span class="ritual-chip">{{ showcase.category.name }}</span>
+            <span class="ritual-count">
+              <i class="fas fa-layer-group"></i>
+              {{ showcase.totalProducts || 0 }} productos
+            </span>
+          </header>
+
+          <div class="ritual-body">
+            <h3>{{ showcase.category.name }}</h3>
+            <p>{{ showcase.description }}</p>
+
+            <div class="ritual-featured" *ngIf="showcase.featuredProduct as featured">
+              <div class="ritual-featured-info">
+                <span class="ritual-featured-label">Producto destacado</span>
+                <span class="ritual-featured-name">{{ featured.name }}</span>
+                <span class="ritual-featured-price" *ngIf="featured.price">
+                  {{ featured.price | currency:'ARS':'symbol-narrow' }}
+                </span>
+              </div>
+              <div class="ritual-featured-thumb">
+                <img
+                  [src]="featured.image"
+                  [alt]="featured.name"
+                  loading="lazy"
+                  (error)="handleImageError($event, '')">
+              </div>
             </div>
-            <div class="featured-thumb">
-              <img
-                [src]="featured.image"
-                [alt]="featured.name"
-                loading="lazy"
-                (error)="handleImageError($event, '')">
+
+            <div class="ritual-tags" *ngIf="showcase.additionalProducts?.length">
+              <span class="ritual-tag" *ngFor="let product of showcase.additionalProducts">
+                {{ product.name }}
+              </span>
             </div>
           </div>
+
+          <footer class="ritual-footer">
+            <span class="ritual-link">
+              Explorar ritual
+              <i class="fas fa-arrow-right"></i>
+            </span>
+          </footer>
         </a>
       </article>
     </div>

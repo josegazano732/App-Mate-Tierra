@@ -36,81 +36,139 @@
   <ng-container *ngIf="!isLoading && !error && products.length > 0">
     <div class="section-header">
       <div class="section-meta">
-        <span class="eyebrow">Colección Seleccionada</span>
-        <h2>Productos destacados</h2>
-        <p>Curaduría con stock y compra rápida para que elijas sin vueltas.</p>
+        <span class="eyebrow">Explorá por ritual</span>
+        <h2>Un producto por categoría</h2>
+        <p>Elegí tu ritual ideal con una selección curada y compra rápida.</p>
+      </div>
+      <div class="ritual-meta" *ngIf="categoryChips.length">
+        <span class="ritual-count">{{ categoryCount }} rituales activos</span>
+        <div class="ritual-chips">
+          <span class="ritual-chip" *ngFor="let chip of categoryChips">{{ chip }}</span>
+        </div>
       </div>
     </div>
 
     <div class="products-gallery">
-      <div class="gallery-grid">
-        <article
-          class="mosaic-card"
-          *ngFor="let product of visibleProducts; trackBy: trackByProductId">
+      <div class="featured-layout">
+        <div class="featured-hero" *ngIf="visibleProducts[0] as hero">
           <a
-            class="mosaic-surface"
-            [routerLink]="['/productos', product.id]"
-            [attr.aria-label]="'Ver producto ' + product.name">
-            <div class="mosaic-bg">
+            class="featured-hero-card"
+            [routerLink]="['/productos', hero.id]"
+            [attr.aria-label]="'Ver producto ' + hero.name">
+            <div class="featured-hero-bg">
               <img
-                [src]="getPrimaryImage(product)"
-                [alt]="product.name"
+                [src]="getPrimaryImage(hero)"
+                [alt]="hero.name"
                 loading="lazy"
                 (error)="handleImageError($event)">
             </div>
+            <div class="featured-hero-overlay"></div>
 
-            <div class="mosaic-overlay"></div>
-
-            <header class="mosaic-header">
-              <span class="mosaic-chip">{{ product.category || 'Colección Mate' }}</span>
-              <span class="mosaic-count" *ngIf="product.stock !== undefined">
-                <i class="fas" [ngClass]="getStockBadgeIcon(product)"></i>
-                {{ getStockBadgeLabel(product) }}
+            <header class="featured-hero-header">
+              <span class="featured-hero-chip">{{ getCategoryLabel(hero) }}</span>
+              <span class="featured-hero-stock" *ngIf="hero.stock !== undefined">
+                <i class="fas" [ngClass]="getStockBadgeIcon(hero)"></i>
+                {{ getStockBadgeLabel(hero) }}
               </span>
             </header>
 
-            <div class="mosaic-body">
-              <h3 class="mosaic-title">{{ product.name }}</h3>
-              <p class="mosaic-description">{{ product.description }}</p>
+            <div class="featured-hero-body">
+              <h3 class="featured-hero-title">{{ hero.name }}</h3>
+              <p class="featured-hero-description">{{ hero.description }}</p>
 
-              <div class="mosaic-featured" *ngIf="product.price">
-                <div class="featured-left">
-                  <span class="featured-tag" *ngIf="product.discount">Ahorro -{{ product.discount }}%</span>
-                  <span class="featured-tag" *ngIf="!product.discount">Precio</span>
-                  <span class="featured-name">{{ getDisplayPrice(product) | currency:'ARS':'symbol-narrow' }}</span>
-                  <span class="featured-price" *ngIf="product.discount">{{ product.price | currency:'ARS':'symbol-narrow' }}</span>
+              <div class="featured-hero-price" *ngIf="hero.price">
+                <div class="hero-price-main">
+                  <span class="hero-price-tag" *ngIf="hero.discount">Ahorro -{{ hero.discount }}%</span>
+                  <span class="hero-price-tag" *ngIf="!hero.discount">Precio especial</span>
+                  <span class="hero-price-value">{{ getDisplayPrice(hero) | currency:'ARS':'symbol-narrow' }}</span>
+                  <span class="hero-price-original" *ngIf="hero.discount">
+                    {{ hero.price | currency:'ARS':'symbol-narrow' }}
+                  </span>
                 </div>
-                <div class="featured-thumb">
-                  <img [src]="getPrimaryImage(product)" [alt]="product.name" loading="lazy" (error)="handleImageError($event)">
+                <div class="hero-price-thumb">
+                  <img
+                    [src]="getPrimaryImage(hero)"
+                    [alt]="hero.name"
+                    loading="lazy"
+                    (error)="handleImageError($event)">
                 </div>
               </div>
 
-              <div class="mosaic-pills">
-                <span class="pill" *ngIf="product.seasonal">Destacado</span>
-                <span class="pill" *ngIf="product.discount">-{{ product.discount }}%</span>
-                <span class="pill" *ngIf="product.rating">★ {{ getRating(product) }}</span>
+              <div class="featured-hero-pills">
+                <span class="pill" *ngIf="hero.seasonal">Curado</span>
+                <span class="pill" *ngIf="hero.discount">-{{ hero.discount }}%</span>
+                <span class="pill" *ngIf="hero.rating">★ {{ getRating(hero) }}</span>
               </div>
             </div>
 
-            <footer class="mosaic-footer">
-              <div class="mosaic-footer-row">
-                <span class="mosaic-link">
-                  Ver producto
-                  <i class="fas fa-arrow-right"></i>
-                </span>
+            <footer class="featured-hero-footer">
+              <span class="featured-hero-link">
+                Ver detalle
+                <i class="fas fa-arrow-right"></i>
+              </span>
+              <button
+                class="featured-hero-cart"
+                type="button"
+                [disabled]="hero.stock <= 0"
+                (click)="$event.preventDefault(); $event.stopPropagation(); addToCart(hero)">
+                <i class="fas fa-cart-plus"></i>
+                <span>{{ hero.stock > 0 ? 'Comprar ahora' : 'Sin stock' }}</span>
+              </button>
+            </footer>
+          </a>
+        </div>
 
+        <div class="featured-rail">
+          <div class="featured-rail-header">
+            <h3>Más rituales destacados</h3>
+            <a routerLink="/productos" class="rail-link">Ver colección</a>
+          </div>
+
+          <div class="featured-rail-track">
+            <article
+              class="featured-rail-card"
+              *ngFor="let product of visibleProducts | slice:1:5; trackBy: trackByProductId">
+              <a
+                class="featured-rail-link"
+                [routerLink]="['/productos', product.id]"
+                [attr.aria-label]="'Ver producto ' + product.name">
+                <div class="rail-thumb">
+                  <img
+                    [src]="getPrimaryImage(product)"
+                    [alt]="product.name"
+                    loading="lazy"
+                    (error)="handleImageError($event)">
+                </div>
+                <div class="rail-info">
+                  <div class="rail-top">
+                    <span class="rail-chip">{{ getCategoryLabel(product) }}</span>
+                    <span class="rail-stock" *ngIf="product.stock !== undefined">
+                      <i class="fas" [ngClass]="getStockBadgeIcon(product)"></i>
+                      {{ getStockBadgeLabel(product) }}
+                    </span>
+                  </div>
+                  <h4>{{ product.name }}</h4>
+                  <p>{{ product.description }}</p>
+                  <div class="rail-price" *ngIf="product.price">
+                    <span class="rail-price-current">{{ getDisplayPrice(product) | currency:'ARS':'symbol-narrow' }}</span>
+                    <span class="rail-price-original" *ngIf="product.discount">
+                      {{ product.price | currency:'ARS':'symbol-narrow' }}
+                    </span>
+                  </div>
+                  <span class="rail-cta">Ver ritual</span>
+                </div>
                 <button
-                  class="mosaic-cart"
+                  class="rail-cart"
                   type="button"
                   [disabled]="product.stock <= 0"
                   (click)="$event.preventDefault(); $event.stopPropagation(); addToCart(product)">
                   <i class="fas fa-cart-plus"></i>
                   <span>{{ product.stock > 0 ? 'Agregar' : 'Sin stock' }}</span>
                 </button>
-              </div>
-            </footer>
-          </a>
-        </article>
+              </a>
+            </article>
+          </div>
+        </div>
       </div>
     </div>
 

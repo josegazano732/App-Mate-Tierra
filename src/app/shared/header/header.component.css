@@ -119,18 +119,6 @@ header.scrolled {
   min-width: 0;
 }
 
-.brand-name {
-  display: none;
-}
-
-.brand-name {
-  color: var(--header-text);
-  font-weight: 700;
-  font-size: 1.05rem;
-  letter-spacing: 0.03em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
 
 .brand-tagline {
   margin-top: 0.25rem;
