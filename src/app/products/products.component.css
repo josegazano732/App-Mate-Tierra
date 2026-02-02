@@ -400,6 +400,25 @@
   flex-wrap: wrap;
 }
 
+.whatsapp-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 700;
+  color: #1f8a3d;
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+
+.whatsapp-inline i {
+  font-size: 1.1rem;
+  color: #25d366;
+}
+
+.whatsapp-inline:hover {
+  color: #177233;
+}
+
 .price-wrapper {
   display: flex;
   flex-direction: column;
@@ -492,7 +511,6 @@
 .btn.secondary:not(:disabled):hover {
   box-shadow: 0 18px 35px rgba(15, 23, 42, 0.10);
 }
-
 .pagination {
   display: flex;
   justify-content: center;

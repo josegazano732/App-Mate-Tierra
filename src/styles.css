@@ -5,6 +5,7 @@ body.menu-open {
 
 /* AOS Styles */
 @import 'aos/dist/aos.css';
+@import 'animate.css/animate.min.css';
 
 /* Additional smooth scroll behavior */
 html {

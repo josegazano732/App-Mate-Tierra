@@ -31,6 +31,7 @@ export class ProductsComponent implements OnInit {
   availableProducts = 0;
   private readonly productImageFallback = 'https://images.unsplash.com/photo-1501426026826-31c667bdf23d?auto=format&fit=crop&w=900&q=60';
   private readonly prioritizedKeywords = ['mates', 'termera', 'termos'];
+  private readonly whatsappPhone = '5493758459113';
 
   constructor(
     private cartService: CartService,
@@ -168,5 +169,12 @@ export class ProductsComponent implements OnInit {
 
     target.onerror = null;
     target.src = this.productImageFallback;
+  }
+
+  getWhatsAppLink(product: Product): string {
+    const price = typeof product?.price === 'number' ? product.price.toFixed(2) : 'N/A';
+    const imageUrl = this.getPrimaryImage(product);
+    const message = `Hola! Quiero consultar por el producto: ${product.name}. Precio: ${price}. Imagen: ${imageUrl}`;
+    return `https://wa.me/${this.whatsappPhone}?text=${encodeURIComponent(message)}`;
   }
 }

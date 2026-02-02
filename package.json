@@ -21,6 +21,7 @@
     "@angular/platform-browser-dynamic": "^15.2.0",
     "@angular/router": "^15.2.0",
     "@supabase/supabase-js": "^2.39.3",
+    "animate.css": "^4.1.1",
     "aos": "^2.3.4",
     "firebase": "^9.22.0",
     "jspdf": "^2.5.1",

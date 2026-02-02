@@ -116,6 +116,10 @@
                 <span class="product-price">{{ product.price | currency:'USD' }}</span>
                 <small>Precio final</small>
               </div>
+              <a class="whatsapp-inline animate__animated animate__rubberBand animate__infinite" [href]="getWhatsAppLink(product)" target="_blank" rel="noopener">
+                <i class="fab fa-whatsapp"></i>
+                Consultar
+              </a>
               <div class="stock-info" [class.low-stock]="product.stock < 5" [class.out-of-stock]="product.stock === 0">
                 <i class="fas" [ngClass]="{
                   'fa-check-circle': product.stock > 5,
