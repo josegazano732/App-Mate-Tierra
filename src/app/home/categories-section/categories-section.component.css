@@ -5,6 +5,8 @@
     radial-gradient(700px circle at 88% 24%, rgba(0, 255, 163, 0.03), transparent 60%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.35) 0%, rgba(246, 251, 247, 0.40) 100%);
   position: relative;
+  content-visibility: auto;
+  contain-intrinsic-size: 900px 1200px;
   z-index: 1;
 }
 
@@ -636,6 +638,19 @@
   .ritual-card:nth-child(1) {
     grid-column: span 12;
     min-height: 360px;
+  }
+}
+
+@media (max-width: 768px) {
+  .ritual-surface,
+  .mosaic-surface,
+  .featured-link {
+    box-shadow: 0 12px 28px rgba(22, 40, 31, 0.14);
+  }
+
+  .ritual-featured,
+  .mosaic-featured {
+    backdrop-filter: none;
   }
 }
 

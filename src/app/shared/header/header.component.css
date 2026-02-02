@@ -571,6 +571,9 @@ nav {
    RESPONSIVE: MOBILE & TABLETS (≤768px)
    ============================================ */
 @media (max-width: 768px) {
+  header.scrolled {
+    backdrop-filter: none;
+  }
   /* Reduce logo for mobile */
   .logo-image {
     width: 64px;
@@ -618,6 +621,7 @@ nav {
   /* Backdrop for mobile menu */
   .nav-backdrop {
     display: block;
+    backdrop-filter: none;
   }
 
   /* Mobile navigation drawer */
@@ -631,7 +635,7 @@ nav {
     max-width: 420px;
     margin: 0 auto;
     background: linear-gradient(135deg, rgba(16, 43, 28, 0.98) 0%, rgba(22, 40, 31, 0.98) 100%);
-    backdrop-filter: blur(20px);
+    backdrop-filter: none;
     flex-direction: column;
     justify-content: flex-start;
     align-items: stretch;
@@ -648,7 +652,7 @@ nav {
     max-height: calc(100vh - 1.5rem);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    box-shadow: -8px 0 32px rgba(0, 0, 0, 0.4);
+    box-shadow: -6px 0 24px rgba(0, 0, 0, 0.32);
     border-radius: 18px;
   }
 
