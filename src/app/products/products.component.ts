@@ -75,6 +75,7 @@ export class ProductsComponent implements OnInit {
       this.filteredProducts = [...this.products];
     }
 
+    this.currentPage = 1;
     this.filteredProducts = this.sortProductsByPriority(this.filteredProducts);
     this.updateAvailableProducts();
     this.updateDisplayedProducts();
