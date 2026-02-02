@@ -822,6 +822,35 @@
   }
 }
 
+@media (max-width: 768px) {
+  .carousel-container {
+    content-visibility: auto;
+    contain-intrinsic-size: 900px 1200px;
+  }
+
+  .featured-hero-card,
+  .featured-rail,
+  .featured-rail-card {
+    box-shadow: 0 12px 28px rgba(22, 40, 31, 0.12);
+  }
+
+  .featured-hero-card,
+  .featured-rail-card,
+  .rail-link,
+  .featured-hero-cart,
+  .rail-cart,
+  .control-button,
+  .indicator {
+    transition: none;
+  }
+
+  .featured-hero-bg img {
+    filter: none;
+    transform: none;
+    transition: none;
+  }
+}
+
 @media (min-width: 1400px) {
   .carousel-container {
     max-width: 1180px;

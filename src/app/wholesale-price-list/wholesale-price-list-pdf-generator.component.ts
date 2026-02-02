@@ -80,16 +80,19 @@ export class WholesalePriceListPdfGeneratorComponent {
     );
 
     // Create table data
-    const tableData = this.products.map(product => [
-      '',
-      product.name,
-      product.category_name,
-      `$${product.price.toFixed(2)}`,
-      `${product.tier1Quantity}+`,
-      `$${product.tier1Price.toFixed(2)}`,
-      `${product.tier2Quantity}+`,
-      `$${product.tier2Price.toFixed(2)}`
-    ]);
+    const tableData = this.products.map(product => {
+      const pricePerKg = typeof product?.price === 'number' ? product.price : 0;
+      const pricePer500 = pricePerKg * 0.5 * 1.2;
+      const pricePer250 = pricePerKg * 0.25 * 1.3;
+      return [
+        '',
+        product.name,
+        product.category_name,
+        `$${pricePerKg.toFixed(2)}`,
+        `$${pricePer500.toFixed(2)}`,
+        `$${pricePer250.toFixed(2)}`
+      ];
+    });
 
     // Add table
     (doc as any).autoTable({
@@ -98,11 +101,9 @@ export class WholesalePriceListPdfGeneratorComponent {
           'Imagen',
           'Producto',
           'Categoría',
-          'Precio Regular',
-          'Cantidad Nivel 1',
-          'Precio Nivel 1',
-          'Cantidad Nivel 2',
-          'Precio Nivel 2'
+          'Precio x KG',
+          'Precio x 500g',
+          'Precio x 250g'
         ]
       ],
       body: tableData,

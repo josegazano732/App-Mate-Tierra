@@ -124,7 +124,12 @@ export class ProductsComponent implements OnInit {
     if (newPage >= 1 && newPage <= this.totalPages) {
       this.currentPage = newPage;
       this.updateDisplayedProducts();
+      this.scrollToTop();
     }
+  }
+
+  private scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   addToCart(product: Product) {
