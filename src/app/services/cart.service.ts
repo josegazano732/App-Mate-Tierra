@@ -8,6 +8,13 @@ export interface CartItem {
   originalPrice?: number;
   quantity: number;
   unit_of_measure?: string;
+  category_name?: string;
+  category?: string;
+  weightMode?: 'kg' | 'grams' | 'fraction' | 'unit';
+  gramsQuantity?: number;
+  fractionCount?: number;
+  gramsPerFraction?: number;
+  lineDiscountPercent?: number;
 }
 
 @Injectable({
@@ -87,12 +94,15 @@ export class CartService {
     this.updateCart();
   }
 
-  updateQuantity(productId: string, quantity: number, newPrice?: number) {
+  updateQuantity(productId: string, quantity: number, newPrice?: number, meta?: Partial<CartItem>) {
     const item = this.cartItems.find(item => item.id === productId);
     if (item) {
       item.quantity = quantity;
       if (newPrice !== undefined) {
         item.price = newPrice;
+      }
+      if (meta) {
+        Object.assign(item, meta);
       }
       if (item.quantity <= 0) {
         this.removeFromCart(productId);
@@ -100,6 +110,13 @@ export class CartService {
         this.updateCart();
       }
     }
+  }
+
+  updateItemMeta(productId: string, meta: Partial<CartItem>) {
+    const item = this.cartItems.find(entry => entry.id === productId);
+    if (!item) return;
+    Object.assign(item, meta);
+    this.updateCart();
   }
 
   clearCart() {

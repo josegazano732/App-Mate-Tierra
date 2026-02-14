@@ -139,7 +139,9 @@ export class ProductsComponent implements OnInit {
       name: product.name,
       price: product.price,
       quantity: 1,
-      unit_of_measure: product.unit_of_measure || 'unidad'
+      unit_of_measure: product.unit_of_measure || 'unidad',
+      category_name: product.category_name || product.category,
+      category: product.category
     });
   }
 

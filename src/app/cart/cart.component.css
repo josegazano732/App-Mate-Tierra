@@ -184,6 +184,83 @@
   flex-wrap: wrap;
 }
 
+.quantity-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.unit-toggle {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.unit-toggle button {
+  border: 1px solid rgba(47, 143, 68, 0.3);
+  background: rgba(47, 143, 68, 0.08);
+  color: #16522e;
+  padding: 0.5rem 0.85rem;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.unit-toggle button.active {
+  background: linear-gradient(120deg, #2f8f44, #62c370);
+  color: #fff;
+  box-shadow: 0 10px 20px rgba(47, 143, 68, 0.2);
+}
+
+.herb-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.herb-row {
+  display: grid;
+  grid-template-columns: auto 100px auto;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.herb-row input,
+.herb-fraction-grid input {
+  width: 100%;
+  max-width: 100px;
+  padding: 0.45rem 0.55rem;
+  border-radius: 10px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  font-weight: 600;
+}
+
+.herb-label {
+  font-size: 0.85rem;
+  color: #4a5b50;
+  font-weight: 600;
+}
+
+.herb-hint {
+  color: #516458;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.herb-fraction-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 0.65rem;
+  align-items: end;
+}
+
+.herb-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
 .quantity-control {
   display: inline-flex;
   align-items: center;

@@ -47,19 +47,84 @@
           </header>
 
           <div class="cart-card-body">
-            <div class="quantity-control" aria-label="Controlar cantidad">
-              <button
-                type="button"
-                (click)="decrementQuantity(item)"
-                [disabled]="item.quantity <= getQuantityStep(item)"
-                aria-label="Disminuir cantidad">
-                <i class="fas fa-minus"></i>
-              </button>
-              <span>{{ formatQuantity(item) }}</span>
-              <button type="button" (click)="incrementQuantity(item)" aria-label="Incrementar cantidad">
-                <i class="fas fa-plus"></i>
-              </button>
+            <div class="quantity-block" aria-label="Controlar cantidad">
+              <ng-container *ngIf="isHerb(item); else standardQuantity">
+                <div class="unit-toggle">
+                  <button type="button" [class.active]="item.weightMode === 'kg'" (click)="onHerbModeChange(item, 'kg')">KG</button>
+                  <button type="button" [class.active]="item.weightMode === 'unit'" (click)="onHerbModeChange(item, 'unit')">Unidad</button>
+                  <button type="button" [class.active]="item.weightMode === 'grams'" (click)="onHerbModeChange(item, 'grams')">Gramos</button>
+                  <button type="button" [class.active]="item.weightMode === 'fraction'" (click)="onHerbModeChange(item, 'fraction')">Unidad fraccionada</button>
+                </div>
+
+                <div class="herb-inputs" [ngSwitch]="item.weightMode">
+                  <div *ngSwitchCase="'kg'" class="quantity-control">
+                    <button
+                      type="button"
+                      (click)="decrementQuantity(item)"
+                      [disabled]="item.quantity <= getQuantityStep(item)"
+                      aria-label="Disminuir cantidad">
+                      <i class="fas fa-minus"></i>
+                    </button>
+                    <span>{{ formatQuantity(item) }}</span>
+                    <button type="button" (click)="incrementQuantity(item)" aria-label="Incrementar cantidad">
+                      <i class="fas fa-plus"></i>
+                    </button>
+                  </div>
+
+                  <div *ngSwitchCase="'unit'" class="quantity-control">
+                    <button
+                      type="button"
+                      (click)="decrementQuantity(item)"
+                      [disabled]="item.quantity <= getQuantityStep(item)"
+                      aria-label="Disminuir cantidad">
+                      <i class="fas fa-minus"></i>
+                    </button>
+                    <span>{{ formatQuantity(item) }}</span>
+                    <button type="button" (click)="incrementQuantity(item)" aria-label="Incrementar cantidad">
+                      <i class="fas fa-plus"></i>
+                    </button>
+                  </div>
+
+                  <div *ngSwitchCase="'grams'" class="herb-row">
+                    <label class="herb-label">Gramos</label>
+                    <input type="number" min="1" step="10" [value]="item.gramsQuantity || defaultGrams" (change)="onHerbGramsChange(item, $any($event.target).value)">
+                    <span class="herb-hint">Equivale a {{ getHerbQuantityKg(item) | number:'1.2-2' }} kg</span>
+                  </div>
+
+                  <div *ngSwitchCase="'fraction'" class="herb-fraction-grid">
+                    <div class="herb-field">
+                      <label class="herb-label">Unidades</label>
+                      <input type="number" min="1" step="1" [value]="item.fractionCount || 1" (change)="onHerbFractionChange(item, $any($event.target).value, item.gramsPerFraction || defaultFractionGrams)">
+                    </div>
+                    <div class="herb-field">
+                      <label class="herb-label">Gramos c/u</label>
+                      <input type="number" min="1" step="10" [value]="item.gramsPerFraction || defaultFractionGrams" (change)="onHerbFractionChange(item, item.fractionCount || 1, $any($event.target).value)">
+                    </div>
+                    <div class="herb-hint">Total: {{ formatQuantity(item) }}</div>
+                    <div class="herb-hint" *ngIf="item.gramsPerFraction && item.price">
+                      Precio por unidad fraccionada: {{ getHerbFractionUnitPrice(item) | currency:'ARS':'symbol':'1.2-2' }}
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+
+              <ng-template #standardQuantity>
+                <div class="quantity-control">
+                  <button
+                    type="button"
+                    (click)="decrementQuantity(item)"
+                    [disabled]="item.quantity <= getQuantityStep(item)"
+                    aria-label="Disminuir cantidad">
+                    <i class="fas fa-minus"></i>
+                  </button>
+                  <span>{{ formatQuantity(item) }}</span>
+                  <button type="button" (click)="incrementQuantity(item)" aria-label="Incrementar cantidad">
+                    <i class="fas fa-plus"></i>
+                  </button>
+                </div>
+              </ng-template>
             </div>
+
             <div class="line-total">
               <span>Total</span>
               <strong>{{ (item.price * item.quantity) | currency:'ARS':'symbol':'1.2-2' }}</strong>

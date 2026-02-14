@@ -25,6 +25,7 @@ export class CurrentSaleComponent implements OnInit, OnDestroy {
   errorMessage = '';
   customerName = '';
   paymentDueDate: string | null = null;
+  globalDiscountPercent = 0;
   userId: string | null = null;
   private destroy$ = new Subject<void>();
 
@@ -40,7 +41,7 @@ export class CurrentSaleComponent implements OnInit, OnDestroy {
     this.cartService.getCart()
       .pipe(takeUntil(this.destroy$))
       .subscribe(items => {
-        this.saleItems = items;
+        this.saleItems = items.map(item => this.normalizeSaleItem(item));
         this.updateInitialAmount();
       });
 
@@ -106,7 +107,8 @@ export class CurrentSaleComponent implements OnInit, OnDestroy {
     const existing = this.saleItems.find(item => item.id === product.id);
     if (existing) {
       existing.quantity = this.normalizeQuantity(existing.quantity + this.getQuantityStep(existing), existing.unit_of_measure);
-      existing.price = product.price;
+      existing.originalPrice = product.price;
+      existing.price = this.applyLineDiscount(existing, existing.lineDiscountPercent || 0, product.price);
     } else {
       this.saleItems.push({
         id: product.id,
@@ -114,7 +116,8 @@ export class CurrentSaleComponent implements OnInit, OnDestroy {
         price: product.price,
         originalPrice: product.price,
         quantity: 1,
-        unit_of_measure: product.unit_of_measure || 'unidad'
+        unit_of_measure: product.unit_of_measure || 'unidad',
+        lineDiscountPercent: 0
       });
     }
     this.updateInitialAmount();
@@ -163,13 +166,53 @@ export class CurrentSaleComponent implements OnInit, OnDestroy {
     return normalized === 'kg';
   }
 
+  private normalizeSaleItem(item: CartItem): CartItem {
+    const original = item.originalPrice ?? item.price;
+    const percent = this.toPercent(item.lineDiscountPercent ?? 0);
+    const price = this.applyLineDiscount({ ...item, originalPrice: original }, percent, original);
+    return { ...item, originalPrice: original, price, lineDiscountPercent: percent };
+  }
+
+  setLineDiscount(item: CartItem, raw: string | number) {
+    const percent = this.toPercent(raw);
+    item.lineDiscountPercent = percent;
+    item.price = this.applyLineDiscount(item, percent);
+    this.updateInitialAmount();
+  }
+
+  private applyLineDiscount(item: CartItem, percent: number, basePrice?: number): number {
+    const base = basePrice ?? item.originalPrice ?? item.price;
+    const factor = Math.max(0, 1 - percent / 100);
+    return this.round(base * factor);
+  }
+
+  getLineUnitPrice(item: CartItem): number {
+    return this.round(item.price ?? 0);
+  }
+
+  private toPercent(value: any): number {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed) || parsed < 0) return 0;
+    return Math.min(100, parsed);
+  }
+
+  private round(value: number): number {
+    return Number((Number(value) || 0).toFixed(2));
+  }
+
   removeItem(productId: string) {
     this.saleItems = this.saleItems.filter(item => item.id !== productId);
     this.updateInitialAmount();
   }
 
   getTotal(): number {
-    return this.saleItems.reduce((total, item) => total + (item.price * item.quantity), 0);
+    const subtotal = this.getSubtotal();
+    const factor = Math.max(0, 1 - (this.globalDiscountPercent || 0) / 100);
+    return this.round(subtotal * factor);
+  }
+
+  getSubtotal(): number {
+    return this.saleItems.reduce((total, item) => total + (this.getLineUnitPrice(item) * item.quantity), 0);
   }
 
   updateInitialAmount() {
@@ -266,7 +309,14 @@ export class CurrentSaleComponent implements OnInit, OnDestroy {
     }));
     const paymentMethods = normalizedSplits.map(split => split.method).join(',');
 
-    this.salesService.createSale(this.userId, this.saleItems, paymentMethods, normalizedSplits, {
+    const globalFactor = Math.max(0, 1 - (this.globalDiscountPercent || 0) / 100);
+    const discountedItems = this.saleItems.map(item => ({
+      ...item,
+      price: this.round(this.getLineUnitPrice(item) * globalFactor),
+      originalPrice: item.originalPrice ?? item.price
+    }));
+
+    this.salesService.createSale(this.userId, discountedItems, paymentMethods, normalizedSplits, {
       customerName: this.customerName.trim() || null,
       paymentDueDate: this.paymentDueDate
     })

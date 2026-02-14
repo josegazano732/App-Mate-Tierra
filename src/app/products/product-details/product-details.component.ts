@@ -129,7 +129,9 @@ export class ProductDetailsComponent implements OnInit {
         price: unitPrice,
         originalPrice: this.product.price,
         quantity: this.quantity,
-        unit_of_measure: this.product.unit_of_measure || 'unidad'
+        unit_of_measure: this.product.unit_of_measure || 'unidad',
+        category_name: this.product.category_name || this.product.category,
+        category: this.product.category
       });
 
       this.router.navigate(['/carrito']);
