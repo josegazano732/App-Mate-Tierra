@@ -476,6 +476,78 @@
 }
 
 @media (max-width: 768px) {
+  .cart-page {
+    padding: 1.5rem 1.1rem 2rem;
+    gap: 1.35rem;
+  }
+
+  .cart-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.2rem;
+  }
+
+  .hero-metrics {
+    width: 100%;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+
+  .cart-layout {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .cart-card {
+    padding: 1.2rem 1.1rem;
+  }
+
+  .cart-card-body {
+    align-items: flex-start;
+    gap: 0.9rem;
+  }
+
+  .quantity-block {
+    width: 100%;
+  }
+
+  .quantity-control {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .herb-row {
+    grid-template-columns: auto 110px;
+    gap: 0.4rem;
+  }
+
+  .herb-hint {
+    font-size: 0.85rem;
+  }
+
+  .herb-fraction-grid {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  }
+
+  .summary-card {
+    padding: 1.4rem 1.2rem;
+    position: static;
+  }
+
+  .summary-actions button,
+  .summary-actions .btn-primary,
+  .summary-actions .btn-secondary,
+  .summary-actions .btn-outline {
+    width: 100%;
+  }
+
+  .summary-total {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+  }
+}
+
+@media (max-width: 768px) {
   .cart-hero {
     flex-direction: column;
     text-align: center;
