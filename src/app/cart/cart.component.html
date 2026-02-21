@@ -152,7 +152,7 @@
         </div>
 
         <p class="summary-note">
-          Una vez revisado el detalle, podés descargar un comprobante PDF o continuar con el proceso de pago.
+          Una vez revisado el detalle, podés descargar un detalle PDF o enviar por WhatsApp el pedido.
         </p>
 
         <div class="summary-actions">
@@ -162,8 +162,8 @@
           <button type="button" class="btn-outline" (click)="clearCart()">
             <i class="fas fa-trash"></i> Vaciar carrito
           </button>
-          <button type="button" class="btn-primary" (click)="proceedToPayment()">
-            <i class="fas fa-credit-card"></i> Proceder al pago
+          <button type="button" class="btn-outline whatsapp-share" (click)="sendCartViaWhatsApp()">
+            <i class="fab fa-whatsapp"></i> Enviar por WhatsApp
           </button>
         </div>
       </aside>

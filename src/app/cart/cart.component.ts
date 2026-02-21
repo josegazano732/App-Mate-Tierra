@@ -113,6 +113,30 @@ export class CartComponent implements OnInit {
     this.cartService.clearCart();
   }
 
+  sendCartViaWhatsApp() {
+    const phone = '5493758459113'; // destination WhatsApp number
+    const itemsText = this.cartItems
+      .map(item => {
+        const name = item.name || 'Producto';
+        const qty = this.formatQuantity(item);
+        const price = this.currencyFormatter.format(item.price);
+        const lineTotal = this.currencyFormatter.format(item.price * item.quantity);
+        const discount = this.getDiscount(item);
+        const discountText = discount > 0 ? ` (-${discount.toFixed(0)}%)` : '';
+        return `• ${name} | ${qty} | ${price}${discountText} | Total: ${lineTotal}`;
+      })
+      .join('%0A');
+
+    const subtotal = this.currencyFormatter.format(this.getSubtotal());
+    const savings = this.getTotalSavings();
+    const total = this.currencyFormatter.format(this.getTotal());
+    const savingsLine = savings > 0 ? `%0AAhorro aplicado: ${this.currencyFormatter.format(savings)}` : '';
+
+    const message = `Hola, quiero confirmar este pedido:%0A${itemsText}%0A%0ASubtotal: ${subtotal}${savingsLine}%0ATotal a pagar: ${total}`;
+    const url = `https://wa.me/${phone}?text=${message}`;
+    window.open(url, '_blank');
+  }
+
   proceedToPayment() {
     this.router.navigate(['/registro']);
   }

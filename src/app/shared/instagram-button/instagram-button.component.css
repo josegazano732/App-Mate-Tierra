@@ -16,6 +16,15 @@
   box-shadow: 2px 2px 3px #999;
   transition: all 0.3s ease;
   z-index: 1200;
+  animation-name: shakeYInterval;
+  animation-duration: 2s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-delay: 0s;
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
 }
 
 .instagram-button:hover {
@@ -43,5 +52,44 @@
     height: 68px;
     font-size: 32px;
     box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22);
+  }
+}
+
+@keyframes shakeYInterval {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  5% {
+    transform: translate3d(0, -6px, 0);
+  }
+  10% {
+    transform: translate3d(0, 6px, 0);
+  }
+  15% {
+    transform: translate3d(0, -6px, 0);
+  }
+  20% {
+    transform: translate3d(0, 6px, 0);
+  }
+  25% {
+    transform: translate3d(0, -5px, 0);
+  }
+  30% {
+    transform: translate3d(0, 5px, 0);
+  }
+  35% {
+    transform: translate3d(0, -4px, 0);
+  }
+  40% {
+    transform: translate3d(0, 4px, 0);
+  }
+  45% {
+    transform: translate3d(0, -3px, 0);
+  }
+  50% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 0, 0);
   }
 }

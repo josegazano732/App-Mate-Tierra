@@ -382,6 +382,34 @@
   gap: 0.75rem;
 }
 
+.whatsapp-share {
+  background: linear-gradient(120deg, #2f8f44, #62c370);
+  color: #fff;
+  border: none;
+  box-shadow: 0 16px 30px rgba(47, 143, 68, 0.25);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  position: relative;
+  animation: whatsapp-pulse 2.6s ease-in-out infinite;
+}
+
+.whatsapp-share:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 34px rgba(47, 143, 68, 0.28);
+}
+
+@keyframes whatsapp-pulse {
+  0% {
+    box-shadow: 0 16px 30px rgba(47, 143, 68, 0.25);
+  }
+  50% {
+    box-shadow: 0 20px 38px rgba(47, 143, 68, 0.35);
+  }
+  100% {
+    box-shadow: 0 16px 30px rgba(47, 143, 68, 0.25);
+  }
+}
+
 .btn-primary,
 .btn-secondary,
 .btn-outline {
