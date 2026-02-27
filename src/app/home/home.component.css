@@ -791,6 +791,10 @@
     margin-bottom: 1.25rem;
   }
 
+  .hero-highlights {
+    display: none;
+  }
+
   .hero-buttons {
     padding: 0;
   }
