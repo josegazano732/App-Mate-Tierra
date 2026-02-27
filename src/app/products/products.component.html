@@ -66,6 +66,10 @@
           </span>
         </div>
         <div class="toolbar-actions">
+          <button type="button" class="toolbar-secondary" (click)="openGuide()">
+            <i class="fas fa-question-circle"></i>
+            ¿Cómo comprar?
+          </button>
           <span class="page-indicator" *ngIf="totalPages > 1">Página {{ currentPage }} / {{ totalPages }}</span>
           <button type="button" class="toolbar-refresh" (click)="retryLoading()" [disabled]="isLoading">
             <i class="fas fa-sync-alt"></i>
@@ -73,6 +77,29 @@
           </button>
         </div>
       </div>
+
+      <section class="guide-card glass-card">
+        <div class="guide-header">
+          <div>
+            <p class="eyebrow">Guía rápida</p>
+            <h3>Cómo comprar en 4 pasos</h3>
+            <p class="guide-lead">Filtrá, elegí, agregá al carrito y enviá tu pedido por WhatsApp.</p>
+          </div>
+          <button type="button" class="toolbar-secondary" (click)="openGuide()">
+            <i class="fas fa-play-circle"></i>
+            Ver guía completa
+          </button>
+        </div>
+        <div class="guide-steps">
+          <div class="guide-step" *ngFor="let step of guideSteps | slice:0:3">
+            <div class="step-icon"><i class="fas" [ngClass]="step.icon"></i></div>
+            <div class="step-copy">
+              <h4>{{ step.title }}</h4>
+              <p>{{ step.copy }}</p>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <div class="state-card" *ngIf="isLoading">
         <i class="fas fa-spinner fa-spin"></i>
@@ -180,3 +207,30 @@
     </section>
   </div>
 </section>
+
+<div class="guide-modal" *ngIf="showGuideModal">
+  <div class="guide-backdrop" (click)="closeGuide()"></div>
+  <div class="guide-dialog glass-card">
+    <div class="guide-dialog__header">
+      <div>
+        <p class="eyebrow">Guía de compra</p>
+        <h3>Completá tu pedido y enviá por WhatsApp</h3>
+      </div>
+      <button type="button" class="close-btn" (click)="closeGuide()" aria-label="Cerrar guía">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="guide-dialog__body">
+      <div class="guide-step" *ngFor="let step of guideSteps">
+        <div class="step-icon"><i class="fas" [ngClass]="step.icon"></i></div>
+        <div class="step-copy">
+          <h4>{{ step.title }}</h4>
+          <p>{{ step.copy }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="guide-dialog__footer">
+      <button type="button" class="toolbar-refresh" (click)="closeGuide()">Ir a productos</button>
+    </div>
+  </div>
+</div>
