@@ -3,6 +3,8 @@ import { Router } from '@angular/router';
 import { CartService } from '../services/cart.service';
 import { ProductService, Product } from '../services/product.service';
 import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
+import { CategoryService } from '../services/category.service';
+import { Category } from '../models/category.model';
 
 @Component({
   selector: 'app-products',
@@ -23,12 +25,16 @@ export class ProductsComponent implements OnInit {
   products: Product[] = [];
   filteredProducts: Product[] = [];
   displayedProducts: Product[] = [];
+  categories: Category[] = [];
+  selectedCategory: Category | null = null;
   isLoading = true;
   currentPage = 1;
   productsPerPage = 10;
   totalPages = 1;
   errorMessage: string | null = null;
   availableProducts = 0;
+  private activeCategoryName = '';
+  readonly categoryImageFallback = 'assets/images/Isotipo - VerdePng.png';
   private readonly productImageFallback = 'https://images.unsplash.com/photo-1501426026826-31c667bdf23d?auto=format&fit=crop&w=900&q=60';
   private readonly prioritizedKeywords = ['mates', 'termera', 'termos'];
   private readonly whatsappPhone = '5493758459113';
@@ -36,10 +42,12 @@ export class ProductsComponent implements OnInit {
   constructor(
     private cartService: CartService,
     private productService: ProductService,
+    private categoryService: CategoryService,
     private router: Router
   ) {}
 
   ngOnInit() {
+    this.loadCategories();
     this.loadProducts();
   }
 
@@ -71,14 +79,29 @@ export class ProductsComponent implements OnInit {
          product.description.toLowerCase().includes(filter.search.toLowerCase())) &&
         (filter.category === '' || product.category_name === filter.category)
       );
+      this.activeCategoryName = filter.category?.trim() || '';
     } else {
       this.filteredProducts = [...this.products];
+      this.activeCategoryName = '';
     }
 
+    this.setSelectedCategory(this.activeCategoryName);
     this.currentPage = 1;
     this.filteredProducts = this.sortProductsByPriority(this.filteredProducts);
     this.updateAvailableProducts();
     this.updateDisplayedProducts();
+  }
+
+  private loadCategories() {
+    this.categoryService.getCategories().subscribe({
+      next: (categories) => {
+        this.categories = categories;
+        this.setSelectedCategory(this.activeCategoryName);
+      },
+      error: (error) => {
+        console.error('Error loading categories:', error);
+      }
+    });
   }
 
   private sortProductsByPriority(products: Product[]): Product[] {
@@ -119,6 +142,16 @@ export class ProductsComponent implements OnInit {
 
   private updateAvailableProducts() {
     this.availableProducts = this.filteredProducts.filter(product => product.stock > 0).length;
+  }
+
+  private setSelectedCategory(categoryName: string) {
+    const normalized = categoryName?.trim();
+    if (!normalized) {
+      this.selectedCategory = null;
+      return;
+    }
+
+    this.selectedCategory = this.categories.find(category => category.name === normalized) || null;
   }
 
   changePage(newPage: number) {
@@ -184,5 +217,27 @@ export class ProductsComponent implements OnInit {
     const imageUrl = this.getPrimaryImage(product);
     const message = `Hola! Quiero consultar por el producto: ${product.name}. Precio: ${price}. Imagen: ${imageUrl}`;
     return `https://wa.me/${this.whatsappPhone}?text=${encodeURIComponent(message)}`;
+  }
+
+  getActiveCategoryImage(): string {
+    if (this.selectedCategory?.image) {
+      return this.selectedCategory.image;
+    }
+
+    return this.categoryImageFallback;
+  }
+
+  handleCategoryImageError(event: Event) {
+    const target = event.target as HTMLImageElement | null;
+    if (!target) {
+      return;
+    }
+
+    if (target.src === this.categoryImageFallback) {
+      return;
+    }
+
+    target.onerror = null;
+    target.src = this.categoryImageFallback;
   }
 }

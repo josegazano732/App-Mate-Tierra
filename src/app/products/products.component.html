@@ -5,16 +5,36 @@
       <h1>Encuentra tu próximo ritual matero</h1>
       <p>Explora nuestra selección de productos para mate con descripciones claras, disponibilidad al momento y acciones rápidas.</p>
     </div>
-    <div class="hero-metrics">
-      <div class="metric">
-        <span class="metric-value">{{ filteredProducts.length || 0 }}</span>
-        <span class="metric-label">Productos encontrados</span>
+    <div class="hero-category-card" *ngIf="selectedCategory; else allCategories">
+      <div class="category-thumb">
+        <img [src]="getActiveCategoryImage()"
+             [alt]="selectedCategory.name"
+             [class.logo]="!selectedCategory || !selectedCategory.image"
+             (error)="handleCategoryImageError($event)"
+             loading="lazy">
       </div>
-      <div class="metric">
-        <span class="metric-value">{{ availableProducts || 0 }}</span>
-        <span class="metric-label">Con stock activo</span>
+      <div class="category-copy">
+        <span class="eyebrow">Categoría activa</span>
+        <h2>{{ selectedCategory.name }}</h2>
+        <p>{{ selectedCategory.description || 'Productos curados según la categoría seleccionada.' }}</p>
       </div>
     </div>
+    <ng-template #allCategories>
+      <div class="hero-category-card neutral">
+        <div class="category-thumb">
+          <img class="logo"
+               [src]="categoryImageFallback"
+               alt="Todas las categorías"
+               (error)="handleCategoryImageError($event)"
+               loading="lazy">
+        </div>
+        <div class="category-copy">
+          <span class="eyebrow">Vista general</span>
+          <h2>Todas las categorías</h2>
+          <p>Explora el catálogo completo o filtra para ver una categoría en detalle.</p>
+        </div>
+      </div>
+    </ng-template>
   </header>
 
   <div class="products-layout">
