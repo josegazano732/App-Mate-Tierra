@@ -26,6 +26,29 @@ export class CartComponent implements OnInit {
   readonly herbCategoryKey = 'hierbas';
   readonly defaultGrams = 100;
   readonly defaultFractionGrams = 50;
+  showGuideModal = false;
+  readonly cartGuideSteps = [
+    {
+      icon: 'fa-clipboard-check',
+      title: 'Revisá cantidades',
+      copy: 'Ajustá unidades o gramos desde el carrito y verificá el stock disponible.'
+    },
+    {
+      icon: 'fa-file-download',
+      title: 'Descargá el detalle en PDF',
+      copy: 'Generá un PDF con precios, descuentos y totales para guardarlo o enviarlo.'
+    },
+    {
+      icon: 'fa-whatsapp',
+      title: 'Compartí por WhatsApp',
+      copy: 'Usá el botón “Enviar por WhatsApp” para compartir tu lista y coordinar la compra.'
+    },
+    {
+      icon: 'fa-check-circle',
+      title: 'Confirmá el pedido',
+      copy: 'Revisá el total y finalizá el pedido con los datos acordados con el vendedor.'
+    }
+  ];
 
   constructor(
     private cartService: CartService,
@@ -782,5 +805,13 @@ export class CartComponent implements OnInit {
     }
 
     return null;
+  }
+
+  openGuide() {
+    this.showGuideModal = true;
+  }
+
+  closeGuide() {
+    this.showGuideModal = false;
   }
 }

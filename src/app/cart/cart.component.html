@@ -22,6 +22,33 @@
       </div>
     </header>
 
+    <section class="guide-card glass-card">
+      <div class="guide-header">
+        <div>
+          <p class="eyebrow">Guía rápida</p>
+          <h3>Cómo finalizar tu compra</h3>
+          <p class="guide-lead">Ajustá cantidades, descargá el PDF y enviá tu pedido por WhatsApp.</p>
+        </div>
+        <div class="guide-actions">
+          <button type="button" class="toolbar-secondary" (click)="generatePDF()">
+            <i class="fas fa-file-download"></i> Descargar PDF
+          </button>
+          <button type="button" class="toolbar-secondary" (click)="openGuide()">
+            <i class="fas fa-question-circle"></i> Ver guía completa
+          </button>
+        </div>
+      </div>
+      <div class="guide-steps">
+        <div class="guide-step" *ngFor="let step of cartGuideSteps | slice:0:3">
+          <div class="step-icon"><i class="fas" [ngClass]="step.icon"></i></div>
+          <div class="step-copy">
+            <h4>{{ step.title }}</h4>
+            <p>{{ step.copy }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <div *ngIf="errorMessage" class="cart-alert">
       <i class="fas fa-exclamation-triangle"></i>
       {{ errorMessage }}
@@ -152,7 +179,7 @@
         </div>
 
         <p class="summary-note">
-          Una vez revisado el detalle, podés descargar un detalle PDF o enviar por WhatsApp el pedido.
+          Una vez revisado el detalle, podés descargar el PDF con precios y totales o enviar el pedido por WhatsApp.
         </p>
 
         <div class="summary-actions">
@@ -181,3 +208,35 @@
     </div>
   </ng-template>
 </section>
+
+<div class="guide-modal" *ngIf="showGuideModal">
+  <div class="guide-backdrop" (click)="closeGuide()"></div>
+  <div class="guide-dialog glass-card">
+    <div class="guide-dialog__header">
+      <div>
+        <p class="eyebrow">Guía de compra</p>
+        <h3>Cerrá tu pedido desde el carrito</h3>
+      </div>
+      <button type="button" class="close-btn" (click)="closeGuide()" aria-label="Cerrar guía">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="guide-dialog__body">
+      <div class="guide-step" *ngFor="let step of cartGuideSteps">
+        <div class="step-icon"><i class="fas" [ngClass]="step.icon"></i></div>
+        <div class="step-copy">
+          <h4>{{ step.title }}</h4>
+          <p>{{ step.copy }}</p>
+        </div>
+      </div>
+    </div>
+    <div class="guide-dialog__footer">
+      <button type="button" class="toolbar-secondary" (click)="generatePDF()">
+        <i class="fas fa-file-download"></i> Descargar PDF
+      </button>
+      <button type="button" class="toolbar-refresh" (click)="closeGuide()">
+        Entendido
+      </button>
+    </div>
+  </div>
+</div>
