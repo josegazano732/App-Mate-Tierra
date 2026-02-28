@@ -520,6 +520,7 @@
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.11), rgba(255, 255, 255, 0.04));
   z-index: 1;
+  overflow: hidden;
 }
 
 .hero-frame-media::after {
@@ -527,9 +528,12 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(180deg, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.75) 100%),
-    radial-gradient(600px circle at 25% 15%, rgba(0, 255, 163, 0.20), transparent 60%);
-  opacity: 0.95;
+    linear-gradient(180deg, rgba(52, 35, 20, 0.55) 0%, rgba(15, 9, 6, 0.78) 100%),
+    radial-gradient(620px circle at 24% 18%, rgba(214, 164, 112, 0.34), transparent 62%),
+    radial-gradient(520px circle at 78% 68%, rgba(124, 88, 54, 0.28), transparent 64%),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.06) 1px, transparent 1px, transparent 3px);
+  mix-blend-mode: multiply;
+  opacity: 0.9;
 }
 
 .hero-frame-media::before {
@@ -537,11 +541,93 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(900px circle at 30% 20%, rgba(255, 255, 255, 0.22), transparent 52%),
-    radial-gradient(700px circle at 75% 15%, rgba(0, 255, 163, 0.14), transparent 58%);
+    radial-gradient(900px circle at 30% 20%, rgba(255, 232, 200, 0.32), transparent 52%),
+    radial-gradient(700px circle at 75% 15%, rgba(255, 204, 128, 0.22), transparent 58%);
   mix-blend-mode: overlay;
   opacity: 0.65;
   pointer-events: none;
+}
+
+.hero-image-layer {
+  position: absolute;
+  inset: -2%;
+  background-size: cover;
+  background-position: center;
+  border-radius: inherit;
+  opacity: 0;
+  transform: scale(1.06) translateY(12px);
+  transition: opacity 0.85s ease, transform 1s ease;
+  filter: sepia(0.32) hue-rotate(-6deg) saturate(0.95) contrast(1.06) brightness(0.96);
+}
+
+.hero-image-layer.is-active {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  z-index: 2;
+}
+
+.hero-frame-sheen {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(420px circle at 18% 20%, rgba(255, 255, 255, 0.18), transparent 56%),
+    linear-gradient(135deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 0, 0, 0.1) 100%);
+  mix-blend-mode: screen;
+  opacity: 0.45;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.hero-chip {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  color: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+  z-index: 4;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  font-size: 0.85rem;
+}
+
+.hero-chip i {
+  color: rgba(0, 255, 163, 0.95);
+}
+
+.hero-dots {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.65rem;
+  align-items: center;
+}
+
+.hero-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  padding: 0;
+}
+
+.hero-dot.active {
+  width: 22px;
+  background: linear-gradient(135deg, rgba(0, 255, 163, 0.95), rgba(61, 211, 56, 0.9));
+  border-color: transparent;
+}
+
+.hero-dot:hover {
+  transform: translateY(-1px);
 }
 
 .hero-frame-image {

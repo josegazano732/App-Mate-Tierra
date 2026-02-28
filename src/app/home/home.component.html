@@ -33,24 +33,36 @@
           </div>
         </div>
 
-        <div class="hero-media" aria-hidden="true">
-          <figure class="hero-frame">
+        <div class="hero-media">
+          <figure class="hero-frame" aria-label="Galería de mates destacados">
             <div class="hero-frame-media">
-              <img
-                class="hero-frame-image"
-                src="https://vsfyedgeotrypgyhczcg.supabase.co/storage/v1/object/public/products/1769999392263_mate_campero_2026_02_01_23_29_52.png"
-                alt="Mate artesanal"
-                loading="lazy">
+              <div
+                class="hero-image-layer"
+                *ngFor="let image of mateImages; let i = index; trackBy: trackByImage"
+                [class.is-active]="i === activeImageIndex"
+                [style.backgroundImage]="'url(' + image + ')'"
+                role="presentation"></div>
+              <div class="hero-frame-sheen"></div>
+              <div class="hero-chip">
+                <i class="fas fa-mug-hot" aria-hidden="true"></i>
+                Mates destacados
+              </div>
             </div>
             <figcaption class="hero-frame-caption">
-              <span class="hero-frame-kicker">Artesanal & natural</span>
-              
-              <!--
-              <span class="hero-frame-title">Elegí tu mate ideal</span>
-             
-              <span class="hero-frame-sub">Detalles, stock y compra rápida.</span>
-              -->
-            
+              <span class="hero-frame-kicker">Colección Mates</span>
+              <span class="hero-frame-title">Probá el mate que te está esperando</span>
+              <span class="hero-frame-sub">Elegí tu favorito y sentí el aroma a tradición apenas lo veas.</span>
+              <div class="hero-dots" *ngIf="mateImages.length > 1" role="group" aria-label="Cambiar imagen de mate">
+                <button
+                  type="button"
+                  class="hero-dot"
+                  *ngFor="let image of mateImages; let i = index; trackBy: trackByImage"
+                  [class.active]="i === activeImageIndex"
+                  (click)="goToImage(i)"
+                  [attr.aria-pressed]="i === activeImageIndex"
+                  [attr.aria-label]="'Mostrar imagen ' + (i + 1)">
+                </button>
+              </div>
             </figcaption>
           </figure>
         </div>
