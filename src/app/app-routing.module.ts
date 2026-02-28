@@ -16,6 +16,7 @@ import { PaymentMethodsComponent } from './admin/payment-methods/payment-methods
 import { CashRegisterComponent } from './admin/cash-register/cash-register.component';
 import { CurrentSaleComponent } from './admin/current-sale/current-sale.component';
 import { SupplierExpensesComponent } from './admin/supplier-expenses/supplier-expenses.component';
+import { SiteSettingsComponent } from './admin/site-settings/site-settings.component';
 import { AdminGuard } from './guards/admin.guard';
 
 const routes: Routes = [
@@ -35,6 +36,7 @@ const routes: Routes = [
   { path: 'metodos-pago', component: PaymentMethodsComponent, canActivate: [AdminGuard] },
   { path: 'caja', component: CashRegisterComponent, canActivate: [AdminGuard] },
   { path: 'gastos-proveedores', component: SupplierExpensesComponent, canActivate: [AdminGuard] },
+  { path: 'ajustes-sitio', component: SiteSettingsComponent, canActivate: [AdminGuard] },
   { 
     path: 'lista-precios-mayorista', 
     loadChildren: () => import('./wholesale-price-list/wholesale-price-list.module').then(m => m.WholesalePriceListModule),

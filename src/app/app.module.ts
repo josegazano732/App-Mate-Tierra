@@ -31,6 +31,7 @@ import { CategoriesSectionComponent } from './home/categories-section/categories
 import { RecentSalesComponent } from './admin/recent-sales/recent-sales.component';
 import { CurrentSaleComponent } from './admin/current-sale/current-sale.component';
 import { SupplierExpensesComponent } from './admin/supplier-expenses/supplier-expenses.component';
+import { SiteSettingsComponent } from './admin/site-settings/site-settings.component';
 
 import { AppRoutingModule } from './app-routing.module';
 import { SupabaseService } from './services/supabase.service';
@@ -70,7 +71,8 @@ import { PaymentMethodsService } from './services/payment-methods.service';
     CategoriesSectionComponent,
     RecentSalesComponent,
     CurrentSaleComponent,
-    SupplierExpensesComponent
+    SupplierExpensesComponent,
+    SiteSettingsComponent
   ],
   imports: [
     BrowserModule,

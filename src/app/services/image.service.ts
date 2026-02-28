@@ -120,10 +120,10 @@ export class ImageService {
           switchMap(({ data, error }) => {
             if (error) throw error;
             if (!data) throw new Error('Upload failed');
-            
+            const cleanPath = (data.path || '').replace(/^\/+/, '');
             const { data: urlData } = this.supabase.client.storage
               .from(bucket)
-              .getPublicUrl(data.path);
+              .getPublicUrl(cleanPath);
 
             return of(urlData.publicUrl);
           })

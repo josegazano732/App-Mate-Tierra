@@ -1,0 +1,36 @@
+<div class="settings-card">
+  <div class="settings-header">
+    <div>
+      <p class="eyebrow">Hero del home</p>
+      <h1>Ajustar imagen de fondo</h1>
+      <p class="lead">Solo administradores. La imagen se guarda en la base de datos y se refleja en el hero.</p>
+    </div>
+    <button class="ghost" type="button" (click)="loadSettings()" [disabled]="isLoading || isSaving">Recargar</button>
+  </div>
+
+  <div class="settings-body" *ngIf="!isLoading; else loadingTpl">
+    <div class="field-group">
+      <label for="heroFile">Subir imagen (JPG, PNG, WebP, SVG)</label>
+      <input id="heroFile" name="heroFile" type="file" accept="image/*" (change)="onFileSelected($event)" [disabled]="isUploading || isSaving">
+      <small>Se sube al bucket y queda lista para guardar.</small>
+    </div>
+
+    <div class="actions">
+      <button class="primary" type="button" (click)="save()" [disabled]="isSaving">{{ isSaving ? 'Guardando...' : 'Guardar cambio' }}</button>
+    </div>
+
+    <div class="feedback" *ngIf="message">{{ message }}</div>
+    <div class="feedback error" *ngIf="error">{{ error }}</div>
+    <div class="feedback" *ngIf="uploadMessage">{{ uploadMessage }}</div>
+    <div class="feedback error" *ngIf="uploadError">{{ uploadError }}</div>
+
+    <div class="preview">
+      <div class="preview-frame" [style.backgroundImage]="'url(' + previewUrl + ')'"></div>
+      <p class="preview-caption">Previsualización rápida</p>
+    </div>
+  </div>
+
+  <ng-template #loadingTpl>
+    <div class="loading">Cargando ajustes...</div>
+  </ng-template>
+</div>

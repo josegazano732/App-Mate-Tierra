@@ -1,6 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subject, map, takeUntil } from 'rxjs';
 import { Product, ProductService } from '../services/product.service';
+import { SiteSettingsService } from '../services/site-settings.service';
 
 @Component({
   selector: 'app-home',
@@ -10,22 +11,25 @@ import { Product, ProductService } from '../services/product.service';
 export class HomeComponent implements OnInit, OnDestroy {
   mateImages: string[] = [];
   activeImageIndex = 0;
+  heroBgUrl: string | null = null;
 
   private readonly fallbackImages: string[] = [
     'https://vsfyedgeotrypgyhczcg.supabase.co/storage/v1/object/public/products/1769999392263_mate_campero_2026_02_01_23_29_52.png',
     'https://images.unsplash.com/photo-1543258103-a62bdc069871?auto=format&fit=crop&w=1200&q=80',
     'https://images.unsplash.com/photo-1615484477481-5cfb6423f447?auto=format&fit=crop&w=1200&q=80'
   ];
+  private readonly fallbackHeroBg = 'https://images.unsplash.com/photo-1508672019048-805c876b67e2?auto=format&fit=crop&w=1800&q=80';
   private readonly rotationIntervalMs = 4500;
   private rotationTimer?: number;
   private destroy$ = new Subject<void>();
 
-  constructor(private productService: ProductService) {
+  constructor(private productService: ProductService, private siteSettingsService: SiteSettingsService) {
     this.mateImages = this.fallbackImages;
   }
 
   ngOnInit() {
     this.loadMateImages();
+    this.loadHeroBackground();
   }
 
   ngOnDestroy() {
@@ -36,6 +40,11 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   get currentImage(): string {
     return this.mateImages[this.activeImageIndex] || this.fallbackImages[0];
+  }
+
+  get heroBgCssValue(): string {
+    const url = this.heroBgUrl || this.fallbackHeroBg;
+    return `url('${url}')`;
   }
 
   goToImage(index: number) {
@@ -67,6 +76,20 @@ export class HomeComponent implements OnInit, OnDestroy {
           this.mateImages = this.fallbackImages;
           this.activeImageIndex = 0;
           this.restartRotation();
+        }
+      });
+  }
+
+  private loadHeroBackground() {
+    this.siteSettingsService.getHeroBackground()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (heroBg) => {
+          this.heroBgUrl = heroBg?.image_url || null;
+        },
+        error: (error) => {
+          console.error('Error loading hero background:', error);
+          this.heroBgUrl = null;
         }
       });
   }

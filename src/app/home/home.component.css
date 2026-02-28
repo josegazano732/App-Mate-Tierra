@@ -99,7 +99,7 @@
   background:
     radial-gradient(900px circle at 18% 20%, rgba(0, 255, 163, 0.14), transparent 60%),
     radial-gradient(800px circle at 82% 18%, rgba(61, 211, 56, 0.10), transparent 62%),
-    url("https://images.unsplash.com/photo-1508672019048-805c876b67e2?auto=format&fit=crop&w=1800&q=80") center/cover no-repeat;
+    var(--hero-bg-image, url('https://images.unsplash.com/photo-1508672019048-805c876b67e2?auto=format&fit=crop&w=1800&q=80')) center/cover no-repeat;
   background-size: 120% auto, 120% auto, cover;
   background-position: 12% 12%, 88% 10%, center;
   animation: none;
@@ -746,7 +746,7 @@
     background:
       radial-gradient(700px circle at 18% 18%, rgba(0, 255, 163, 0.10), transparent 60%),
       radial-gradient(650px circle at 82% 18%, rgba(61, 211, 56, 0.08), transparent 62%),
-      url("https://images.unsplash.com/photo-1508672019048-805c876b67e2?auto=format&fit=crop&w=1100&q=70") center/cover no-repeat;
+      var(--hero-bg-image, url('https://images.unsplash.com/photo-1508672019048-805c876b67e2?auto=format&fit=crop&w=1100&q=70')) center/cover no-repeat;
     filter: none;
     transform: none;
     opacity: 0.3;
