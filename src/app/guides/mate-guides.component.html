@@ -1,0 +1,96 @@
+<section class="guides-hero">
+  <div class="container">
+    <p class="eyebrow">Guía de uso y cuidado</p>
+    <h1>Mate perfecto, historia y mantenimiento</h1>
+    <p class="lede">Todo lo que necesitas para curar tu porongo, cebar un mate parejo, limpiar bombillas y cuidar el termo. Paso a paso, sin mitos.</p>
+    <div class="hero-grid">
+      <div class="hero-card">
+        <h3>Origen y ritual</h3>
+        <p>El mate nació como infusión comunitaria y ritual. Hoy lo mantenemos vivo: buena materia prima, agua a punto y respeto por cada pieza.</p>
+        <ul class="hero-bullets">
+          <li><i class="fas fa-seedling" aria-hidden="true"></i> Yerba fresca y aireada</li>
+          <li><i class="fas fa-thermometer-half" aria-hidden="true"></i> Agua a 70-80 °C</li>
+          <li><i class="fas fa-tools" aria-hidden="true"></i> Utensilios limpios y secos</li>
+        </ul>
+      </div>
+      <div class="hero-card hero-highlight">
+        <h3>Checklist rápido</h3>
+        <ul class="checklist">
+          <li><span class="dot"></span> Mate curado y sin olores</li>
+          <li><span class="dot"></span> Bombilla fija y limpia</li>
+          <li><span class="dot"></span> Termo precalentado</li>
+          <li><span class="dot"></span> Agua al punto justo</li>
+        </ul>
+        <p class="note">Sigue las guías siguientes para dominar cada paso.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="guides-list">
+  <div class="container">
+    <div class="guides-grid">
+      <article class="guide-card" *ngFor="let guide of guides">
+        <div class="guide-image" *ngIf="guide.image">
+          <img [src]="guide.image" [alt]="guide.imageAlt || guide.title" loading="lazy">
+        </div>
+        <div class="guide-head">
+          <div class="badge">{{ guide.tag }}</div>
+          <div class="meta">
+            <span><i class="fas fa-clock" aria-hidden="true"></i> {{ guide.time }}</span>
+            <span><i class="fas fa-signal" aria-hidden="true"></i> {{ guide.difficulty }}</span>
+          </div>
+        </div>
+        <h2>{{ guide.title }}</h2>
+        <p class="summary">{{ guide.summary }}</p>
+
+        <div class="steps" aria-label="Pasos">
+          <div class="step" *ngFor="let step of guide.steps; let i = index">
+            <div class="step-number">{{ i + 1 }}</div>
+            <div class="step-body">
+              <h4>{{ step.title }}</h4>
+              <p>{{ step.text }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tips" *ngIf="guide.tips?.length">
+          <h5>Tips clave</h5>
+          <ul>
+            <li *ngFor="let tip of guide.tips">
+              <i class="fas fa-leaf" aria-hidden="true"></i>
+              <span>{{ tip }}</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="guides-history">
+  <div class="container">
+    <div class="history-card">
+      <h3>Un ritual que se pasa de mano en mano</h3>
+      <p>El mate es pausa, charla y hospitalidad. Curar un porongo, cebar parejo y cuidar la bombilla son gestos que respetan esa historia. Cada limpieza y cada cebada buena prolongan el sabor y bajan reclamos: menos filtraciones, menos amargos, más rondas compartidas.</p>
+      <div class="history-grid">
+        <div>
+          <h4>Errores frecuentes</h4>
+          <ul class="bullets">
+            <li>Agua hirviendo que lava la yerba.</li>
+            <li>Bombilla que se mueve y suelta polvo.</li>
+            <li>Mate guardado húmedo: hongos y olor.</li>
+          </ul>
+        </div>
+        <div>
+          <h4>Hábitos que alargan la vida</h4>
+          <ul class="bullets">
+            <li>Secar boca abajo y ventilar.</li>
+            <li>Reforzar la cura cada cierto tiempo.</li>
+            <li>Desarmar y limpiar tapas y roscas del termo.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

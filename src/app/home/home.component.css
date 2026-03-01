@@ -736,6 +736,12 @@
 
 }
 
+@media (max-width: 430px) {
+  .seasonal-products .container {
+    padding: 0;
+  }
+}
+
 /* Nota: features se renderiza en `app-features-section` (CSS propio).
    Se eliminan reglas huérfanas para reducir budget del Home. */
 

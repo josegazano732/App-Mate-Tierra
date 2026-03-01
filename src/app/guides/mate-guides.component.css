@@ -1,0 +1,347 @@
+.guides-hero {
+  background:
+    radial-gradient(900px circle at 18% 18%, rgba(0, 255, 163, 0.08), transparent 55%),
+    radial-gradient(900px circle at 82% 12%, rgba(61, 211, 56, 0.08), transparent 55%),
+    linear-gradient(135deg, rgba(16, 43, 28, 0.78) 0%, rgba(27, 61, 42, 0.76) 100%),
+    url('https://vsfyedgeotrypgyhczcg.supabase.co/storage/v1/object/public/products/1772380090636_matepng_2026_03_01_12_48_10.png');
+  background-size: auto, auto, cover, cover;
+  background-position: 18% 18%, 82% 12%, center, center;
+  background-repeat: no-repeat;
+  color: #f7f9f8;
+  padding: 4.5rem 1rem 3.5rem;
+}
+
+.guides-hero .container {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.guides-hero .eyebrow {
+  display: inline-flex;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: #d6ffe9;
+}
+
+.guides-hero h1 {
+  margin: 1rem 0 0.5rem;
+  font-size: clamp(2.2rem, 4vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.guides-hero .lede {
+  max-width: 780px;
+  color: rgba(247, 249, 248, 0.9);
+  line-height: 1.6;
+  font-size: 1.05rem;
+}
+
+.guides-hero .hero-grid {
+  margin-top: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.hero-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 18px;
+  padding: 1.5rem;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+}
+
+.hero-card h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1.2rem;
+}
+
+.hero-card p {
+  margin: 0;
+  color: rgba(247, 249, 248, 0.9);
+}
+
+.hero-highlight {
+  background: linear-gradient(135deg, rgba(0, 255, 163, 0.2), rgba(61, 211, 56, 0.18));
+  border-color: rgba(0, 255, 163, 0.32);
+  color: #f7f9f8;
+}
+
+.hero-bullets,
+.checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0.75rem 0 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.hero-bullets li,
+.checklist li {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(247, 249, 248, 0.95);
+}
+
+.hero-highlight .checklist li {
+  color: rgba(247, 249, 248, 0.94);
+}
+
+.checklist .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #0f9c62;
+  box-shadow: 0 0 0 4px rgba(15, 156, 98, 0.15);
+}
+
+.guides-list {
+  background: #f7f9f8;
+  padding: 3.5rem 1rem;
+}
+
+.guides-list .container {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.guides-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.guide-card {
+  background: #ffffff;
+  border: 1px solid rgba(22, 40, 31, 0.1);
+  border-radius: 18px;
+  padding: 1.5rem;
+  box-shadow: 0 16px 40px rgba(22, 40, 31, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.guide-image {
+  overflow: hidden;
+  border-radius: 14px;
+  border: 1px solid rgba(22, 40, 31, 0.08);
+  box-shadow: 0 12px 26px rgba(22, 40, 31, 0.12);
+}
+
+.guide-image img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  display: block;
+}
+
+.guide-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(0, 255, 163, 0.12);
+  color: #0f3e2b;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  font-size: 0.78rem;
+  border: 1px solid rgba(0, 255, 163, 0.28);
+}
+
+.meta {
+  display: inline-flex;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  color: #3a4a42;
+}
+
+.meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.guide-card h2 {
+  margin: 0;
+  font-size: 1.35rem;
+  color: #13231a;
+}
+
+.summary {
+  margin: 0;
+  color: #3d4d44;
+  line-height: 1.55;
+}
+
+.steps {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.step {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.65rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 14px;
+  background: rgba(15, 156, 98, 0.05);
+  border: 1px solid rgba(15, 156, 98, 0.12);
+}
+
+.step-number {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: #0f9c62;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 0.95rem;
+  box-shadow: 0 10px 20px rgba(15, 156, 98, 0.25);
+}
+
+.step-body h4 {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+  color: #13231a;
+}
+
+.step-body p {
+  margin: 0;
+  color: #3d4d44;
+}
+
+.tips {
+  padding: 0.5rem 0 0;
+  border-top: 1px solid rgba(22, 40, 31, 0.08);
+}
+
+.tips h5 {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+  color: #0f3e2b;
+}
+
+.tips ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.tips li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  color: #3a4a42;
+}
+
+.tips i {
+  color: #0f9c62;
+  margin-top: 0.15rem;
+}
+
+.guides-history {
+  background: linear-gradient(135deg, #102b1c 0%, #1b3d2a 100%);
+  color: #f7f9f8;
+  padding: 3.5rem 1rem 4rem;
+}
+
+.guides-history .container {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.history-card {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 18px;
+  padding: 1.75rem;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+}
+
+.history-card h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1.45rem;
+}
+
+.history-card p {
+  margin: 0 0 1.25rem;
+  color: rgba(247, 249, 248, 0.9);
+  line-height: 1.6;
+}
+
+.history-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.history-grid h4 {
+  margin: 0 0 0.5rem;
+}
+
+.bullets {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 0.35rem;
+  color: rgba(247, 249, 248, 0.9);
+}
+
+.bullets li {
+  position: relative;
+  padding-left: 1.2rem;
+}
+
+.bullets li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.4rem;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #0f9c62;
+  box-shadow: 0 0 0 4px rgba(15, 156, 98, 0.18);
+}
+
+.note {
+  margin-top: 0.5rem;
+  color: rgba(247, 249, 248, 0.94);
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .guides-hero {
+    padding: 3.5rem 1rem 3rem;
+  }
+
+  .guides-hero h1 {
+    font-size: 2rem;
+  }
+
+  .guide-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

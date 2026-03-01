@@ -18,12 +18,14 @@ import { CurrentSaleComponent } from './admin/current-sale/current-sale.componen
 import { SupplierExpensesComponent } from './admin/supplier-expenses/supplier-expenses.component';
 import { SiteSettingsComponent } from './admin/site-settings/site-settings.component';
 import { AdminGuard } from './guards/admin.guard';
+import { MateGuidesComponent } from './guides/mate-guides.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'productos', component: ProductsComponent },
   { path: 'productos/:id', component: ProductDetailsComponent },
   { path: 'contacto', component: ContactComponent },
+  { path: 'guias', component: MateGuidesComponent },
   { path: 'carrito', component: CartComponent },
   { path: 'login', component: LoginComponent },
   { path: 'registro', component: RegisterComponent },

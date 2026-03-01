@@ -32,6 +32,7 @@ import { RecentSalesComponent } from './admin/recent-sales/recent-sales.componen
 import { CurrentSaleComponent } from './admin/current-sale/current-sale.component';
 import { SupplierExpensesComponent } from './admin/supplier-expenses/supplier-expenses.component';
 import { SiteSettingsComponent } from './admin/site-settings/site-settings.component';
+import { MateGuidesComponent } from './guides/mate-guides.component';
 
 import { AppRoutingModule } from './app-routing.module';
 import { SupabaseService } from './services/supabase.service';
@@ -72,7 +73,8 @@ import { PaymentMethodsService } from './services/payment-methods.service';
     RecentSalesComponent,
     CurrentSaleComponent,
     SupplierExpensesComponent,
-    SiteSettingsComponent
+    SiteSettingsComponent,
+    MateGuidesComponent
   ],
   imports: [
     BrowserModule,

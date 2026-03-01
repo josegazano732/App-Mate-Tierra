@@ -4,6 +4,9 @@
   margin: 0 auto;
   padding: 5.25rem clamp(1rem, 4vw, 3rem) 3.5rem;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   background:
     radial-gradient(900px circle at 12% 12%, rgba(60, 156, 54, 0.03), transparent 55%),
     radial-gradient(700px circle at 88% 24%, rgba(0, 255, 163, 0.02), transparent 60%),
@@ -327,6 +330,7 @@
 
 .products-gallery {
   position: relative;
+  width: 100%;
 }
 
 .featured-layout {
@@ -334,6 +338,7 @@
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
   gap: 2rem;
   align-items: stretch;
+  width: 100%;
 }
 
 .featured-hero-card {
@@ -914,4 +919,28 @@
     justify-content: center;
   }
 
+}
+
+@media (max-width: 430px) {
+  .carousel-container {
+    width: calc(100vw - 24px);
+    max-width: none;
+    padding: 1.75rem 0.75rem 2rem;
+    border-radius: 20px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .featured-layout {
+    gap: 1.35rem;
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .featured-hero-card,
+  .featured-rail {
+    border-radius: 20px;
+    width: 100%;
+    max-width: 540px;
+  }
 }
