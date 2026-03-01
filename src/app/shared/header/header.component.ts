@@ -46,6 +46,10 @@ export class HeaderComponent implements OnInit {
     if (!target.closest('.admin-menu')) {
       this.isAdminMenuOpen = false;
     }
+
+    if (this.isMenuOpen && !target.closest('.main-nav') && !target.closest('.menu-toggle')) {
+      this.closeMenu();
+    }
   }
 
   constructor(

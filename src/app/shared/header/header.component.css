@@ -238,6 +238,7 @@ nav {
 }
 
 .nav-backdrop.show {
+  display: block;
   opacity: 1;
   visibility: visible;
 }
