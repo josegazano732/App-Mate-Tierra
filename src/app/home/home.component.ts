@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subject, map, takeUntil } from 'rxjs';
 import { Product, ProductService } from '../services/product.service';
-import { SiteSettingsService } from '../services/site-settings.service';
+import { HeroBackground, SiteSettingsService } from '../services/site-settings.service';
 
 @Component({
   selector: 'app-home',
@@ -11,16 +11,19 @@ import { SiteSettingsService } from '../services/site-settings.service';
 export class HomeComponent implements OnInit, OnDestroy {
   mateImages: string[] = [];
   activeImageIndex = 0;
-  heroBgUrl: string | null = null;
+  heroBgUrls: string[] = [];
+  heroBgActiveIndex = 0;
 
   private readonly fallbackImages: string[] = [
     'https://vsfyedgeotrypgyhczcg.supabase.co/storage/v1/object/public/products/1769999392263_mate_campero_2026_02_01_23_29_52.png',
     'https://images.unsplash.com/photo-1543258103-a62bdc069871?auto=format&fit=crop&w=1200&q=80',
     'https://images.unsplash.com/photo-1615484477481-5cfb6423f447?auto=format&fit=crop&w=1200&q=80'
   ];
-  private readonly fallbackHeroBg = 'https://images.unsplash.com/photo-1508672019048-805c876b67e2?auto=format&fit=crop&w=1800&q=80';
+  private readonly fallbackHeroBg = ['https://images.unsplash.com/photo-1508672019048-805c876b67e2?auto=format&fit=crop&w=1800&q=80'];
   private readonly rotationIntervalMs = 4500;
+  private readonly heroRotationIntervalMs = 6500;
   private rotationTimer?: number;
+  private heroRotationTimer?: number;
   private destroy$ = new Subject<void>();
 
   constructor(private productService: ProductService, private siteSettingsService: SiteSettingsService) {
@@ -34,17 +37,13 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.stopRotation();
+    this.stopHeroRotation();
     this.destroy$.next();
     this.destroy$.complete();
   }
 
   get currentImage(): string {
     return this.mateImages[this.activeImageIndex] || this.fallbackImages[0];
-  }
-
-  get heroBgCssValue(): string {
-    const url = this.heroBgUrl || this.fallbackHeroBg;
-    return `url('${url}')`;
   }
 
   goToImage(index: number) {
@@ -81,15 +80,21 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   private loadHeroBackground() {
-    this.siteSettingsService.getHeroBackground()
+    this.siteSettingsService.getHeroBackgrounds(6)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (heroBg) => {
-          this.heroBgUrl = heroBg?.image_url || null;
+        next: (heroBgs: HeroBackground[]) => {
+          const urls = heroBgs
+            .map(bg => (bg.image_url || '').trim())
+            .filter(u => u.length > 0);
+
+          this.heroBgUrls = urls.length ? urls : this.fallbackHeroBg;
+          this.heroBgActiveIndex = 0;
+          this.restartHeroRotation();
         },
         error: (error) => {
           console.error('Error loading hero background:', error);
-          this.heroBgUrl = null;
+          this.heroBgUrls = this.fallbackHeroBg;
         }
       });
   }
@@ -127,12 +132,25 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.startRotation();
   }
 
+  private restartHeroRotation() {
+    this.stopHeroRotation();
+    this.startHeroRotation();
+  }
+
   private startRotation() {
     if (this.mateImages.length <= 1) {
       return;
     }
 
     this.rotationTimer = window.setInterval(() => this.advanceImage(), this.rotationIntervalMs);
+  }
+
+  private startHeroRotation() {
+    if (this.heroBgUrls.length <= 1) {
+      return;
+    }
+
+    this.heroRotationTimer = window.setInterval(() => this.advanceHeroBackground(), this.heroRotationIntervalMs);
   }
 
   private stopRotation() {
@@ -142,11 +160,26 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
   }
 
+  private stopHeroRotation() {
+    if (this.heroRotationTimer) {
+      window.clearInterval(this.heroRotationTimer);
+      this.heroRotationTimer = undefined;
+    }
+  }
+
   private advanceImage() {
     if (!this.mateImages.length) {
       return;
     }
 
     this.activeImageIndex = (this.activeImageIndex + 1) % this.mateImages.length;
+  }
+
+  private advanceHeroBackground() {
+    if (!this.heroBgUrls.length) {
+      return;
+    }
+
+    this.heroBgActiveIndex = (this.heroBgActiveIndex + 1) % this.heroBgUrls.length;
   }
 }

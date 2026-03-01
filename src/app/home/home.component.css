@@ -96,25 +96,30 @@
   height: 100%;
   z-index: 0;
   pointer-events: none;
-  background:
-    radial-gradient(900px circle at 18% 20%, rgba(0, 255, 163, 0.14), transparent 60%),
-    radial-gradient(800px circle at 82% 18%, rgba(61, 211, 56, 0.10), transparent 62%),
-    var(--hero-bg-image, url('https://images.unsplash.com/photo-1508672019048-805c876b67e2?auto=format&fit=crop&w=1800&q=80')) center/cover no-repeat;
+}
+
+.hero-bg-layer {
+  position: absolute;
+  inset: 0;
+  background-repeat: no-repeat;
   background-size: 120% auto, 120% auto, cover;
   background-position: 12% 12%, 88% 10%, center;
-  animation: none;
-  opacity: 0.34;
+  opacity: 0;
   filter: saturate(0.78) contrast(1.06) blur(0.4px);
   transform: scale(1.02);
-  transition: opacity 400ms ease;
+  transition: opacity 800ms ease, transform 1400ms ease;
+}
+
+.hero-bg-layer.is-active {
+  opacity: 0.34;
+  transform: scale(1);
 }
 
 @media (min-width: 1024px) {
-  .hero-bg-slider {
+  .hero-bg-layer {
     background-size: 140% auto, 140% auto, cover;
     background-position: 10% 18%, 90% 14%, center;
     transform: scale(1.01);
-    opacity: 0.36;
   }
 }
 
@@ -211,6 +216,10 @@
     animation: none;
     transform: none;
   }
+
+  .hero-bg-layer {
+    transition: none;
+  }
 }
 
 .hero-content {
@@ -229,10 +238,6 @@
   align-items: center;
   gap: 2.25rem;
   width: 100%;
-}
-
-.hero-copy {
-  max-width: 680px;
 }
 
 .hero-badge {
@@ -742,13 +747,14 @@
     padding: 4.5rem clamp(1rem, 4vw, 2rem) 3.6rem;
   }
 
-  .hero-bg-slider {
-    background:
-      radial-gradient(700px circle at 18% 18%, rgba(0, 255, 163, 0.10), transparent 60%),
-      radial-gradient(650px circle at 82% 18%, rgba(61, 211, 56, 0.08), transparent 62%),
-      var(--hero-bg-image, url('https://images.unsplash.com/photo-1508672019048-805c876b67e2?auto=format&fit=crop&w=1100&q=70')) center/cover no-repeat;
+  .hero-bg-layer {
+    background-size: 125% auto, 125% auto, cover;
+    background-position: 12% 18%, 88% 15%, center;
     filter: none;
     transform: none;
+  }
+
+  .hero-bg-layer.is-active {
     opacity: 0.3;
   }
 

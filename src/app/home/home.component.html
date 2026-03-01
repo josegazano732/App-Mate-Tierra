@@ -1,6 +1,15 @@
 <div class="home-container">
   <section class="hero">
-    <div class="hero-bg-slider" [style.--hero-bg-image]="heroBgCssValue"></div>
+    <div class="hero-bg-slider">
+      <div
+        class="hero-bg-layer"
+        *ngFor="let url of heroBgUrls; let i = index"
+        [class.is-active]="i === heroBgActiveIndex"
+        [ngStyle]="{
+          'background-image': 'radial-gradient(900px circle at 18% 20%, rgba(0, 255, 163, 0.14), transparent 60%), radial-gradient(800px circle at 82% 18%, rgba(61, 211, 56, 0.10), transparent 62%), url(' + url + ')'
+        }"
+        aria-hidden="true"></div>
+    </div>
     <div class="hero-content">
       <div class="hero-grid">
         <div class="hero-copy">

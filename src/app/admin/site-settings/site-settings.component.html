@@ -5,18 +5,14 @@
       <h1>Ajustar imagen de fondo</h1>
       <p class="lead">Solo administradores. La imagen se guarda en la base de datos y se refleja en el hero.</p>
     </div>
-    <button class="ghost" type="button" (click)="loadSettings()" [disabled]="isLoading || isSaving">Recargar</button>
+    <button class="ghost" type="button" (click)="loadSettings()" [disabled]="isLoading">Recargar</button>
   </div>
 
   <div class="settings-body" *ngIf="!isLoading; else loadingTpl">
     <div class="field-group">
       <label for="heroFile">Subir imagen (JPG, PNG, WebP, SVG)</label>
-      <input id="heroFile" name="heroFile" type="file" accept="image/*" (change)="onFileSelected($event)" [disabled]="isUploading || isSaving">
-      <small>Se sube al bucket y queda lista para guardar.</small>
-    </div>
-
-    <div class="actions">
-      <button class="primary" type="button" (click)="save()" [disabled]="isSaving">{{ isSaving ? 'Guardando...' : 'Guardar cambio' }}</button>
+      <input id="heroFile" name="heroFile" type="file" accept="image/*" (change)="onFileSelected($event)" [disabled]="isUploading">
+      <small>Máximo 6 imágenes. Cada subida se guarda y se suma al carrusel del hero.</small>
     </div>
 
     <div class="feedback" *ngIf="message">{{ message }}</div>
@@ -25,8 +21,20 @@
     <div class="feedback error" *ngIf="uploadError">{{ uploadError }}</div>
 
     <div class="preview">
-      <div class="preview-frame" [style.backgroundImage]="'url(' + previewUrl + ')'"></div>
+      <div class="preview-frame" [style.backgroundImage]="'url(' + previewUrl + ')'" ></div>
       <p class="preview-caption">Previsualización rápida</p>
+    </div>
+
+    <div class="gallery" *ngIf="heroImages.length > 0">
+      <div class="gallery-header">
+        <p class="eyebrow">Imágenes cargadas ({{ heroImages.length }}/6)</p>
+      </div>
+      <div class="gallery-grid">
+        <div class="thumb" *ngFor="let img of heroImages">
+          <div class="thumb-img" [style.backgroundImage]="'url(' + (img.image_url || previewUrl) + ')'" ></div>
+          <button type="button" class="ghost danger" (click)="removeImage(img.id)">Eliminar</button>
+        </div>
+      </div>
     </div>
   </div>
 

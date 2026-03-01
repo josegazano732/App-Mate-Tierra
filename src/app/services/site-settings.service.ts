@@ -61,6 +61,62 @@ export class SiteSettingsService {
     );
   }
 
+  getHeroBackgrounds(limit: number = 6): Observable<HeroBackground[]> {
+    return from(
+      this.supabase.client
+        .from('hero_backgrounds')
+        .select('*')
+        .order('updated_at', { ascending: false })
+        .limit(limit)
+    ).pipe(
+      map(({ data, error }) => {
+        if (error) throw error;
+        return Array.isArray(data) ? data : [];
+      }),
+      catchError(error => {
+        console.error('Error fetching hero backgrounds:', error);
+        return throwError(() => new Error('Error loading hero backgrounds'));
+      })
+    );
+  }
+
+  addHeroBackground(heroUrl: string): Observable<HeroBackground> {
+    return from(
+      this.supabase.client
+        .from('hero_backgrounds')
+        .insert({ image_url: heroUrl })
+        .select()
+        .single()
+    ).pipe(
+      map(({ data, error }) => {
+        if (error) throw error;
+        return data;
+      }),
+      catchError(error => {
+        console.error('Error adding hero background:', error);
+        return throwError(() => new Error('Error adding hero background'));
+      })
+    );
+  }
+
+  deleteHeroBackground(id: string): Observable<void> {
+    return from(
+      this.supabase.client
+        .from('hero_backgrounds')
+        .delete()
+        .eq('id', id)
+    ).pipe(
+      map(({ error }) => {
+        if (error) throw error;
+        return void 0;
+      }),
+      catchError(error => {
+        console.error('Error deleting hero background:', error);
+        return throwError(() => new Error('Error deleting hero background'));
+      })
+    );
+  }
+
   updateHeroBackground(heroUrl: string, id?: string): Observable<HeroBackground> {
     const targetId = id || '00000000-0000-0000-0000-000000000000';
 
