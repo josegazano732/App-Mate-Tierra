@@ -17,6 +17,7 @@ export interface Product {
   seasonal: boolean;
   cost: number;
   markup_percentage: number;
+  wholesale_price?: number | null;
   created_at?: string;
   updated_at?: string;
   discount?: number;
@@ -109,7 +110,8 @@ export class ProductService {
           stock: product.stock,
           seasonal: product.seasonal,
           cost: product.cost,
-          markup_percentage: product.markup_percentage
+          markup_percentage: product.markup_percentage,
+          wholesale_price: product.wholesale_price ?? null
         }])
         .select()
         .single()
@@ -140,7 +142,8 @@ export class ProductService {
       stock: product.stock,
       seasonal: product.seasonal,
       cost: product.cost,
-      markup_percentage: product.markup_percentage
+      markup_percentage: product.markup_percentage,
+      wholesale_price: product.wholesale_price ?? null
     };
 
     return from(
@@ -224,6 +227,7 @@ export class ProductService {
       ...row,
       image: primaryImage,
       image_urls: imageUrls,
+      wholesale_price: row?.wholesale_price == null ? null : Number(row.wholesale_price),
       unit_of_measure: row?.unit_of_measure || 'unidad'
     } as Product;
   }

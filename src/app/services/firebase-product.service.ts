@@ -9,6 +9,7 @@ export interface FirebaseProduct {
   name: string;
   description: string;
   price: number;
+  wholesale_price?: number | null;
   image: string;
   category: string;
   unit_of_measure?: string;

@@ -66,6 +66,10 @@
           </span>
         </div>
         <div class="toolbar-actions">
+          <a class="toolbar-secondary" routerLink="/catalogo-mayorista">
+            <i class="fab fa-whatsapp"></i>
+            Catalogo Mayorista
+          </a>
           <button type="button" class="toolbar-secondary" (click)="openGuide()">
             <i class="fas fa-question-circle"></i>
             ¿Cómo comprar?
@@ -184,6 +188,7 @@
                 <i class="fas fa-cart-plus"></i>
                 {{ product.stock === 0 ? 'Sin stock' : 'Agregar al carrito' }}
               </button>
+
               <button class="btn secondary" (click)="viewProductDetails(product)">
                 <i class="fas fa-info-circle"></i>
                 Ver detalles

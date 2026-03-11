@@ -19,10 +19,13 @@ import { SupplierExpensesComponent } from './admin/supplier-expenses/supplier-ex
 import { SiteSettingsComponent } from './admin/site-settings/site-settings.component';
 import { AdminGuard } from './guards/admin.guard';
 import { MateGuidesComponent } from './guides/mate-guides.component';
+import { WhatsappCatalogComponent } from './products/whatsapp-catalog/whatsapp-catalog.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
   { path: 'productos', component: ProductsComponent },
+  { path: 'catalogo-mayorista', component: WhatsappCatalogComponent },
+  { path: 'catalogo-whatsapp', redirectTo: 'catalogo-mayorista', pathMatch: 'full' },
   { path: 'productos/:id', component: ProductDetailsComponent },
   { path: 'contacto', component: ContactComponent },
   { path: 'guias', component: MateGuidesComponent },

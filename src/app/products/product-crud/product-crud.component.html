@@ -213,6 +213,7 @@
             <th>Costo</th>
             <th>Margen %</th>
             <th>Precio</th>
+            <th>Precio mayorista</th>
             <th>Stock</th>
             <th>Categoría</th>
             <th>Temporada</th>
@@ -236,6 +237,7 @@
             <td data-label="Costo">{{ product.cost | currency : 'USD' }}</td>
             <td data-label="Margen">{{ product.markup_percentage }}%</td>
             <td data-label="Precio">{{ product.price | currency : 'USD' }}</td>
+            <td data-label="Precio mayorista">{{ (product.wholesale_price || 0) | currency : 'USD' }}</td>
             <td
               data-label="Stock"
               [class.low-stock]="product.stock < 5"
@@ -265,7 +267,7 @@
             </td>
           </tr>
           <tr *ngIf="!paginatedProducts.length && !isLoadingProducts">
-            <td colspan="10" class="empty-state">
+            <td colspan="11" class="empty-state">
               <i class="fas fa-search"></i>
               <span>
                 {{ hasActiveFilters ? 'No encontramos productos que coincidan con los filtros aplicados.' : 'Todavía no hay productos registrados.' }}
@@ -412,6 +414,19 @@
                   [attr.inputmode]="getUnitLabel(editingProduct.unit_of_measure) === 'kg' ? 'decimal' : 'numeric'"
                 />
                 <small>Los clientes verán alertas cuando el stock sea bajo.</small>
+              </div>
+              <div class="form-field">
+                <label for="wholesale-price-edit">Precio mayorista</label>
+                <input
+                  type="number"
+                  id="wholesale-price-edit"
+                  [(ngModel)]="editingProduct.wholesale_price"
+                  name="wholesale_price"
+                  step="0.01"
+                  min="0"
+                  inputmode="decimal"
+                />
+                <small>Se usa en el catálogo mayorista. Si queda vacío o en 0, no se publica.</small>
               </div>
               <div class="form-field">
                 <label for="unit-edit">Unidad de medida</label>
@@ -597,6 +612,19 @@
                   [attr.inputmode]="getUnitLabel(product.unit_of_measure) === 'kg' ? 'decimal' : 'numeric'"
                 />
                 <small>Los clientes verán alertas cuando el stock sea bajo.</small>
+              </div>
+              <div class="form-field">
+                <label for="wholesale-price-create">Precio mayorista</label>
+                <input
+                  type="number"
+                  id="wholesale-price-create"
+                  [(ngModel)]="product.wholesale_price"
+                  name="wholesale_price"
+                  step="0.01"
+                  min="0"
+                  inputmode="decimal"
+                />
+                <small>Se usa en el catálogo mayorista. Si queda vacío o en 0, no se publica.</small>
               </div>
               <div class="form-field">
                 <label for="unit-create">Unidad de medida</label>

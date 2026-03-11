@@ -33,6 +33,7 @@ import { CurrentSaleComponent } from './admin/current-sale/current-sale.componen
 import { SupplierExpensesComponent } from './admin/supplier-expenses/supplier-expenses.component';
 import { SiteSettingsComponent } from './admin/site-settings/site-settings.component';
 import { MateGuidesComponent } from './guides/mate-guides.component';
+import { WhatsappCatalogComponent } from './products/whatsapp-catalog/whatsapp-catalog.component';
 
 import { AppRoutingModule } from './app-routing.module';
 import { SupabaseService } from './services/supabase.service';
@@ -74,7 +75,8 @@ import { PaymentMethodsService } from './services/payment-methods.service';
     CurrentSaleComponent,
     SupplierExpensesComponent,
     SiteSettingsComponent,
-    MateGuidesComponent
+    MateGuidesComponent,
+    WhatsappCatalogComponent
   ],
   imports: [
     BrowserModule,

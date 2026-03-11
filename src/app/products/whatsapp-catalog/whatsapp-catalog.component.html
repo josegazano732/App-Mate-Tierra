@@ -1,0 +1,192 @@
+<section class="wa-catalog-page">
+  <header class="wa-hero glass-card">
+    <div>
+      <span class="eyebrow">Catalogo Mayorista</span>
+      <h1>Lista de precios mayorista: Hierbas y Alimentos Secos</h1>
+    </div>
+    <div class="hero-actions">
+      <button type="button" class="btn secondary" (click)="goToProducts()">
+        <i class="fas fa-arrow-left"></i>
+        Volver a productos
+      </button>
+    </div>
+  </header>
+
+  <section class="wa-filters glass-card">
+    <div class="filter-field">
+      <label>Buscar</label>
+      <input
+        type="text"
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="applyFilters()"
+        placeholder="Buscar por nombre o descripcion"
+      >
+    </div>
+
+    <div class="filter-field">
+      <label>Categoria</label>
+      <select [(ngModel)]="selectedCategory" (ngModelChange)="applyFilters()">
+        <option value="">Todas (Hierbas + Alimentos Secos)</option>
+        <option *ngFor="let category of availableCategories" [value]="category">{{ category }}</option>
+      </select>
+    </div>
+
+    <button type="button" class="btn refresh" (click)="loadProducts()" [disabled]="isLoading">
+      <i class="fas fa-sync-alt"></i>
+      Actualizar
+    </button>
+  </section>
+
+  <section class="wa-state glass-card" *ngIf="isLoading">
+    <i class="fas fa-spinner fa-spin"></i>
+    <span>Cargando catalogo...</span>
+  </section>
+
+  <section class="wa-state glass-card error" *ngIf="errorMessage">
+    <i class="fas fa-exclamation-circle"></i>
+    <span>{{ errorMessage }}</span>
+  </section>
+
+  <section class="wa-list glass-card" *ngIf="!isLoading && !errorMessage">
+    <div class="list-header">
+      <span>Producto</span>
+      <span>Precio mayorista</span>
+      <span>Cantidad</span>
+      <span>Accion</span>
+    </div>
+
+    <article class="list-row" *ngFor="let product of displayedProducts">
+      <div class="product-main">
+        <img [src]="getPrimaryImage(product)" [alt]="product.name" (error)="handleProductImageError($event)">
+        <div>
+          <h3>{{ product.name }}</h3>
+          <p>{{ product.description | slice:0:90 }}{{ product.description.length > 90 ? '...' : '' }}</p>
+          <small>{{ product.category_name || product.category }}</small>
+        </div>
+      </div>
+
+      <div class="price-col">{{ formatPrice(getWholesalePrice(product)) }}</div>
+
+      <div class="qty-col">
+        <ng-container *ngIf="getProductQuantity(product) > 0; else noQty">
+          <div class="counter">
+            <button type="button" (click)="decreaseOrder(product)">
+              <i class="fas fa-minus"></i>
+            </button>
+            <span>{{ getProductQuantity(product) }}</span>
+            <button type="button" (click)="increaseOrder(product)">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </ng-container>
+        <ng-template #noQty>
+          <span class="no-qty">0</span>
+        </ng-template>
+      </div>
+
+      <div class="action-col">
+        <button type="button" class="btn order" (click)="addOrder(product)" [disabled]="product.stock === 0">
+          <i class="fas fa-cart-plus"></i>
+          {{ product.stock === 0 ? 'Sin stock' : 'Pedir' }}
+        </button>
+      </div>
+    </article>
+
+    <div class="empty" *ngIf="filteredProducts.length === 0">
+      No hay productos para esos filtros.
+    </div>
+
+    <div class="pagination" *ngIf="totalPages > 1">
+      <button type="button" (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1">Anterior</button>
+      <span>Pagina {{ currentPage }} / {{ totalPages }}</span>
+      <button type="button" (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages">Siguiente</button>
+    </div>
+  </section>
+
+  <footer class="wa-summary glass-card" *ngIf="!isLoading && !errorMessage">
+    <div class="summary-cart-pill" (click)="goToCart()" role="button" tabindex="0">
+      <i class="fas fa-shopping-cart"></i>
+      <span class="count">({{ orderCount }})</span>
+    </div>
+
+    <div class="summary-amount">
+      <p class="summary-subtotal">Subtotal: {{ formatPrice(orderSubtotal) }}</p>
+      <p class="summary-caption">Actualiza en tiempo real mientras agregas productos</p>
+    </div>
+
+    <div class="summary-actions">
+      <button type="button" class="btn clear" (click)="clearOrder()" [disabled]="orderCount === 0">
+        <i class="fas fa-trash-alt"></i>
+        Vaciar
+      </button>
+      <button type="button" class="btn whatsapp" (click)="openWhatsAppConfirmModal()" [disabled]="orderCount === 0">
+        <i class="fab fa-whatsapp"></i>
+        Enviar pedido
+      </button>
+    </div>
+  </footer>
+</section>
+
+<div class="wa-confirm-modal" *ngIf="showWhatsAppConfirmModal">
+  <div class="wa-confirm-backdrop" (click)="closeWhatsAppConfirmModal()"></div>
+
+  <section class="wa-confirm-dialog">
+    <header class="confirm-top">
+      <div class="confirm-options">
+        <label>
+          <input type="radio" name="paymentMethod" value="efectivo" [(ngModel)]="paymentMethod">
+          Pago en Efectivo
+        </label>
+        <label>
+          <input type="radio" name="deliveryMethod" value="domicilio" [(ngModel)]="deliveryMethod" (ngModelChange)="onDeliveryMethodChange($event)">
+          Envio a Domicilio
+        </label>
+        <label>
+          <input type="radio" name="paymentMethod" value="transferencia" [(ngModel)]="paymentMethod">
+          Pago por Transferencia
+        </label>
+        <label>
+          <input type="radio" name="deliveryMethod" value="retiro" [(ngModel)]="deliveryMethod" (ngModelChange)="onDeliveryMethodChange($event)">
+          Retiro por Tienda
+        </label>
+      </div>
+      <button type="button" class="close-confirm" (click)="closeWhatsAppConfirmModal()" aria-label="Cerrar">
+        <i class="fas fa-times"></i>
+      </button>
+    </header>
+
+    <div class="confirm-body">
+      <div class="confirm-fields">
+        <input type="text" [(ngModel)]="customerName" placeholder="¿Tu Nombre?">
+        <input type="text" [(ngModel)]="customerLastName" placeholder="¿Tu Apellido?">
+        <input
+          type="text"
+          [(ngModel)]="customerAddress"
+          placeholder="¿Tu Direccion?"
+          [disabled]="deliveryMethod === 'retiro'"
+        >
+      </div>
+
+      <div class="confirm-order">
+        <h3>Pedido</h3>
+        <ul>
+          <li *ngFor="let item of orderItems">
+            {{ item.quantity }} {{ item.name }} ... ( {{ formatPrice(item.price * item.quantity) }} )
+          </li>
+        </ul>
+        <p class="confirm-total">Total: {{ formatPrice(orderSubtotal) }}</p>
+      </div>
+
+      <p class="confirm-error" *ngIf="confirmError">{{ confirmError }}</p>
+    </div>
+
+    <footer class="confirm-footer">
+      <button type="button" class="btn-modal secondary" (click)="closeWhatsAppConfirmModal()">
+        Modificar
+      </button>
+      <button type="button" class="btn-modal success" (click)="confirmAndSendOrderViaWhatsApp()" [disabled]="!canConfirmOrder()">
+        Si, lo quiero!
+      </button>
+    </footer>
+  </section>
+</div>
