@@ -561,31 +561,9 @@
   gap: 0.5rem;
 }
 
-.product-title {
-  margin: 0;
-  font-size: 1.35rem;
-  color: #1c3223;
-  cursor: pointer;
-}
-
-.product-title:hover {
-  color: #2f8f44;
-}
-
-.product-description {
-  margin: 0;
-  color: #5a6a60;
-  line-height: 1.5;
-}
-
 /* El título ya está destacado en la imagen; aquí se baja un poco el peso visual */
 .card-header {
   gap: 0.4rem;
-}
-
-.product-title {
-  font-size: 1.15rem;
-  color: #203b2e;
 }
 
 .card-meta {

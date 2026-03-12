@@ -38,29 +38,6 @@ export class ProductsComponent implements OnInit {
   private readonly productImageFallback = 'https://images.unsplash.com/photo-1501426026826-31c667bdf23d?auto=format&fit=crop&w=900&q=60';
   private readonly prioritizedKeywords = ['mates', 'termera', 'termos'];
   private readonly whatsappPhone = '5493758459113';
-  showGuideModal = false;
-  readonly guideSteps = [
-    {
-      icon: 'fa-search',
-      title: 'Encontrá tu producto',
-      copy: 'Usá la búsqueda o filtrá por categoría para ver opciones disponibles al instante.'
-    },
-    {
-      icon: 'fa-info-circle',
-      title: 'Revisá detalles y stock',
-      copy: 'Abrí el producto para ver fotos, descripción y disponibilidad actual.'
-    },
-    {
-      icon: 'fa-cart-plus',
-      title: 'Agregá al carrito',
-      copy: 'Sumá las unidades que necesites; podés ajustar cantidades en el carrito.'
-    },
-    {
-      icon: 'fa-whatsapp',
-      title: 'Enviá tu pedido',
-      copy: 'Desde el carrito tocá "Enviar por WhatsApp" para compartir tu lista y coordinar la compra.'
-    }
-  ];
 
   constructor(
     private cartService: CartService,
@@ -264,11 +241,4 @@ export class ProductsComponent implements OnInit {
     target.src = this.categoryImageFallback;
   }
 
-  openGuide() {
-    this.showGuideModal = true;
-  }
-
-  closeGuide() {
-    this.showGuideModal = false;
-  }
 }
