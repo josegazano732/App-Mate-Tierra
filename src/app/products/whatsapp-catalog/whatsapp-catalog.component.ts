@@ -27,6 +27,7 @@ export class WhatsappCatalogComponent implements OnInit {
   orderCount = 0;
   orderSubtotal = 0;
   showWhatsAppConfirmModal = false;
+  submitAttempted = false;
   paymentMethod: 'efectivo' | 'transferencia' | '' = '';
   deliveryMethod: 'domicilio' | 'retiro' | '' = '';
   customerName = '';
@@ -148,11 +149,13 @@ export class WhatsappCatalogComponent implements OnInit {
   openWhatsAppConfirmModal(): void {
     if (!this.orderItems.length) return;
     this.confirmError = '';
+    this.submitAttempted = false;
     this.showWhatsAppConfirmModal = true;
   }
 
   closeWhatsAppConfirmModal(): void {
     this.showWhatsAppConfirmModal = false;
+    this.submitAttempted = false;
   }
 
   clearOrder(): void {
@@ -163,8 +166,11 @@ export class WhatsappCatalogComponent implements OnInit {
 
   confirmAndSendOrderViaWhatsApp(): void {
     if (!this.orderItems.length) return;
-    if (!this.canConfirmOrder()) {
-      this.confirmError = 'Completa los datos requeridos para continuar.';
+    this.submitAttempted = true;
+
+    const validationErrors = this.getConfirmValidationErrors();
+    if (validationErrors.length > 0) {
+      this.confirmError = validationErrors.join('\n');
       return;
     }
 
@@ -197,12 +203,7 @@ export class WhatsappCatalogComponent implements OnInit {
   }
 
   canConfirmOrder(): boolean {
-    const hasName = this.customerName.trim().length > 1;
-    const hasLastName = this.customerLastName.trim().length > 1;
-    const hasPayment = this.paymentMethod !== '';
-    const hasDelivery = this.deliveryMethod !== '';
-    const hasAddressIfNeeded = this.deliveryMethod !== 'domicilio' || this.customerAddress.trim().length > 4;
-    return hasName && hasLastName && hasPayment && hasDelivery && hasAddressIfNeeded;
+    return this.getConfirmValidationErrors().length === 0;
   }
 
   onDeliveryMethodChange(mode: 'domicilio' | 'retiro' | ''): void {
@@ -210,6 +211,48 @@ export class WhatsappCatalogComponent implements OnInit {
     if (mode === 'retiro') {
       this.customerAddress = '';
     }
+
+    if (this.submitAttempted) {
+      this.confirmError = this.getConfirmValidationErrors().join('\n');
+    }
+  }
+
+  isPaymentSelected(): boolean {
+    return this.paymentMethod === 'efectivo' || this.paymentMethod === 'transferencia';
+  }
+
+  isDeliverySelected(): boolean {
+    return this.deliveryMethod === 'domicilio' || this.deliveryMethod === 'retiro';
+  }
+
+  isAddressRequired(): boolean {
+    return this.deliveryMethod === 'domicilio';
+  }
+
+  private getConfirmValidationErrors(): string[] {
+    const errors: string[] = [];
+
+    if (this.customerName.trim().length <= 1) {
+      errors.push('Ingresa un nombre valido.');
+    }
+
+    if (this.customerLastName.trim().length <= 1) {
+      errors.push('Ingresa un apellido valido.');
+    }
+
+    if (!this.isPaymentSelected()) {
+      errors.push('Debes seleccionar Pago en Efectivo o Pago por Transferencia.');
+    }
+
+    if (!this.isDeliverySelected()) {
+      errors.push('Debes seleccionar Envio a Domicilio o Retiro por Tienda.');
+    }
+
+    if (this.isAddressRequired() && this.customerAddress.trim().length <= 4) {
+      errors.push('Para envio a domicilio, completa una direccion valida.');
+    }
+
+    return errors;
   }
 
   goToCart(): void {

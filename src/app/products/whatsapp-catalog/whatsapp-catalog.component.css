@@ -369,7 +369,31 @@
 .confirm-options {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.3rem 1.4rem;
+  gap: 0.7rem 1rem;
+}
+
+.confirm-option-group {
+  padding: 0.45rem 0.55rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.07);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.confirm-option-group.invalid {
+  border-color: rgba(255, 166, 166, 0.75);
+  background: rgba(179, 57, 43, 0.22);
+}
+
+.group-title {
+  margin: 0;
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: rgba(230, 247, 238, 0.92);
+  font-weight: 700;
 }
 
 .confirm-options label {
@@ -418,6 +442,11 @@
   background: #e7efe9;
 }
 
+.confirm-fields input.invalid-field {
+  border-color: #c0392b;
+  box-shadow: 0 0 0 3px rgba(192, 57, 43, 0.14);
+}
+
 .confirm-order {
   margin-top: 0.85rem;
   border-top: 1px solid rgba(40, 97, 67, 0.18);
@@ -449,6 +478,7 @@
   margin: 0.7rem 0 0;
   color: #b3392b;
   font-weight: 600;
+  white-space: pre-line;
 }
 
 .confirm-footer {

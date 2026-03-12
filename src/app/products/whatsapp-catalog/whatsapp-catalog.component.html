@@ -133,22 +133,29 @@
   <section class="wa-confirm-dialog">
     <header class="confirm-top">
       <div class="confirm-options">
-        <label>
-          <input type="radio" name="paymentMethod" value="efectivo" [(ngModel)]="paymentMethod">
-          Pago en Efectivo
-        </label>
-        <label>
-          <input type="radio" name="deliveryMethod" value="domicilio" [(ngModel)]="deliveryMethod" (ngModelChange)="onDeliveryMethodChange($event)">
-          Envio a Domicilio
-        </label>
-        <label>
-          <input type="radio" name="paymentMethod" value="transferencia" [(ngModel)]="paymentMethod">
-          Pago por Transferencia
-        </label>
-        <label>
-          <input type="radio" name="deliveryMethod" value="retiro" [(ngModel)]="deliveryMethod" (ngModelChange)="onDeliveryMethodChange($event)">
-          Retiro por Tienda
-        </label>
+        <div class="confirm-option-group" [class.invalid]="submitAttempted && !isPaymentSelected()">
+          <p class="group-title">Metodo de pago *</p>
+          <label>
+            <input type="radio" name="paymentMethod" value="efectivo" [(ngModel)]="paymentMethod">
+            Pago en Efectivo
+          </label>
+          <label>
+            <input type="radio" name="paymentMethod" value="transferencia" [(ngModel)]="paymentMethod">
+            Pago por Transferencia
+          </label>
+        </div>
+
+        <div class="confirm-option-group" [class.invalid]="submitAttempted && !isDeliverySelected()">
+          <p class="group-title">Tipo de entrega *</p>
+          <label>
+            <input type="radio" name="deliveryMethod" value="domicilio" [(ngModel)]="deliveryMethod" (ngModelChange)="onDeliveryMethodChange($event)">
+            Envio a Domicilio
+          </label>
+          <label>
+            <input type="radio" name="deliveryMethod" value="retiro" [(ngModel)]="deliveryMethod" (ngModelChange)="onDeliveryMethodChange($event)">
+            Retiro por Tienda
+          </label>
+        </div>
       </div>
       <button type="button" class="close-confirm" (click)="closeWhatsAppConfirmModal()" aria-label="Cerrar">
         <i class="fas fa-times"></i>
@@ -157,12 +164,13 @@
 
     <div class="confirm-body">
       <div class="confirm-fields">
-        <input type="text" [(ngModel)]="customerName" placeholder="¿Tu Nombre?">
-        <input type="text" [(ngModel)]="customerLastName" placeholder="¿Tu Apellido?">
+        <input type="text" [(ngModel)]="customerName" placeholder="¿Tu Nombre?" [class.invalid-field]="submitAttempted && customerName.trim().length <= 1">
+        <input type="text" [(ngModel)]="customerLastName" placeholder="¿Tu Apellido?" [class.invalid-field]="submitAttempted && customerLastName.trim().length <= 1">
         <input
           type="text"
           [(ngModel)]="customerAddress"
           placeholder="¿Tu Direccion?"
+          [class.invalid-field]="submitAttempted && isAddressRequired() && customerAddress.trim().length <= 4"
           [disabled]="deliveryMethod === 'retiro'"
         >
       </div>
@@ -184,7 +192,7 @@
       <button type="button" class="btn-modal secondary" (click)="closeWhatsAppConfirmModal()">
         Modificar
       </button>
-      <button type="button" class="btn-modal success" (click)="confirmAndSendOrderViaWhatsApp()" [disabled]="!canConfirmOrder()">
+      <button type="button" class="btn-modal success" (click)="confirmAndSendOrderViaWhatsApp()">
         Si, lo quiero!
       </button>
     </footer>
