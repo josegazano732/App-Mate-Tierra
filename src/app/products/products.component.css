@@ -21,23 +21,6 @@
   pointer-events: none;
 }
 
-.products-page::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image:
-    url('../../assets/images/yerba-mate-leaves.png'),
-    url('../../assets/images/yerba-mate-leaves.png'),
-    url('../../assets/images/yerba-mate-leaves.png');
-  background-position: 6% 18%, 93% 16%, 88% 78%;
-  background-size: 210px auto, 240px auto, 230px auto;
-  background-repeat: no-repeat;
-  opacity: 0.16;
-  filter: grayscale(0.2) saturate(0.85);
-  z-index: -1;
-  pointer-events: none;
-}
-
 .glass-card {
   background: rgba(255, 251, 245, 0.86);
   border-radius: 32px;
@@ -94,7 +77,6 @@
   border-radius: 22px;
   background: rgba(255, 255, 255, 0.74);
   border: 1px solid rgba(24, 50, 34, 0.08);
-  box-shadow: 0 12px 24px rgba(18, 40, 30, 0.05);
 }
 
 .hero-side {
@@ -140,7 +122,6 @@
 .category-thumb img.logo {
   object-fit: contain;
   padding: 12px;
-  background: linear-gradient(180deg, #f6fbf5 0%, #eaf4e5 100%);
 }
 
 .category-copy h2 {
@@ -154,10 +135,6 @@
   font-size: 0.92rem;
   color: #55675a;
   line-height: 1.5;
-}
-
-.products-layout {
-  display: block;
 }
 
 .products-panel {
@@ -315,24 +292,10 @@
   transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
 }
 
-.product-card::before {
-  content: '';
-  position: absolute;
-  inset: 0 0 auto;
-  height: 4px;
-  background: linear-gradient(90deg, #2f8f44, #e09b4e);
-  opacity: 0;
-  transition: opacity 0.25s ease;
-}
-
 .product-card:hover {
   transform: translateY(-6px);
   box-shadow: 0 24px 48px rgba(18, 40, 30, 0.14);
   border-color: rgba(47, 143, 68, 0.18);
-}
-
-.product-card:hover::before {
-  opacity: 1;
 }
 
 .card-media {
@@ -647,6 +610,10 @@
   font-weight: 700;
 }
 
+.mobile-cart-bar {
+  display: none;
+}
+
 @media (max-width: 1120px) {
   .products-list {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -659,7 +626,7 @@
 
 @media (max-width: 768px) {
   .products-page {
-    padding: 1.15rem 0.75rem 2rem;
+    padding: 1.15rem 0.75rem 6rem;
     gap: 0.9rem;
   }
 
@@ -723,6 +690,75 @@
   .state-card p,
   .state-card small {
     margin: 0;
+  }
+
+  .mobile-cart-bar {
+    position: fixed;
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: 0.75rem;
+    z-index: 1100;
+    min-height: 56px;
+    padding: 0.65rem 0.8rem;
+    border: 1px solid rgba(20, 58, 35, 0.12);
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(18, 47, 31, 0.96), rgba(38, 97, 57, 0.94));
+    box-shadow: 0 16px 34px rgba(10, 28, 18, 0.26);
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 0.75rem;
+    color: #f7fff9;
+    cursor: pointer;
+  }
+
+  .mobile-cart-bar__icon {
+    position: relative;
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .mobile-cart-bar__count {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 0.3rem;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #f3b25d;
+    color: #173223;
+    font-size: 0.68rem;
+    font-weight: 800;
+  }
+
+  .mobile-cart-bar__copy {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.12rem;
+    align-items: flex-start;
+  }
+
+  .mobile-cart-bar__copy strong {
+    font-size: 0.88rem;
+    font-weight: 800;
+    color: #ffffff;
+  }
+
+  .mobile-cart-bar__copy small {
+    color: rgba(236, 248, 239, 0.84);
+    font-size: 0.72rem;
   }
 }
 
@@ -909,6 +945,32 @@
 
   .category-copy p {
     display: none;
+  }
+
+  .mobile-cart-bar {
+    left: 0.6rem;
+    right: 0.6rem;
+    bottom: 0.6rem;
+    min-height: 52px;
+    padding: 0.58rem 0.7rem;
+    border-radius: 16px;
+    gap: 0.6rem;
+  }
+
+  .mobile-cart-bar__icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+  }
+
+  .mobile-cart-bar__copy strong {
+    font-size: 0.82rem;
+  }
+
+  .mobile-cart-bar__copy small,
+  .mobile-cart-bar__cta {
+    font-size: 0.68rem;
   }
 }
 

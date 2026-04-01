@@ -27,6 +27,8 @@ export class ProductsComponent implements OnInit {
   displayedProducts: Product[] = [];
   categories: Category[] = [];
   selectedCategory: Category | null = null;
+  cartItemCount = 0;
+  cartTotal = 0;
   isLoading = true;
   currentPage = 1;
   productsPerPage = 10;
@@ -49,6 +51,10 @@ export class ProductsComponent implements OnInit {
   ngOnInit() {
     this.loadCategories();
     this.loadProducts();
+    this.cartService.getCart().subscribe(items => {
+      this.cartItemCount = items.reduce((total, item) => total + item.quantity, 0);
+      this.cartTotal = items.reduce((total, item) => total + (item.price * item.quantity), 0);
+    });
   }
 
   loadProducts() {
@@ -180,6 +186,10 @@ export class ProductsComponent implements OnInit {
 
   viewProductDetails(product: Product) {
     this.router.navigate(['/productos', product.id]);
+  }
+
+  goToCart() {
+    this.router.navigate(['/carrito']);
   }
 
   retryLoading() {

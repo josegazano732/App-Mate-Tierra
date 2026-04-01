@@ -179,4 +179,20 @@
       </div>
     </section>
   </div>
+
+  <button
+    type="button"
+    class="mobile-cart-bar"
+    *ngIf="cartItemCount > 0"
+    (click)="goToCart()"
+    aria-label="Ver carrito">
+    <span class="mobile-cart-bar__icon">
+      <i class="fas fa-shopping-cart"></i>
+      <span class="mobile-cart-bar__count">{{ cartItemCount }}</span>
+    </span>
+    <span class="mobile-cart-bar__copy">
+      <strong>Carrito</strong>
+      <small>{{ cartTotal | currency:'USD' }}</small>
+    </span>
+  </button>
 </section>
