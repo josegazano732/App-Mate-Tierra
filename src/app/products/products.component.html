@@ -119,6 +119,7 @@
                 <span class="product-category-pill">{{ product.category_name || 'Colección' }}</span>
                 <span class="product-unit" *ngIf="product.unit_of_measure">{{ product.unit_of_measure }}</span>
               </div>
+              <span class="media-title media-title-inline">{{ product.name }}</span>
               <p class="product-description">
                 {{ (product.description || 'Producto disponible para compra inmediata desde el catálogo.') | slice:0:115 }}<ng-container *ngIf="(product.description || '').length > 115">...</ng-container>
               </p>
