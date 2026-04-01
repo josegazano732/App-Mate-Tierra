@@ -2,59 +2,50 @@
   <header class="products-hero glass-card">
     <div class="hero-copy">
       <span class="eyebrow">Catálogo premium</span>
-      <h1>Encuentra tu próximo producto</h1>
-    </div>
-    <div class="hero-category-card" *ngIf="selectedCategory; else allCategories">
-      <div class="category-thumb">
-        <img [src]="getActiveCategoryImage()"
-             [alt]="selectedCategory.name"
-             [class.logo]="!selectedCategory || !selectedCategory.image"
-             (error)="handleCategoryImageError($event)"
-             loading="lazy">
-      </div>
-      <div class="category-copy">
-        <span class="eyebrow">Categoría activa</span>
-        <h2>{{ selectedCategory.name }}</h2>
-        <p>{{ selectedCategory.description || 'Productos curados según la categoría seleccionada.' }}</p>
+
+      <div class="hero-filter-shell">
+        <app-product-filter (filterChange)="onFilterChange($event)"></app-product-filter>
       </div>
     </div>
-    <ng-template #allCategories>
-      <div class="hero-category-card neutral">
+    <div class="hero-side">
+      <div class="hero-category-card" *ngIf="selectedCategory; else allCategories">
         <div class="category-thumb">
-          <img class="logo"
-               [src]="categoryImageFallback"
-               alt="Todas las categorías"
+          <img [src]="getActiveCategoryImage()"
+               [alt]="selectedCategory.name"
+               [class.logo]="!selectedCategory || !selectedCategory.image"
                (error)="handleCategoryImageError($event)"
                loading="lazy">
         </div>
         <div class="category-copy">
-          <span class="eyebrow">Vista general</span>
-          <h2>Todas las categorías</h2>
-          <p>Explora el catálogo completo o filtra para ver una categoría en detalle.</p>
+          <span class="eyebrow">Categoría activa</span>
+          <h2>{{ selectedCategory.name }}</h2>
+          <p>{{ selectedCategory.description || 'Productos curados según la categoría seleccionada.' }}</p>
         </div>
       </div>
-    </ng-template>
+      <ng-template #allCategories>
+        <div class="hero-category-card neutral">
+          <div class="category-thumb">
+            <img class="logo"
+                 [src]="categoryImageFallback"
+                 alt="Todas las categorías"
+                 (error)="handleCategoryImageError($event)"
+                 loading="lazy">
+          </div>
+          <div class="category-copy">
+            <span class="eyebrow">Vista general</span>
+            <h2>Todas las categorías</h2>
+          </div>
+        </div>
+      </ng-template>
+
+    </div>
   </header>
 
   <div class="products-layout">
-    <aside class="filter-panel glass-card">
-      <div class="filter-intro">
-        <div>
-          <p class="eyebrow">Filtrar catálogo</p>
-          <h2>Buscar productos</h2>
-          <!-- <p>Combina palabras clave y categorías para encontrar el set ideal.</p> -->
-        </div>
-        <button type="button" class="toolbar-refresh" (click)="retryLoading()" [disabled]="isLoading">
-          <i class="fas fa-sync-alt"></i>
-          Actualizar datos
-        </button>
-      </div>
-      <app-product-filter (filterChange)="onFilterChange($event)"></app-product-filter>
-    </aside>
-
     <section class="products-panel glass-card">
       <div class="products-toolbar">
         <div class="toolbar-meta">
+          <span class="eyebrow">Vista de catálogo</span>
           <span class="results-count">
             <i class="fas fa-box-open"></i>
             Mostrando {{ displayedProducts.length }} de {{ filteredProducts.length }} productos
@@ -65,10 +56,6 @@
           </span>
         </div>
         <div class="toolbar-actions">
-          <a class="toolbar-secondary" routerLink="/catalogo-mayorista">
-            <i class="fab fa-whatsapp"></i>
-            Catalogo Mayorista
-          </a>
           <span class="page-indicator" *ngIf="totalPages > 1">Página {{ currentPage }} / {{ totalPages }}</span>
           <button type="button" class="toolbar-refresh" (click)="retryLoading()" [disabled]="isLoading">
             <i class="fas fa-sync-alt"></i>
@@ -104,10 +91,10 @@
         </div>
       </div>
 
-      <div *ngIf="!isLoading && !errorMessage && filteredProducts.length" [@productAnimation]="displayedProducts.length" class="products-list">
+      <div *ngIf="!isLoading && !errorMessage && filteredProducts.length" [@productAnimation]="displayedProducts.length" class="products-list" id="catalogo-grid">
         <article class="product-card" *ngFor="let product of displayedProducts">
           <div class="card-media" (click)="viewProductDetails(product)" role="button" tabindex="0">
-              <img [src]="getPrimaryImage(product)"
+        <img [src]="getPrimaryImage(product)"
                  [alt]="product.name"
                  loading="lazy"
                  (error)="handleProductImageError($event)">
@@ -128,6 +115,13 @@
 
           <div class="card-body">
             <div class="card-header">
+              <div class="card-kicker">
+                <span class="product-category-pill">{{ product.category_name || 'Colección' }}</span>
+                <span class="product-unit" *ngIf="product.unit_of_measure">{{ product.unit_of_measure }}</span>
+              </div>
+              <p class="product-description">
+                {{ (product.description || 'Producto disponible para compra inmediata desde el catálogo.') | slice:0:115 }}<ng-container *ngIf="(product.description || '').length > 115">...</ng-container>
+              </p>
             </div>
 
             <div class="card-meta">
@@ -135,9 +129,14 @@
                 <span class="product-price">{{ product.price | currency:'USD' }}</span>
                 <small>Precio final</small>
               </div>
-              <a class="whatsapp-inline animate__animated animate__rubberBand animate__infinite" [href]="getWhatsAppLink(product)" target="_blank" rel="noopener">
+              <a class="whatsapp-inline animate__animated animate__rubberBand animate__infinite"
+                 [href]="getWhatsAppLink(product)"
+                 target="_blank"
+                 rel="noopener"
+                 [attr.aria-label]="'Consultar por WhatsApp sobre ' + product.name"
+                 [attr.title]="'Consultar por WhatsApp sobre ' + product.name">
                 <i class="fab fa-whatsapp"></i>
-                Consultar
+                <span class="whatsapp-label">Consultar</span>
               </a>
               <div class="stock-info" [class.low-stock]="product.stock < 5" [class.out-of-stock]="product.stock === 0">
                 <i class="fas" [ngClass]="{
