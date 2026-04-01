@@ -773,6 +773,10 @@
     font-size: 0.62rem;
   }
 
+  .badge.category {
+    display: none;
+  }
+
   .media-title {
     display: none;
   }
