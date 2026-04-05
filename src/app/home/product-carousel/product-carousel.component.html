@@ -36,12 +36,12 @@
   <ng-container *ngIf="!isLoading && !error && products.length > 0">
     <div class="section-header">
       <div class="section-meta">
-        <span class="eyebrow">Explorá por ritual</span>
+        <span class="eyebrow">Colección destacada</span>
         <h2>Un producto por categoría</h2>
-        <p>Elegí tu ritual ideal con una selección curada y compra rápida.</p>
+        <p>Descubrí tu favorito y llevátelo hoy.</p>
       </div>
       <div class="ritual-meta" *ngIf="categoryChips.length">
-        <span class="ritual-count">{{ categoryCount }} rituales activos</span>
+        <span class="ritual-count">{{ categoryCount }} experiencias únicas</span>
         <div class="ritual-chips">
           <span class="ritual-chip" *ngFor="let chip of categoryChips">{{ chip }}</span>
         </div>
@@ -49,149 +49,74 @@
     </div>
 
     <div class="products-gallery">
-      <div class="featured-layout">
-        <div class="featured-hero" *ngIf="visibleProducts[0] as hero">
+      <div 
+        #scrollGallery
+        class="scroll-gallery">
+        <article class="ritual-card" *ngFor="let product of products; trackBy: trackByProductId">
           <a
-            class="featured-hero-card"
-            [routerLink]="['/productos', hero.id]"
-            [attr.aria-label]="'Ver producto ' + hero.name">
-            <div class="featured-hero-bg">
+            class="ritual-link"
+            [routerLink]="['/productos', product.id]"
+            [attr.aria-label]="'Ver producto ' + product.name">
+            
+            <div class="ritual-image-wrapper">
               <img
-                [src]="getPrimaryImage(hero)"
-                [alt]="hero.name"
+                class="ritual-image"
+                [src]="getPrimaryImage(product)"
+                [alt]="product.name"
                 loading="lazy"
                 (error)="handleImageError($event)">
+              <div class="ritual-overlay"></div>
+              
+              <div class="ritual-badges">
+                <span class="ritual-category">{{ getCategoryLabel(product) }}</span>
+                <span class="ritual-discount" *ngIf="product.discount">-{{ product.discount }}%</span>
+              </div>
+
+              <div class="ritual-stock-indicator" *ngIf="product.stock !== undefined">
+                <i class="fas" [ngClass]="getStockBadgeIcon(product)"></i>
+                <span>{{ getStockBadgeLabel(product) }}</span>
+              </div>
             </div>
-            <div class="featured-hero-overlay"></div>
 
-            <header class="featured-hero-header">
-              <span class="featured-hero-chip">{{ getCategoryLabel(hero) }}</span>
-              <span class="featured-hero-stock" *ngIf="hero.stock !== undefined">
-                <i class="fas" [ngClass]="getStockBadgeIcon(hero)"></i>
-                {{ getStockBadgeLabel(hero) }}
-              </span>
-            </header>
+            <div class="ritual-content">
+              <div class="ritual-header">
+                <h3 class="ritual-title">{{ product.name }}</h3>
+                <p class="ritual-description" *ngIf="product.description">{{ product.description }}</p>
+              </div>
 
-            <div class="featured-hero-body">
-              <h3 class="featured-hero-title">{{ hero.name }}</h3>
-              <p class="featured-hero-description">{{ hero.description }}</p>
-
-              <div class="featured-hero-price" *ngIf="hero.price">
-                <div class="hero-price-main">
-                  <span class="hero-price-tag" *ngIf="hero.discount">Ahorro -{{ hero.discount }}%</span>
-                  <span class="hero-price-tag" *ngIf="!hero.discount">Precio especial</span>
-                  <span class="hero-price-value">{{ getDisplayPrice(hero) | currency:'ARS':'symbol-narrow' }}</span>
-                  <span class="hero-price-original" *ngIf="hero.discount">
-                    {{ hero.price | currency:'ARS':'symbol-narrow' }}
+              <div class="ritual-meta">
+                <div class="ritual-tags" *ngIf="product.seasonal || product.rating">
+                  <span class="ritual-tag" *ngIf="product.seasonal">
+                    <i class="fas fa-star"></i>
+                    Destacado
+                  </span>
+                  <span class="ritual-tag" *ngIf="product.rating">
+                    ★ {{ getRating(product) }}
                   </span>
                 </div>
-                <div class="hero-price-thumb">
-                  <img
-                    [src]="getPrimaryImage(hero)"
-                    [alt]="hero.name"
-                    loading="lazy"
-                    (error)="handleImageError($event)">
-                </div>
               </div>
 
-              <div class="featured-hero-pills">
-                <span class="pill" *ngIf="hero.seasonal">Curado</span>
-                <span class="pill" *ngIf="hero.discount">-{{ hero.discount }}%</span>
-                <span class="pill" *ngIf="hero.rating">★ {{ getRating(hero) }}</span>
-              </div>
-            </div>
-
-            <footer class="featured-hero-footer">
-              <span class="featured-hero-link">
-                Ver detalle
-                <i class="fas fa-arrow-right"></i>
-              </span>
-              <button
-                class="featured-hero-cart"
-                type="button"
-                [disabled]="hero.stock <= 0"
-                (click)="$event.preventDefault(); $event.stopPropagation(); addToCart(hero)">
-                <i class="fas fa-cart-plus"></i>
-                <span>{{ hero.stock > 0 ? 'Comprar ahora' : 'Sin stock' }}</span>
-              </button>
-            </footer>
-          </a>
-        </div>
-
-        <div class="featured-rail">
-          <div class="featured-rail-header">
-            <h3>Más rituales destacados</h3>
-            <a routerLink="/productos" class="rail-link">Ver colección</a>
-          </div>
-
-          <div class="featured-rail-track">
-            <article
-              class="featured-rail-card"
-              *ngFor="let product of visibleProducts | slice:1:5; trackBy: trackByProductId">
-              <a
-                class="featured-rail-link"
-                [routerLink]="['/productos', product.id]"
-                [attr.aria-label]="'Ver producto ' + product.name">
-                <div class="rail-thumb">
-                  <img
-                    [src]="getPrimaryImage(product)"
-                    [alt]="product.name"
-                    loading="lazy"
-                    (error)="handleImageError($event)">
+              <div class="ritual-footer">
+                <div class="ritual-price" *ngIf="product.price">
+                  <span class="ritual-price-current">{{ getDisplayPrice(product) | currency:'ARS':'symbol-narrow' }}</span>
+                  <span class="ritual-price-original" *ngIf="product.discount">
+                    {{ product.price | currency:'ARS':'symbol-narrow' }}
+                  </span>
                 </div>
-                <div class="rail-info">
-                  <div class="rail-top">
-                    <span class="rail-chip">{{ getCategoryLabel(product) }}</span>
-                    <span class="rail-stock" *ngIf="product.stock !== undefined">
-                      <i class="fas" [ngClass]="getStockBadgeIcon(product)"></i>
-                      {{ getStockBadgeLabel(product) }}
-                    </span>
-                  </div>
-                  <h4>{{ product.name }}</h4>
-                  <p>{{ product.description }}</p>
-                  <div class="rail-price" *ngIf="product.price">
-                    <span class="rail-price-current">{{ getDisplayPrice(product) | currency:'ARS':'symbol-narrow' }}</span>
-                    <span class="rail-price-original" *ngIf="product.discount">
-                      {{ product.price | currency:'ARS':'symbol-narrow' }}
-                    </span>
-                  </div>
-                  <span class="rail-cta">Ver ritual</span>
-                </div>
+
                 <button
-                  class="rail-cart"
+                  class="ritual-cta"
                   type="button"
                   [disabled]="product.stock <= 0"
                   (click)="$event.preventDefault(); $event.stopPropagation(); addToCart(product)">
                   <i class="fas fa-cart-plus"></i>
                   <span>{{ product.stock > 0 ? 'Agregar' : 'Sin stock' }}</span>
                 </button>
-              </a>
-            </article>
-          </div>
-        </div>
+              </div>
+            </div>
+          </a>
+        </article>
       </div>
-    </div>
-
-    <div class="gallery-controls">
-      <button class="control-button prev" 
-              (click)="prevGroup(); $event.stopPropagation()" 
-              [disabled]="currentGroup === 0"
-              aria-label="Anterior">
-        <i class="fas fa-chevron-left"></i>
-      </button>
-      <div class="gallery-indicators">
-        <span *ngFor="let group of totalGroups; let i = index" 
-              class="indicator" 
-              [class.active]="i === currentGroup"
-              (click)="showGroup(i); $event.stopPropagation()">
-        </span>
-      </div>
-      <button class="control-button next" 
-              (click)="nextGroup(); $event.stopPropagation()"
-              [disabled]="currentGroup === totalGroups.length - 1"
-              aria-label="Siguiente">
-        <i class="fas fa-chevron-right"></i>
-      </button>
     </div>
   </ng-container>
 

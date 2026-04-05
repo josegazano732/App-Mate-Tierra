@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { ProductService, Product } from '../../services/product.service';
 import { CartService } from '../../services/cart.service';
@@ -8,19 +8,44 @@ import { CartService } from '../../services/cart.service';
   templateUrl: './product-carousel.component.html',
   styleUrls: ['./product-carousel.component.css']
 })
-export class ProductCarouselComponent implements OnInit {
+export class ProductCarouselComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('scrollGallery')
+  set scrollGalleryRef(element: ElementRef<HTMLDivElement> | undefined) {
+    this.scrollGallery = element;
+
+    if (!element) {
+      this.stopAutoScroll();
+      this.cleanupScrollListeners();
+      return;
+    }
+
+    this.cleanupScrollListeners();
+    this.setupScrollListeners();
+    this.syncScrollPosition();
+    this.startAutoScroll();
+  }
+
+  private scrollGallery?: ElementRef<HTMLDivElement>;
+  private readonly autoScrollDelay = 3000;
+  private readonly resumeDelay = 10000;
+  private readonly autoScrollStep = 356;
+  
   products: Product[] = [];
-  visibleProducts: Product[] = [];
   skeletonCards = Array.from({ length: 5 });
-  currentGroup = 0;
-  productsPerGroup = 5;
-  totalGroups: number[] = [];
   categoryChips: string[] = [];
   categoryCount = 0;
   isLoading = true;
-  isSliding = false;
   error: string | null = null;
   private readonly fallbackImage = 'https://images.unsplash.com/photo-1501426026826-31c667bdf23d?auto=format&fit=crop&w=900&q=60';
+  private autoScrollTimer: ReturnType<typeof setTimeout> | null = null;
+  private resumeAutoScrollTimer: ReturnType<typeof setTimeout> | null = null;
+  private animationTimers: Array<ReturnType<typeof setTimeout>> = [];
+  private scrollPosition = 0;
+  private userHasControl = false;
+  private isAutoScrolling = false;
+  private lastScrollLeft = 0;
+  private autoScrollRunId = 0;
+  private removeScrollListeners: Array<() => void> = [];
 
   constructor(
     private productService: ProductService,
@@ -30,6 +55,208 @@ export class ProductCarouselComponent implements OnInit {
 
   ngOnInit() {
     this.loadRitualProducts();
+  }
+
+  ngAfterViewInit() {
+    this.syncScrollPosition();
+  }
+
+  ngOnDestroy() {
+    this.stopAutoScroll();
+    this.cleanupScrollListeners();
+  }
+
+  private setupScrollListeners() {
+    const gallery = this.scrollGallery?.nativeElement;
+    if (!gallery) {
+      return;
+    }
+
+    const addListener = (eventName: string, handler: EventListener, options?: AddEventListenerOptions) => {
+      gallery.addEventListener(eventName, handler, options);
+      this.removeScrollListeners.push(() => gallery.removeEventListener(eventName, handler, options));
+    };
+
+    addListener('scroll', this.handleScroll, { passive: true });
+    addListener('wheel', this.handleUserInteraction, { passive: true });
+    addListener('touchstart', this.handleUserInteraction, { passive: true });
+    addListener('pointerdown', this.handleUserInteraction, { passive: true });
+    addListener('keydown', this.handleUserInteraction);
+  }
+
+  private readonly handleScroll = () => {
+    const gallery = this.scrollGallery?.nativeElement;
+    if (!gallery) {
+      return;
+    }
+
+    const currentScrollLeft = gallery.scrollLeft;
+
+    if (this.isAutoScrolling) {
+      this.lastScrollLeft = currentScrollLeft;
+      this.scrollPosition = currentScrollLeft;
+      return;
+    }
+
+    this.scrollPosition = currentScrollLeft;
+    this.lastScrollLeft = currentScrollLeft;
+
+    if (!this.userHasControl) {
+      this.pauseAutoScrollForManualControl();
+    }
+  };
+
+  private readonly handleUserInteraction = () => {
+    this.pauseAutoScrollForManualControl();
+  };
+
+  private pauseAutoScrollForManualControl() {
+    const gallery = this.scrollGallery?.nativeElement;
+    if (!gallery) {
+      return;
+    }
+
+    this.userHasControl = true;
+    this.autoScrollRunId += 1;
+    this.clearAnimationTimers();
+    this.stopAutoScroll();
+
+    gallery.classList.remove('is-auto-scrolling');
+    gallery.classList.add('is-user-scrolling');
+    gallery.style.opacity = '1';
+    gallery.style.transition = '';
+
+    this.syncScrollPosition();
+
+    if (this.resumeAutoScrollTimer) {
+      clearTimeout(this.resumeAutoScrollTimer);
+    }
+
+    this.resumeAutoScrollTimer = setTimeout(() => {
+      gallery.classList.remove('is-user-scrolling');
+      this.userHasControl = false;
+      this.syncScrollPosition();
+      this.startAutoScroll();
+    }, this.resumeDelay);
+  }
+
+  private cleanupScrollListeners() {
+    this.removeScrollListeners.forEach(removeListener => removeListener());
+    this.removeScrollListeners = [];
+
+    const gallery = this.scrollGallery?.nativeElement;
+    gallery?.classList.remove('is-user-scrolling');
+
+    if (this.resumeAutoScrollTimer) {
+      clearTimeout(this.resumeAutoScrollTimer);
+      this.resumeAutoScrollTimer = null;
+    }
+  }
+
+  private startAutoScroll() {
+    if (this.userHasControl || !this.scrollGallery?.nativeElement) {
+      return;
+    }
+
+    this.stopAutoScroll();
+
+    const runId = ++this.autoScrollRunId;
+
+    this.autoScrollTimer = setTimeout(() => {
+      this.executeAutoScroll(runId);
+    }, this.autoScrollDelay);
+  }
+
+  private stopAutoScroll() {
+    if (this.autoScrollTimer) {
+      clearTimeout(this.autoScrollTimer);
+      this.autoScrollTimer = null;
+    }
+
+    this.isAutoScrolling = false;
+  }
+
+  private executeAutoScroll(runId: number) {
+    const gallery = this.scrollGallery?.nativeElement;
+    if (!gallery || this.userHasControl || runId !== this.autoScrollRunId) {
+      return;
+    }
+
+    const maxScroll = gallery.scrollWidth - gallery.clientWidth;
+    if (maxScroll <= 0) {
+      this.startAutoScroll();
+      return;
+    }
+
+    this.isAutoScrolling = true;
+    gallery.classList.remove('is-user-scrolling');
+    gallery.classList.add('is-auto-scrolling');
+
+    const nextScrollPosition = this.scrollPosition + this.autoScrollStep;
+
+    if (nextScrollPosition >= maxScroll) {
+      gallery.style.transition = 'opacity 0.5s ease-out';
+      gallery.style.opacity = '0.3';
+
+      const resetTimer = setTimeout(() => {
+        if (runId !== this.autoScrollRunId || this.userHasControl) {
+          return;
+        }
+
+        this.scrollPosition = 0;
+        gallery.scrollTo({ left: 0, behavior: 'auto' });
+        this.lastScrollLeft = 0;
+
+        const restoreTimer = setTimeout(() => {
+          if (runId !== this.autoScrollRunId || this.userHasControl) {
+            return;
+          }
+
+          gallery.style.opacity = '1';
+          gallery.style.transition = '';
+          gallery.classList.remove('is-auto-scrolling');
+          this.isAutoScrolling = false;
+          this.startAutoScroll();
+        }, 120);
+
+        this.animationTimers.push(restoreTimer);
+      }, 500);
+
+      this.animationTimers.push(resetTimer);
+      return;
+    }
+
+    this.scrollPosition = nextScrollPosition;
+    this.lastScrollLeft = nextScrollPosition;
+    gallery.scrollTo({ left: this.scrollPosition, behavior: 'smooth' });
+
+    const completeTimer = setTimeout(() => {
+      if (runId !== this.autoScrollRunId || this.userHasControl) {
+        return;
+      }
+
+      gallery.classList.remove('is-auto-scrolling');
+      this.isAutoScrolling = false;
+      this.syncScrollPosition();
+      this.startAutoScroll();
+    }, 650);
+
+    this.animationTimers.push(completeTimer);
+  }
+
+  private clearAnimationTimers() {
+    this.animationTimers.forEach(timer => clearTimeout(timer));
+    this.animationTimers = [];
+  }
+
+  private syncScrollPosition() {
+    const gallery = this.scrollGallery?.nativeElement;
+    if (!gallery) {
+      return;
+    }
+
+    this.scrollPosition = gallery.scrollLeft;
+    this.lastScrollLeft = gallery.scrollLeft;
   }
 
   private loadRitualProducts() {
@@ -43,8 +270,6 @@ export class ProductCarouselComponent implements OnInit {
           .map(product => this.getCategoryLabel(product))
           .filter((label, index, arr) => arr.indexOf(label) === index)
           .slice(0, 6);
-        this.calculateGroups();
-        this.showGroup(0);
         this.isLoading = false;
       },
       error: (error) => {
@@ -77,46 +302,6 @@ export class ProductCarouselComponent implements OnInit {
     const createdAt = product.created_at ? Date.parse(product.created_at) : 0;
 
     return seasonalScore + discountScore + ratingScore + stockScore + createdAt / 1e13;
-  }
-
-  private calculateGroups() {
-    const numberOfGroups = Math.ceil(this.products.length / this.productsPerGroup);
-    this.totalGroups = Array(numberOfGroups).fill(0).map((_, i) => i);
-  }
-
-  private async animateGroupChange(callback: () => void) {
-    this.isSliding = true;
-    await new Promise(resolve => setTimeout(resolve, 300));
-    callback();
-    await new Promise(resolve => setTimeout(resolve, 50));
-    this.isSliding = false;
-  }
-
-  showGroup(groupIndex: number) {
-    if (groupIndex >= 0 && groupIndex < this.totalGroups.length) {
-      this.animateGroupChange(() => {
-        this.currentGroup = groupIndex;
-        const start = this.currentGroup * this.productsPerGroup;
-        const end = start + this.productsPerGroup;
-        this.visibleProducts = this.products.slice(start, end);
-      });
-    }
-  }
-
-  prevGroup() {
-    if (this.currentGroup > 0) {
-      this.showGroup(this.currentGroup - 1);
-    }
-  }
-
-  nextGroup() {
-    if (this.currentGroup < this.totalGroups.length - 1) {
-      this.showGroup(this.currentGroup + 1);
-    }
-  }
-
-  goToProduct(productId: string) {
-    this.router.navigate(['/productos', productId]);
   }
 
   addToCart(product: Product) {
