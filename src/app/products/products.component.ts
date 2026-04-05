@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { CartService } from '../services/cart.service';
+import { CartService, CartItem } from '../services/cart.service';
 import { ProductService, Product } from '../services/product.service';
 import { trigger, transition, style, animate, query, stagger } from '@angular/animations';
 import { CategoryService } from '../services/category.service';
@@ -27,8 +27,17 @@ export class ProductsComponent implements OnInit {
   displayedProducts: Product[] = [];
   categories: Category[] = [];
   selectedCategory: Category | null = null;
+  cartItems: CartItem[] = [];
   cartItemCount = 0;
   cartTotal = 0;
+  showWhatsAppConfirmModal = false;
+  submitAttempted = false;
+  paymentMethod: 'efectivo' | 'transferencia' | '' = '';
+  deliveryMethod: 'domicilio' | 'retiro' | '' = '';
+  customerName = '';
+  customerLastName = '';
+  customerAddress = '';
+  confirmError = '';
   isLoading = true;
   currentPage = 1;
   productsPerPage = 10;
@@ -40,6 +49,11 @@ export class ProductsComponent implements OnInit {
   private readonly productImageFallback = 'https://images.unsplash.com/photo-1501426026826-31c667bdf23d?auto=format&fit=crop&w=900&q=60';
   private readonly prioritizedKeywords = ['mates', 'termera', 'termos'];
   private readonly whatsappPhone = '5493758459113';
+  private readonly currencyFormatter = new Intl.NumberFormat('es-AR', {
+    style: 'currency',
+    currency: 'ARS',
+    minimumFractionDigits: 2
+  });
 
   constructor(
     private cartService: CartService,
@@ -52,6 +66,7 @@ export class ProductsComponent implements OnInit {
     this.loadCategories();
     this.loadProducts();
     this.cartService.getCart().subscribe(items => {
+      this.cartItems = items;
       this.cartItemCount = items.reduce((total, item) => total + item.quantity, 0);
       this.cartTotal = items.reduce((total, item) => total + (item.price * item.quantity), 0);
     });
@@ -192,6 +207,115 @@ export class ProductsComponent implements OnInit {
     this.router.navigate(['/carrito']);
   }
 
+  clearCart() {
+    this.cartService.clearCart();
+  }
+
+  openWhatsAppConfirmModal() {
+    if (!this.cartItems.length) {
+      return;
+    }
+
+    this.confirmError = '';
+    this.submitAttempted = false;
+    this.showWhatsAppConfirmModal = true;
+  }
+
+  closeWhatsAppConfirmModal() {
+    this.showWhatsAppConfirmModal = false;
+    this.submitAttempted = false;
+  }
+
+  sendCartViaWhatsApp() {
+    if (!this.cartItems.length) {
+      return;
+    }
+
+    this.submitAttempted = true;
+    const validationErrors = this.getConfirmValidationErrors();
+    if (validationErrors.length > 0) {
+      this.confirmError = validationErrors.join('\n');
+      return;
+    }
+
+    this.confirmError = '';
+
+    const itemsText = this.cartItems
+      .map(item => {
+        const quantity = this.formatCartQuantity(item);
+        const lineTotal = this.currencyFormatter.format(item.price * item.quantity);
+        return `• ${item.name} | ${quantity} | Total: ${lineTotal}`;
+      })
+      .join('\n');
+
+    const total = this.currencyFormatter.format(this.cartTotal);
+    const message = [
+      'Hola quiero confirmar mi pedido:',
+      '',
+      `Nombre: ${this.customerName.trim()} ${this.customerLastName.trim()}`,
+      `Pago: ${this.paymentMethod === 'efectivo' ? 'Pago en Efectivo' : 'Pago por Transferencia'}`,
+      `Entrega: ${this.deliveryMethod === 'domicilio' ? 'Envio a Domicilio' : 'Retiro por Tienda'}`,
+      this.deliveryMethod === 'domicilio'
+        ? `Direccion: ${this.customerAddress.trim()}`
+        : 'Direccion: Retira por tienda',
+      '',
+      itemsText,
+      '',
+      `Total estimado: ${total}`
+    ].join('\n');
+    window.open(`https://wa.me/${this.whatsappPhone}?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
+    this.closeWhatsAppConfirmModal();
+  }
+
+  onDeliveryMethodChange(mode: 'domicilio' | 'retiro' | '') {
+    this.deliveryMethod = mode;
+    if (mode === 'retiro') {
+      this.customerAddress = '';
+    }
+  }
+
+  formatConfirmCurrency(value: number): string {
+    return this.currencyFormatter.format(value);
+  }
+
+  isPaymentSelected(): boolean {
+    return this.paymentMethod !== '';
+  }
+
+  isDeliverySelected(): boolean {
+    return this.deliveryMethod !== '';
+  }
+
+  isAddressRequired(): boolean {
+    return this.deliveryMethod === 'domicilio';
+  }
+
+  private getConfirmValidationErrors(): string[] {
+    const errors: string[] = [];
+
+    if (!this.isPaymentSelected()) {
+      errors.push('Seleccioná un metodo de pago.');
+    }
+
+    if (!this.isDeliverySelected()) {
+      errors.push('Seleccioná un tipo de entrega.');
+    }
+
+    if (this.customerName.trim().length <= 1) {
+      errors.push('Ingresá tu nombre.');
+    }
+
+    if (this.customerLastName.trim().length <= 1) {
+      errors.push('Ingresá tu apellido.');
+    }
+
+    if (this.isAddressRequired() && this.customerAddress.trim().length <= 4) {
+      errors.push('Ingresá una direccion valida.');
+    }
+
+    return errors;
+  }
+
   retryLoading() {
     this.loadProducts();
   }
@@ -249,6 +373,12 @@ export class ProductsComponent implements OnInit {
 
     target.onerror = null;
     target.src = this.categoryImageFallback;
+  }
+
+  formatCartQuantity(item: CartItem): string {
+    const quantity = Number.isInteger(item.quantity) ? item.quantity.toString() : item.quantity.toFixed(2);
+    const unit = item.unit_of_measure || 'unidad';
+    return `${quantity} ${unit}`;
   }
 
 }

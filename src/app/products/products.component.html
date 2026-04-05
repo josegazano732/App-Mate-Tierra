@@ -57,6 +57,14 @@
         </div>
         <div class="toolbar-actions">
           <span class="page-indicator" *ngIf="totalPages > 1">Página {{ currentPage }} / {{ totalPages }}</span>
+          <button
+            type="button"
+            class="toolbar-refresh desktop-order-trigger"
+            *ngIf="cartItemCount > 0"
+            (click)="openWhatsAppConfirmModal()">
+            <i class="fab fa-whatsapp"></i>
+            Confirmar pedido
+          </button>
           <button type="button" class="toolbar-refresh" (click)="retryLoading()" [disabled]="isLoading">
             <i class="fas fa-sync-alt"></i>
             Refrescar
@@ -180,19 +188,116 @@
     </section>
   </div>
 
-  <button
-    type="button"
-    class="mobile-cart-bar"
-    *ngIf="cartItemCount > 0"
-    (click)="goToCart()"
-    aria-label="Ver carrito">
-    <span class="mobile-cart-bar__icon">
-      <i class="fas fa-shopping-cart"></i>
-      <span class="mobile-cart-bar__count">{{ cartItemCount }}</span>
-    </span>
-    <span class="mobile-cart-bar__copy">
-      <strong>Carrito</strong>
-      <small>{{ cartTotal | currency:'USD' }}</small>
-    </span>
-  </button>
+  <div class="mobile-cart-bar" *ngIf="cartItemCount > 0">
+    <button
+      type="button"
+      class="mobile-cart-bar__main"
+      (click)="goToCart()"
+      aria-label="Ver carrito">
+      <span class="mobile-cart-bar__icon">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="mobile-cart-bar__count">{{ cartItemCount }}</span>
+      </span>
+      <span class="mobile-cart-bar__copy">
+        <strong>Carrito</strong>
+        <small>{{ formatConfirmCurrency(cartTotal) }}</small>
+      </span>
+    </button>
+
+    <div class="mobile-cart-bar__actions">
+      <button
+        type="button"
+        class="mobile-cart-bar__action mobile-cart-bar__action--whatsapp"
+        (click)="openWhatsAppConfirmModal()"
+        aria-label="Enviar carrito por WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+      </button>
+      <button
+        type="button"
+        class="mobile-cart-bar__action mobile-cart-bar__action--clear"
+        (click)="clearCart()"
+        aria-label="Vaciar carrito">
+        <i class="fas fa-trash-alt"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="wa-confirm-modal" *ngIf="showWhatsAppConfirmModal">
+    <div class="wa-confirm-backdrop" (click)="closeWhatsAppConfirmModal()"></div>
+
+    <section class="wa-confirm-dialog">
+      <header class="confirm-top">
+        <div class="confirm-heading">
+          <span class="eyebrow">Confirmar envío</span>
+          <h3>Enviar carrito por WhatsApp</h3>
+          <p>Revisá el resumen antes de abrir la conversación.</p>
+        </div>
+        <button type="button" class="close-confirm" (click)="closeWhatsAppConfirmModal()" aria-label="Cerrar">
+          <i class="fas fa-times"></i>
+        </button>
+      </header>
+
+      <div class="confirm-body">
+        <div class="confirm-options">
+          <div class="confirm-option-group" [class.invalid]="submitAttempted && !isPaymentSelected()">
+            <p class="group-title">Metodo de pago *</p>
+            <label>
+              <input type="radio" name="paymentMethod" value="efectivo" [(ngModel)]="paymentMethod">
+              Pago en Efectivo
+            </label>
+            <label>
+              <input type="radio" name="paymentMethod" value="transferencia" [(ngModel)]="paymentMethod">
+              Pago por Transferencia
+            </label>
+          </div>
+
+          <div class="confirm-option-group" [class.invalid]="submitAttempted && !isDeliverySelected()">
+            <p class="group-title">Tipo de entrega *</p>
+            <label>
+              <input type="radio" name="deliveryMethod" value="domicilio" [(ngModel)]="deliveryMethod" (ngModelChange)="onDeliveryMethodChange($event)">
+              Envio a Domicilio
+            </label>
+            <label>
+              <input type="radio" name="deliveryMethod" value="retiro" [(ngModel)]="deliveryMethod" (ngModelChange)="onDeliveryMethodChange($event)">
+              Retiro por Tienda
+            </label>
+          </div>
+        </div>
+
+        <div class="confirm-fields">
+          <input type="text" [(ngModel)]="customerName" placeholder="Nombre" [class.invalid-field]="submitAttempted && customerName.trim().length <= 1">
+          <input type="text" [(ngModel)]="customerLastName" placeholder="Apellido" [class.invalid-field]="submitAttempted && customerLastName.trim().length <= 1">
+          <input
+            type="text"
+            [(ngModel)]="customerAddress"
+            placeholder="Direccion"
+            [class.invalid-field]="submitAttempted && isAddressRequired() && customerAddress.trim().length <= 4"
+            [disabled]="deliveryMethod === 'retiro'"
+          >
+        </div>
+
+        <div class="confirm-order">
+          <h3>Pedido</h3>
+          <ul>
+            <li *ngFor="let item of cartItems">
+              <span>{{ item.name }}</span>
+              <strong>{{ formatCartQuantity(item) }}</strong>
+            </li>
+          </ul>
+          <p class="confirm-total">Total: {{ formatConfirmCurrency(cartTotal) }}</p>
+        </div>
+
+        <p class="confirm-error" *ngIf="confirmError">{{ confirmError }}</p>
+      </div>
+
+      <footer class="confirm-footer">
+        <button type="button" class="btn-modal secondary" (click)="closeWhatsAppConfirmModal()">
+          Cancelar
+        </button>
+        <button type="button" class="btn-modal success" (click)="sendCartViaWhatsApp()">
+          Enviar por WhatsApp
+        </button>
+      </footer>
+    </section>
+  </div>
 </section>

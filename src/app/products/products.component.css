@@ -106,6 +106,8 @@
 .category-thumb {
   width: 76px;
   height: 76px;
+  display: grid;
+  place-items: center;
   border-radius: 20px;
   overflow: hidden;
   flex-shrink: 0;
@@ -117,11 +119,17 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center;
+  display: block;
 }
 
 .category-thumb img.logo {
+  width: 82%;
+  height: 82%;
   object-fit: contain;
-  padding: 12px;
+  object-position: center;
+  padding: 0;
+  margin: auto;
 }
 
 .category-copy h2 {
@@ -225,6 +233,10 @@
 
 .toolbar-refresh:not(:disabled):hover {
   box-shadow: 0 18px 34px rgba(34, 102, 56, 0.28);
+}
+
+.desktop-order-trigger {
+  display: inline-flex;
 }
 
 .page-indicator {
@@ -611,6 +623,141 @@
 }
 
 .mobile-cart-bar {
+  position: fixed;
+  left: 1rem;
+  right: auto;
+  bottom: 1rem;
+  z-index: 1100;
+  width: 110px;
+  min-height: 0;
+  padding: 0.8rem 0.72rem;
+  border: 1px solid rgba(20, 58, 35, 0.12);
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(18, 47, 31, 0.96), rgba(38, 97, 57, 0.94));
+  box-shadow: 0 16px 34px rgba(10, 28, 18, 0.26);
+  display: grid;
+  grid-template-columns: 1fr;
+  justify-items: center;
+  gap: 0.65rem;
+  color: #f7fff9;
+  animation: desktopCartBarIntro 0.32s ease-out;
+}
+
+@keyframes desktopCartBarIntro {
+  from {
+    opacity: 0;
+    transform: translate3d(-14px, 10px, 0) scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+.mobile-cart-bar__main {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  justify-items: center;
+  gap: 0.5rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: center;
+  cursor: pointer;
+}
+
+.mobile-cart-bar__actions {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.4rem;
+}
+
+.mobile-cart-bar__action {
+  width: 100%;
+  height: 34px;
+  border: 0;
+  border-radius: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.mobile-cart-bar__action i {
+  font-size: 0.95rem;
+}
+
+.mobile-cart-bar__action--whatsapp {
+  background: rgba(37, 211, 102, 0.2);
+  color: #7dffaf;
+}
+
+.mobile-cart-bar__action--clear {
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffd3c8;
+}
+
+.mobile-cart-bar__action:active,
+.mobile-cart-bar__main:active {
+  transform: translateY(1px);
+}
+
+.mobile-cart-bar__icon {
+  position: relative;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.12);
+  color: #ffffff;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.mobile-cart-bar__count {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 0.3rem;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #f3b25d;
+  color: #173223;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.mobile-cart-bar__copy {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.08rem;
+  align-items: center;
+}
+
+.mobile-cart-bar__copy strong {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #ffffff;
+}
+
+.mobile-cart-bar__copy small {
+  color: rgba(236, 248, 239, 0.84);
+  font-size: 0.66rem;
+}
+
+.desktop-order-trigger {
   display: none;
 }
 
@@ -693,73 +840,16 @@
   }
 
   .mobile-cart-bar {
-    position: fixed;
     left: 0.75rem;
     right: 0.75rem;
     bottom: 0.75rem;
-    z-index: 1100;
+    width: auto;
     min-height: 56px;
     padding: 0.65rem 0.8rem;
-    border: 1px solid rgba(20, 58, 35, 0.12);
-    border-radius: 18px;
-    background: linear-gradient(135deg, rgba(18, 47, 31, 0.96), rgba(38, 97, 57, 0.94));
-    box-shadow: 0 16px 34px rgba(10, 28, 18, 0.26);
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
-    gap: 0.75rem;
-    color: #f7fff9;
-    cursor: pointer;
+    animation: none;
   }
 
-  .mobile-cart-bar__icon {
-    position: relative;
-    width: 42px;
-    height: 42px;
-    border-radius: 14px;
-    display: grid;
-    place-items: center;
-    background: rgba(255, 255, 255, 0.12);
-    color: #ffffff;
-    font-size: 1rem;
-    flex-shrink: 0;
-  }
 
-  .mobile-cart-bar__count {
-    position: absolute;
-    top: -6px;
-    right: -6px;
-    min-width: 20px;
-    height: 20px;
-    padding: 0 0.3rem;
-    border-radius: 999px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: #f3b25d;
-    color: #173223;
-    font-size: 0.68rem;
-    font-weight: 800;
-  }
-
-  .mobile-cart-bar__copy {
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.12rem;
-    align-items: flex-start;
-  }
-
-  .mobile-cart-bar__copy strong {
-    font-size: 0.88rem;
-    font-weight: 800;
-    color: #ffffff;
-  }
-
-  .mobile-cart-bar__copy small {
-    color: rgba(236, 248, 239, 0.84);
-    font-size: 0.72rem;
-  }
 }
 
 @media (max-width: 640px) {
@@ -957,6 +1047,20 @@
     gap: 0.6rem;
   }
 
+  .mobile-cart-bar__main {
+    gap: 0.6rem;
+  }
+
+  .mobile-cart-bar__actions {
+    gap: 0.35rem;
+  }
+
+  .mobile-cart-bar__action {
+    width: 34px;
+    height: 34px;
+    border-radius: 11px;
+  }
+
   .mobile-cart-bar__icon {
     width: 38px;
     height: 38px;
@@ -971,6 +1075,40 @@
   .mobile-cart-bar__copy small,
   .mobile-cart-bar__cta {
     font-size: 0.68rem;
+  }
+
+  .mobile-cart-bar__main {
+    grid-template-columns: auto minmax(0, 1fr);
+    justify-items: stretch;
+    gap: 0.75rem;
+    text-align: left;
+  }
+
+  .mobile-cart-bar__actions {
+    width: auto;
+    display: inline-flex;
+    grid-template-columns: none;
+    gap: 0.45rem;
+  }
+
+  .mobile-cart-bar__action {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+  }
+
+  .mobile-cart-bar__copy {
+    width: auto;
+    align-items: flex-start;
+    gap: 0.12rem;
+  }
+
+  .mobile-cart-bar__copy strong {
+    font-size: 0.88rem;
+  }
+
+  .mobile-cart-bar__copy small {
+    font-size: 0.72rem;
   }
 }
 

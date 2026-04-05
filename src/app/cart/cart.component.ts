@@ -27,6 +27,14 @@ export class CartComponent implements OnInit {
   readonly defaultGrams = 100;
   readonly defaultFractionGrams = 50;
   showGuideModal = false;
+  showWhatsAppConfirmModal = false;
+  submitAttempted = false;
+  paymentMethod: 'efectivo' | 'transferencia' | '' = '';
+  deliveryMethod: 'domicilio' | 'retiro' | '' = '';
+  customerName = '';
+  customerLastName = '';
+  customerAddress = '';
+  confirmError = '';
   readonly cartGuideSteps = [
     {
       icon: 'fa-clipboard-check',
@@ -136,8 +144,35 @@ export class CartComponent implements OnInit {
     this.cartService.clearCart();
   }
 
+  openWhatsAppConfirmModal() {
+    if (!this.cartItems.length) {
+      return;
+    }
+
+    this.confirmError = '';
+    this.submitAttempted = false;
+    this.showWhatsAppConfirmModal = true;
+  }
+
+  closeWhatsAppConfirmModal() {
+    this.showWhatsAppConfirmModal = false;
+    this.submitAttempted = false;
+  }
+
   sendCartViaWhatsApp() {
-    const phone = '5493758459113'; // destination WhatsApp number
+    if (!this.cartItems.length) {
+      return;
+    }
+
+    this.submitAttempted = true;
+    const validationErrors = this.getConfirmValidationErrors();
+    if (validationErrors.length > 0) {
+      this.confirmError = validationErrors.join('\n');
+      return;
+    }
+
+    this.confirmError = '';
+    const phone = '5493758459113';
     const itemsText = this.cartItems
       .map(item => {
         const name = item.name || 'Producto';
@@ -148,16 +183,65 @@ export class CartComponent implements OnInit {
         const discountText = discount > 0 ? ` (-${discount.toFixed(0)}%)` : '';
         return `• ${name} | ${qty} | ${price}${discountText} | Total: ${lineTotal}`;
       })
-      .join('%0A');
+      .join('\n');
 
     const subtotal = this.currencyFormatter.format(this.getSubtotal());
     const savings = this.getTotalSavings();
     const total = this.currencyFormatter.format(this.getTotal());
-    const savingsLine = savings > 0 ? `%0AAhorro aplicado: ${this.currencyFormatter.format(savings)}` : '';
+    const savingsLine = savings > 0 ? `Ahorro aplicado: ${this.currencyFormatter.format(savings)}` : '';
 
-    const message = `Hola, quiero confirmar este pedido:%0A${itemsText}%0A%0ASubtotal: ${subtotal}${savingsLine}%0ATotal a pagar: ${total}`;
-    const url = `https://wa.me/${phone}?text=${message}`;
-    window.open(url, '_blank');
+    const message = [
+      'Hola quiero confirmar mi pedido:',
+      '',
+      `Nombre: ${this.customerName.trim()} ${this.customerLastName.trim()}`,
+      `Pago: ${this.paymentMethod === 'efectivo' ? 'Pago en Efectivo' : 'Pago por Transferencia'}`,
+      `Entrega: ${this.deliveryMethod === 'domicilio' ? 'Envio a Domicilio' : 'Retiro por Tienda'}`,
+      this.deliveryMethod === 'domicilio'
+        ? `Direccion: ${this.customerAddress.trim()}`
+        : 'Direccion: Retira por tienda',
+      '',
+      itemsText,
+      '',
+      `Subtotal: ${subtotal}`,
+      ...(savingsLine ? [savingsLine] : []),
+      `Total a pagar: ${total}`
+    ].join('\n');
+    const url = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+    window.open(url, '_blank', 'noopener');
+    this.closeWhatsAppConfirmModal();
+  }
+
+  onDeliveryMethodChange(mode: 'domicilio' | 'retiro' | '') {
+    this.deliveryMethod = mode;
+    if (mode === 'retiro') {
+      this.customerAddress = '';
+    }
+  }
+
+  isPaymentSelected(): boolean {
+    return this.paymentMethod !== '';
+  }
+
+  isDeliverySelected(): boolean {
+    return this.deliveryMethod !== '';
+  }
+
+  isAddressRequired(): boolean {
+    return this.deliveryMethod === 'domicilio';
+  }
+
+  private getConfirmValidationErrors(): string[] {
+    const errors: string[] = [];
+
+    if (!this.isPaymentSelected()) errors.push('Seleccioná un metodo de pago.');
+    if (!this.isDeliverySelected()) errors.push('Seleccioná un tipo de entrega.');
+    if (this.customerName.trim().length <= 1) errors.push('Ingresá tu nombre.');
+    if (this.customerLastName.trim().length <= 1) errors.push('Ingresá tu apellido.');
+    if (this.isAddressRequired() && this.customerAddress.trim().length <= 4) {
+      errors.push('Ingresá una direccion valida.');
+    }
+
+    return errors;
   }
 
   proceedToPayment() {

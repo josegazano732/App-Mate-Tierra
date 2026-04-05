@@ -4,7 +4,6 @@
       <div class="hero-copy">
         <p class="eyebrow">Tu selección actual</p>
         <h2>Detalle del carrito</h2>
-        <p>Revisá cantidades y descuentos antes de confirmar la compra.</p>
       </div>
       <div class="hero-metrics">
         <div class="metric-card">
@@ -21,33 +20,6 @@
         </div>
       </div>
     </header>
-
-    <section class="guide-card glass-card">
-      <div class="guide-header">
-        <div>
-          <p class="eyebrow">Guía rápida</p>
-          <h3>Cómo finalizar tu compra</h3>
-          <p class="guide-lead">Ajustá cantidades, descargá el PDF y enviá tu pedido por WhatsApp.</p>
-        </div>
-        <div class="guide-actions">
-          <button type="button" class="toolbar-secondary" (click)="generatePDF()">
-            <i class="fas fa-file-download"></i> Descargar PDF
-          </button>
-          <button type="button" class="toolbar-secondary" (click)="openGuide()">
-            <i class="fas fa-question-circle"></i> Ver guía completa
-          </button>
-        </div>
-      </div>
-      <div class="guide-steps">
-        <div class="guide-step" *ngFor="let step of cartGuideSteps | slice:0:3">
-          <div class="step-icon"><i class="fas" [ngClass]="step.icon"></i></div>
-          <div class="step-copy">
-            <h4>{{ step.title }}</h4>
-            <p>{{ step.copy }}</p>
-          </div>
-        </div>
-      </div>
-    </section>
 
     <div *ngIf="errorMessage" class="cart-alert">
       <i class="fas fa-exclamation-triangle"></i>
@@ -178,18 +150,11 @@
           <strong>{{ getTotal() | currency:'ARS':'symbol':'1.2-2' }}</strong>
         </div>
 
-        <p class="summary-note">
-          Una vez revisado el detalle, podés descargar el PDF con precios y totales o enviar el pedido por WhatsApp.
-        </p>
-
         <div class="summary-actions">
-          <button type="button" class="btn-secondary" (click)="generatePDF()">
-            <i class="fas fa-file-download"></i> Descargar PDF
-          </button>
           <button type="button" class="btn-outline" (click)="clearCart()">
             <i class="fas fa-trash"></i> Vaciar carrito
           </button>
-          <button type="button" class="btn-outline whatsapp-share" (click)="sendCartViaWhatsApp()">
+          <button type="button" class="btn-outline whatsapp-share" (click)="openWhatsAppConfirmModal()">
             <i class="fab fa-whatsapp"></i> Enviar por WhatsApp
           </button>
         </div>
@@ -207,6 +172,86 @@
       </a>
     </div>
   </ng-template>
+
+<div class="wa-confirm-modal" *ngIf="showWhatsAppConfirmModal">
+  <div class="wa-confirm-backdrop" (click)="closeWhatsAppConfirmModal()"></div>
+
+  <section class="wa-confirm-dialog">
+    <header class="confirm-top">
+      <div class="confirm-heading">
+        <span class="eyebrow">Confirmar envío</span>
+        <h3>Enviar carrito por WhatsApp</h3>
+        <p>Revisá el resumen antes de abrir la conversación.</p>
+      </div>
+      <button type="button" class="close-confirm" (click)="closeWhatsAppConfirmModal()" aria-label="Cerrar">
+        <i class="fas fa-times"></i>
+      </button>
+    </header>
+
+    <div class="confirm-body">
+      <div class="confirm-options">
+        <div class="confirm-option-group" [class.invalid]="submitAttempted && !isPaymentSelected()">
+          <p class="group-title">Metodo de pago *</p>
+          <label>
+            <input type="radio" name="cartPaymentMethod" value="efectivo" [(ngModel)]="paymentMethod">
+            Pago en Efectivo
+          </label>
+          <label>
+            <input type="radio" name="cartPaymentMethod" value="transferencia" [(ngModel)]="paymentMethod">
+            Pago por Transferencia
+          </label>
+        </div>
+
+        <div class="confirm-option-group" [class.invalid]="submitAttempted && !isDeliverySelected()">
+          <p class="group-title">Tipo de entrega *</p>
+          <label>
+            <input type="radio" name="cartDeliveryMethod" value="domicilio" [(ngModel)]="deliveryMethod" (ngModelChange)="onDeliveryMethodChange($event)">
+            Envio a Domicilio
+          </label>
+          <label>
+            <input type="radio" name="cartDeliveryMethod" value="retiro" [(ngModel)]="deliveryMethod" (ngModelChange)="onDeliveryMethodChange($event)">
+            Retiro por Tienda
+          </label>
+        </div>
+      </div>
+
+      <div class="confirm-fields">
+        <input type="text" [(ngModel)]="customerName" placeholder="Nombre" [class.invalid-field]="submitAttempted && customerName.trim().length <= 1">
+        <input type="text" [(ngModel)]="customerLastName" placeholder="Apellido" [class.invalid-field]="submitAttempted && customerLastName.trim().length <= 1">
+        <input
+          type="text"
+          [(ngModel)]="customerAddress"
+          placeholder="Direccion"
+          [class.invalid-field]="submitAttempted && isAddressRequired() && customerAddress.trim().length <= 4"
+          [disabled]="deliveryMethod === 'retiro'"
+        >
+      </div>
+
+      <div class="confirm-order">
+        <h3>Pedido</h3>
+        <ul>
+          <li *ngFor="let item of cartItems">
+            <span>{{ item.name }}</span>
+            <strong>{{ formatQuantity(item) }}</strong>
+          </li>
+        </ul>
+        <p class="confirm-total">Total: {{ getTotal() | currency:'ARS':'symbol':'1.2-2' }}</p>
+      </div>
+
+      <p class="confirm-error" *ngIf="confirmError">{{ confirmError }}</p>
+    </div>
+
+    <footer class="confirm-footer">
+      <button type="button" class="btn-modal secondary" (click)="closeWhatsAppConfirmModal()">
+        Cancelar
+      </button>
+      <button type="button" class="btn-modal success" (click)="sendCartViaWhatsApp()">
+        Enviar por WhatsApp
+      </button>
+    </footer>
+  </section>
+</div>
+
 </section>
 
 <div class="guide-modal" *ngIf="showGuideModal">
