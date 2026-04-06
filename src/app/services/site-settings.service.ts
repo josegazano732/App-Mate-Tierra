@@ -7,6 +7,7 @@ export interface SiteSettings {
   id: string;
   logo_url: string | null;
   hero_bg_url?: string | null;
+  payment_cvu?: string | null;
   updated_at: string;
 }
 
@@ -37,6 +38,26 @@ export class SiteSettingsService {
       catchError(error => {
         console.error('Error fetching site settings:', error);
         return throwError(() => new Error('Error loading site settings'));
+      })
+    );
+  }
+
+  updateSettings(settings: Partial<SiteSettings>): Observable<SiteSettings> {
+    return from(
+      this.supabase.client
+        .from('site_settings')
+        .update(settings)
+        .eq('id', '00000000-0000-0000-0000-000000000000')
+        .select()
+        .single()
+    ).pipe(
+      map(({ data, error }) => {
+        if (error) throw error;
+        return data;
+      }),
+      catchError(error => {
+        console.error('Error updating site settings:', error);
+        return throwError(() => new Error('Error updating site settings'));
       })
     );
   }
@@ -146,22 +167,6 @@ export class SiteSettingsService {
   }
 
   updateLogo(logoUrl: string): Observable<SiteSettings> {
-    return from(
-      this.supabase.client
-        .from('site_settings')
-        .update({ logo_url: logoUrl })
-        .eq('id', '00000000-0000-0000-0000-000000000000')
-        .select()
-        .single()
-    ).pipe(
-      map(({ data, error }) => {
-        if (error) throw error;
-        return data;
-      }),
-      catchError(error => {
-        console.error('Error updating logo:', error);
-        return throwError(() => new Error('Error updating logo'));
-      })
-    );
+    return this.updateSettings({ logo_url: logoUrl });
   }
 }

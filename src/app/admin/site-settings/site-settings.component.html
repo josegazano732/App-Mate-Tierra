@@ -1,14 +1,48 @@
 <div class="settings-card">
   <div class="settings-header">
     <div>
-      <p class="eyebrow">Hero del home</p>
-      <h1>Ajustar imagen de fondo</h1>
-      <p class="lead">Solo administradores. La imagen se guarda en la base de datos y se refleja en el hero.</p>
+      <p class="eyebrow">Ajustes del sitio</p>
+      <h1>QR de pago, CVU e imágenes del home</h1>
+      <p class="lead">Solo administradores. Desde acá cargás el CVU para el QR de productos y también administrás las imágenes del hero.</p>
     </div>
     <button class="ghost" type="button" (click)="loadSettings()" [disabled]="isLoading">Recargar</button>
   </div>
 
   <div class="settings-body" *ngIf="!isLoading; else loadingTpl">
+    <div class="settings-section payment-section">
+      <div class="section-heading">
+        <p class="eyebrow">Cobro por transferencia</p>
+        <h2>QR para billeteras</h2>
+        <p class="lead">Definí el CVU que se usará para generar un QR informativo con datos de transferencia en cada ficha de producto.</p>
+      </div>
+
+      <div class="field-group">
+        <label for="paymentCvu">CVU</label>
+        <input
+          id="paymentCvu"
+          name="paymentCvu"
+          type="text"
+          inputmode="numeric"
+          autocomplete="off"
+          maxlength="22"
+          [(ngModel)]="paymentCvu"
+          [disabled]="isSavingPayment"
+          placeholder="Ingresá los 22 dígitos del CVU">
+        <small>Se guarda como parámetro administrativo y se usa para generar un QR de texto con importe, CVU y concepto. No reemplaza un QR interoperable emitido por una billetera o PSP.</small>
+      </div>
+
+      <div class="actions">
+        <button class="primary" type="button" (click)="savePaymentSettings()" [disabled]="isSavingPayment">
+          {{ isSavingPayment ? 'Guardando...' : 'Guardar CVU' }}
+        </button>
+      </div>
+
+      <div class="feedback" *ngIf="paymentMessage">{{ paymentMessage }}</div>
+      <div class="feedback error" *ngIf="paymentError">{{ paymentError }}</div>
+    </div>
+
+    <div class="settings-divider"></div>
+
     <div class="field-group">
       <label for="heroFile">Subir imagen (JPG, PNG, WebP, SVG)</label>
       <input id="heroFile" name="heroFile" type="file" accept="image/*" (change)="onFileSelected($event)" [disabled]="isUploading">

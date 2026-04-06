@@ -69,6 +69,52 @@
         </div>
       </div>
 
+      <section class="payment-qr" *ngIf="product.stock > 0">
+        <div class="payment-qr-copy">
+          <p class="payment-qr-eyebrow">{{ usesAstroPayFallback ? 'Pago con AstroPay' : 'Datos de transferencia' }}</p>
+          <h3>{{ usesAstroPayFallback ? 'Escaneá y abrí el pago en AstroPay' : 'Escaneá y consultá los datos del pago' }}</h3>
+          <p class="payment-qr-description">
+            {{ usesAstroPayFallback
+              ? 'Este QR abre el link de pago configurado de AstroPay. Si el usuario no escanea, también puede abrir el enlace manualmente.'
+              : 'Este QR contiene texto plano con CVU, importe y concepto. Sirve para consultar o compartir los datos, pero una billetera virtual puede rechazarlo porque no es un QR interoperable de cobro.' }}
+          </p>
+
+          <div class="payment-qr-note">
+            <span class="price-label">Tipo de QR</span>
+            <strong>{{ usesAstroPayFallback ? 'Link de pago AstroPay' : 'Texto plano con datos de transferencia' }}</strong>
+          </div>
+
+          <div class="payment-amount-box">
+            <span class="price-label">Importe a pagar</span>
+            <strong>{{ getPaymentTotal() | currency:'USD' }}</strong>
+          </div>
+
+          <div class="payment-cvu-box" *ngIf="!usesAstroPayFallback; else astroPayLinkBox">
+            <span class="price-label">CVU de cobro</span>
+            <strong>{{ formattedPaymentCvu }}</strong>
+          </div>
+          <ng-template #astroPayLinkBox>
+            <div class="payment-cvu-box payment-link-box">
+              <span class="price-label">Enlace de pago</span>
+              <a [href]="astroPayPaymentUrl" target="_blank" rel="noopener noreferrer">Abrir pago en AstroPay</a>
+            </div>
+          </ng-template>
+        </div>
+
+        <div class="payment-qr-visual">
+          <div class="payment-qr-frame" *ngIf="paymentQrDataUrl && !isGeneratingPaymentQr; else qrStateTpl">
+            <img [src]="paymentQrDataUrl" [alt]="'QR de pago para ' + product.name">
+          </div>
+        </div>
+      </section>
+
+      <ng-template #qrStateTpl>
+        <div class="payment-qr-frame is-placeholder">
+          <span *ngIf="isGeneratingPaymentQr">Generando QR...</span>
+          <span *ngIf="!isGeneratingPaymentQr && paymentQrError">{{ paymentQrError }}</span>
+        </div>
+      </ng-template>
+
       <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
       
       <button class="btn-add-to-cart" (click)="addToCart()" [disabled]="product.stock === 0">

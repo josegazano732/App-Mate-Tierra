@@ -29,7 +29,8 @@
               "html2canvas",
               "jspdf-autotable",
               "aos",
-              "core-js"
+              "core-js",
+              "qrcode"
             ]
           },
           "configurations": {

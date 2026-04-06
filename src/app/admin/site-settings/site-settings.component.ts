@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HeroBackground, SiteSettingsService } from '../../services/site-settings.service';
 import { ImageService } from '../../services/image.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-site-settings',
@@ -9,12 +10,16 @@ import { ImageService } from '../../services/image.service';
 })
 export class SiteSettingsComponent implements OnInit {
   heroImages: HeroBackground[] = [];
+  paymentCvu = '';
   isLoading = false;
   isUploading = false;
+  isSavingPayment = false;
   message: string | null = null;
   error: string | null = null;
   uploadMessage: string | null = null;
   uploadError: string | null = null;
+  paymentMessage: string | null = null;
+  paymentError: string | null = null;
 
   private readonly fallbackHeroBg = 'https://images.unsplash.com/photo-1508672019048-805c876b67e2?auto=format&fit=crop&w=1800&q=80';
   private readonly MAX_IMAGES = 6;
@@ -35,15 +40,47 @@ export class SiteSettingsComponent implements OnInit {
     this.message = null;
     this.error = null;
 
-    this.siteSettingsService.getHeroBackgrounds(this.MAX_IMAGES).subscribe({
-      next: (heroBgs) => {
+    forkJoin({
+      heroBgs: this.siteSettingsService.getHeroBackgrounds(this.MAX_IMAGES),
+      settings: this.siteSettingsService.getSettings()
+    }).subscribe({
+      next: ({ heroBgs, settings }) => {
         this.heroImages = heroBgs;
+        this.paymentCvu = settings.payment_cvu || '';
         this.isLoading = false;
       },
       error: (err) => {
         console.error('Error loading site settings', err);
         this.error = 'No pudimos cargar los ajustes. Intenta nuevamente.';
         this.isLoading = false;
+      }
+    });
+  }
+
+  savePaymentSettings() {
+    const normalizedCvu = this.normalizeCvu(this.paymentCvu);
+
+    this.paymentMessage = null;
+    this.paymentError = null;
+
+    if (normalizedCvu && normalizedCvu.length !== 22) {
+      this.paymentError = 'El CVU debe tener 22 dígitos.';
+      return;
+    }
+
+    this.isSavingPayment = true;
+    this.siteSettingsService.updateSettings({ payment_cvu: normalizedCvu || null }).subscribe({
+      next: (settings) => {
+        this.paymentCvu = settings.payment_cvu || '';
+        this.paymentMessage = normalizedCvu
+          ? 'CVU guardado. El QR ya puede mostrarse en los productos.'
+          : 'CVU eliminado. El QR de pago dejó de mostrarse.';
+        this.isSavingPayment = false;
+      },
+      error: (err) => {
+        console.error('Error saving payment settings', err);
+        this.paymentError = 'No pudimos guardar el CVU. Intenta de nuevo.';
+        this.isSavingPayment = false;
       }
     });
   }
@@ -104,5 +141,9 @@ export class SiteSettingsComponent implements OnInit {
         this.isUploading = false;
       }
     });
+  }
+
+  private normalizeCvu(value: string | null | undefined): string {
+    return (value || '').replace(/\D/g, '');
   }
 }
